@@ -7,6 +7,26 @@ const ImageGallerySchema = new mongoose.Schema({
     trim: true,
     maxlength: [200, 'Title cannot exceed 200 characters']
   },
+  description: {
+    type: String,
+    trim: true,
+    maxlength: [1000, 'Description cannot exceed 1000 characters']
+  },
+  year: {
+    type: Number,
+    min: [1800, 'Year cannot be earlier than 1800'],
+    max: [new Date().getFullYear() + 10, 'Year cannot be more than 10 years in the future']
+  },
+  location: {
+    type: String,
+    trim: true,
+    maxlength: [200, 'Location cannot exceed 200 characters']
+  },
+  venue: {
+    type: String,
+    trim: true,
+    maxlength: [200, 'Venue cannot exceed 200 characters']
+  },
   image: {
     url: {
       type: String,
@@ -67,6 +87,10 @@ const ImageGallerySchema = new mongoose.Schema({
 });
 
 ImageGallerySchema.index({ position: 1, isActive: 1 });
+
+ImageGallerySchema.index({ year: 1 });
+ImageGallerySchema.index({ location: 1 });
+ImageGallerySchema.index({ venue: 1 });
 
 ImageGallerySchema.statics.getNextPosition = async function() {
   const lastImage = await this.findOne({ isActive: true })

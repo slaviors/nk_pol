@@ -48,10 +48,14 @@ export async function PUT(request, { params }) {
     await getUserFromToken(request);
     
     const { id } = params;
-    const { title, isActive, position } = await request.json();
+    const { title, description, year, location, venue, isActive, position } = await request.json();
     
     const updateData = {};
     if (title !== undefined) updateData.title = title;
+    if (description !== undefined) updateData.description = description;
+    if (year !== undefined) updateData.year = year;
+    if (location !== undefined) updateData.location = location;
+    if (venue !== undefined) updateData.venue = venue;
     if (isActive !== undefined) updateData.isActive = isActive;
     if (position !== undefined) updateData.position = position;
     

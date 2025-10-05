@@ -26,10 +26,16 @@ export async function GET(request) {
     const page = parseInt(searchParams.get('page')) || 1;
     const limit = parseInt(searchParams.get('limit')) || 20;
     const isActive = searchParams.get('active') !== 'false';
+    const year = searchParams.get('year');
+    const location = searchParams.get('location');
+    const venue = searchParams.get('venue');
     
     const skip = (page - 1) * limit;
-    
+
     const query = { isActive };
+    if (year) query.year = parseInt(year);
+    if (location) query.location = new RegExp(location, 'i');
+    if (venue) query.venue = new RegExp(venue, 'i');
     
     const [images, total] = await Promise.all([
       ImageGallery.find(query)
@@ -72,7 +78,11 @@ export async function POST(request) {
     
     const formData = await request.formData();
     const files = formData.getAll('files');
-    const titles = formData.getAll('titles'); 
+    const titles = formData.getAll('titles');
+    const descriptions = formData.getAll('descriptions');
+    const years = formData.getAll('years');
+    const locations = formData.getAll('locations');
+    const venues = formData.getAll('venues');
     
     if (!files || files.length === 0) {
       return NextResponse.json(
@@ -107,6 +117,10 @@ export async function POST(request) {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const title = titles[i] || file.name.split('.')[0];
+      const description = descriptions[i] || '';
+      const year = years[i] ? parseInt(years[i]) : undefined;
+      const location = locations[i] || '';
+      const venue = venues[i] || '';
       
       try {
         const bytes = await file.arrayBuffer();
@@ -126,7 +140,7 @@ export async function POST(request) {
           folder: storageInfo.folder || 'nkpol_dev/gallery'
         });
 
-        const imageRecord = await ImageGallery.create({
+        const imageData = {
           title: title,
           image: {
             url: uploadResponse.url,
@@ -142,7 +156,14 @@ export async function POST(request) {
           },
           position: currentPosition + i,
           uploadedBy: user.userId
-        });
+        };
+
+        if (description) imageData.description = description;
+        if (year) imageData.year = year;
+        if (location) imageData.location = location;
+        if (venue) imageData.venue = venue;
+
+        const imageRecord = await ImageGallery.create(imageData);
         
         await imageRecord.populate('uploadedBy', 'username');
         uploadedImages.push(imageRecord);
@@ -198,7 +219,7 @@ export async function PUT(request) {
       }, { status: 200 });
       
     } else if (action === 'update') {
-      const { id, title, isActive } = data;
+      const { id, title, description, year, location, venue, isActive } = data;
       
       if (!id) {
         return NextResponse.json(
@@ -209,6 +230,10 @@ export async function PUT(request) {
       
       const updateData = {};
       if (title !== undefined) updateData.title = title;
+      if (description !== undefined) updateData.description = description;
+      if (year !== undefined) updateData.year = year;
+      if (location !== undefined) updateData.location = location;
+      if (venue !== undefined) updateData.venue = venue;
       if (isActive !== undefined) updateData.isActive = isActive;
       
       const updatedImage = await ImageGallery.findByIdAndUpdate(
