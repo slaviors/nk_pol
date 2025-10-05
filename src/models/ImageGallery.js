@@ -12,9 +12,9 @@ const ImageGallerySchema = new mongoose.Schema({
       type: String,
       required: [true, 'Image URL is required']
     },
-    fileId: {
+    key: {
       type: String,
-      required: [true, 'ImageKit file ID is required']
+      required: [true, 'R2 object key is required']
     },
     thumbnailUrl: {
       type: String,
@@ -28,11 +28,18 @@ const ImageGallerySchema = new mongoose.Schema({
       type: Number,
       required: [true, 'File size is required']
     },
+    contentType: {
+      type: String,
+      required: [true, 'Content type is required']
+    },
     width: {
       type: Number
     },
     height: {
       type: Number
+    },
+    etag: {
+      type: String
     }
   },
   position: {

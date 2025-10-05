@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import ImageGallery from '@/models/ImageGallery';
-import imagekit from '@/lib/imagekit';
+import r2 from '@/lib/r2';
 import jwt from 'jsonwebtoken';
 
 async function getUserFromToken(request) {
@@ -12,6 +12,11 @@ async function getUserFromToken(request) {
   
   const decoded = jwt.verify(token, process.env.JWT_TOKEN);
   return decoded;
+}
+
+function getImageDimensions(buffer) {
+
+  return { width: null, height: null };
 }
 
 export async function GET(request) {
@@ -106,24 +111,27 @@ export async function POST(request) {
         const extension = file.name.split('.').pop();
         const fileName = `${originalName}_${timestamp}.${extension}`;
 
-        const uploadResponse = await imagekit.upload({
-          file: buffer,
+        const { width, height } = getImageDimensions(buffer);
+
+        const uploadResponse = await r2.uploadFile({
+          buffer: buffer,
           fileName: fileName,
-          folder: '/nkpol_dev/gallery',
-          useUniqueFileName: true,
-          tags: ['gallery', 'nkpol_dev']
+          contentType: file.type,
+          folder: 'nkpol_dev/gallery'
         });
 
         const imageRecord = await ImageGallery.create({
           title: title,
           image: {
             url: uploadResponse.url,
-            fileId: uploadResponse.fileId,
+            key: uploadResponse.key,
             thumbnailUrl: uploadResponse.thumbnailUrl,
             name: uploadResponse.name,
             size: uploadResponse.size,
-            width: uploadResponse.width,
-            height: uploadResponse.height
+            contentType: file.type,
+            width: width,
+            height: height,
+            etag: uploadResponse.etag
           },
           position: currentPosition + i,
           uploadedBy: user.userId
@@ -258,9 +266,9 @@ export async function DELETE(request) {
         }
 
         try {
-          await imagekit.deleteFile(image.image.fileId);
-        } catch (imagekitError) {
-          console.error(`Failed to delete from ImageKit: ${imagekitError.message}`);
+          await r2.deleteFile(image.image.key);
+        } catch (r2Error) {
+          console.error(`Failed to delete from R2: ${r2Error.message}`);
         }
         
         await ImageGallery.findByIdAndDelete(imageId);

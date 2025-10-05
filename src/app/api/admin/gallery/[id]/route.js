@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import ImageGallery from '@/models/ImageGallery';
-import imagekit from '@/lib/imagekit';
+import r2 from '@/lib/r2';
 import jwt from 'jsonwebtoken';
 
 async function getUserFromToken(request) {
@@ -97,11 +97,11 @@ export async function DELETE(request, { params }) {
         { status: 404 }
       );
     }
- 
+
     try {
-      await imagekit.deleteFile(image.image.fileId);
-    } catch (imagekitError) {
-      console.error(`Failed to delete from ImageKit: ${imagekitError.message}`);
+      await r2.deleteFile(image.image.key);
+    } catch (r2Error) {
+      console.error(`Failed to delete from R2: ${r2Error.message}`);
     }
 
     await ImageGallery.findByIdAndDelete(id);
