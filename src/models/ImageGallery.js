@@ -1,0 +1,77 @@
+import mongoose from 'mongoose';
+
+const ImageGallerySchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: [true, 'Please provide a title'],
+    trim: true,
+    maxlength: [200, 'Title cannot exceed 200 characters']
+  },
+  image: {
+    url: {
+      type: String,
+      required: [true, 'Image URL is required']
+    },
+    fileId: {
+      type: String,
+      required: [true, 'ImageKit file ID is required']
+    },
+    thumbnailUrl: {
+      type: String,
+      required: [true, 'Thumbnail URL is required']
+    },
+    name: {
+      type: String,
+      required: [true, 'Image name is required']
+    },
+    size: {
+      type: Number,
+      required: [true, 'File size is required']
+    },
+    width: {
+      type: Number
+    },
+    height: {
+      type: Number
+    }
+  },
+  position: {
+    type: Number,
+    required: true,
+    default: 0
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  },
+  uploadedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  }
+}, {
+  timestamps: true
+});
+
+ImageGallerySchema.index({ position: 1, isActive: 1 });
+
+ImageGallerySchema.statics.getNextPosition = async function() {
+  const lastImage = await this.findOne({ isActive: true })
+    .sort({ position: -1 })
+    .select('position');
+  
+  return lastImage ? lastImage.position + 1 : 0;
+};
+
+ImageGallerySchema.statics.reorderPositions = async function(imageIds) {
+  const bulkOps = imageIds.map((id, index) => ({
+    updateOne: {
+      filter: { _id: id },
+      update: { position: index }
+    }
+  }));
+  
+  return await this.bulkWrite(bulkOps);
+};
+
+export default mongoose.models.ImageGallery || mongoose.model('ImageGallery', ImageGallerySchema);
