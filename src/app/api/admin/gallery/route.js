@@ -48,6 +48,8 @@ export async function GET(request) {
 
     const storage = StorageFactory.getInstance();
     const storageInfo = storage.getStorageInfo();
+
+    const activeImageCount = await ImageGallery.countDocuments({ isActive: true });
     
     return NextResponse.json({
       images,
@@ -58,6 +60,12 @@ export async function GET(request) {
         totalImages: total,
         hasNextPage: page < Math.ceil(total / limit),
         hasPrevPage: page > 1
+      },
+      galleryStatus: {
+        totalImages: activeImageCount,
+        maxImages: 4,
+        remainingSlots: 4 - activeImageCount,
+        isFull: activeImageCount >= 4
       }
     }, { status: 200 });
     
@@ -87,6 +95,23 @@ export async function POST(request) {
     if (!files || files.length === 0) {
       return NextResponse.json(
         { error: 'No files provided' },
+        { status: 400 }
+      );
+    }
+
+    const currentImageCount = await ImageGallery.countDocuments({ isActive: true });
+    const remainingSlots = 4 - currentImageCount;
+    
+    if (remainingSlots <= 0) {
+      return NextResponse.json(
+        { error: 'Gallery is full. Maximum of 4 images allowed. Please delete some images before uploading new ones.' },
+        { status: 400 }
+      );
+    }
+    
+    if (files.length > remainingSlots) {
+      return NextResponse.json(
+        { error: `Can only upload ${remainingSlots} more image(s). Gallery has a maximum of 4 images.` },
         { status: 400 }
       );
     }
@@ -176,13 +201,21 @@ export async function POST(request) {
         });
       }
     }
+
+    const newImageCount = await ImageGallery.countDocuments({ isActive: true });
     
     return NextResponse.json({
       message: `Successfully processed ${files.length} file(s)`,
       images: uploadedImages,
       storageInfo,
       successCount: uploadedImages.filter(img => !img.error).length,
-      errorCount: uploadedImages.filter(img => img.error).length
+      errorCount: uploadedImages.filter(img => img.error).length,
+      galleryStatus: {
+        totalImages: newImageCount,
+        maxImages: 4,
+        remainingSlots: 4 - newImageCount,
+        isFull: newImageCount >= 4
+      }
     }, { status: 201 });
     
   } catch (error) {
