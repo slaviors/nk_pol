@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import ImageGallery from '@/models/ImageGallery';
-import imagekit from '@/lib/imagekit';
+import StorageFactory from '@/lib/storage';
 import jwt from 'jsonwebtoken';
 
 async function getUserFromToken(request) {
@@ -48,10 +48,14 @@ export async function PUT(request, { params }) {
     await getUserFromToken(request);
     
     const { id } = params;
-    const { title, isActive, position } = await request.json();
+    const { title, description, year, location, venue, isActive, position } = await request.json();
     
     const updateData = {};
     if (title !== undefined) updateData.title = title;
+    if (description !== undefined) updateData.description = description;
+    if (year !== undefined) updateData.year = year;
+    if (location !== undefined) updateData.location = location;
+    if (venue !== undefined) updateData.venue = venue;
     if (isActive !== undefined) updateData.isActive = isActive;
     if (position !== undefined) updateData.position = position;
     
@@ -97,11 +101,20 @@ export async function DELETE(request, { params }) {
         { status: 404 }
       );
     }
- 
+
     try {
-      await imagekit.deleteFile(image.image.fileId);
-    } catch (imagekitError) {
-      console.error(`Failed to delete from ImageKit: ${imagekitError.message}`);
+      let storage;
+      if (image.image.storageType === 'imagekit') {
+        const { ImageKitAdapter } = await import('@/lib/storage');
+        storage = new ImageKitAdapter();
+      } else {
+        const { CloudflareR2Adapter } = await import('@/lib/storage');
+        storage = new CloudflareR2Adapter();
+      }
+      
+      await storage.deleteFile(image.image.key);
+    } catch (storageError) {
+      console.error(`Failed to delete from ${image.image.storageType}: ${storageError.message}`);
     }
 
     await ImageGallery.findByIdAndDelete(id);

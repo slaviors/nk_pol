@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import ImageGallery from '@/models/ImageGallery';
-import imagekit from '@/lib/imagekit';
+import StorageFactory from '@/lib/storage';
 import jwt from 'jsonwebtoken';
 
 async function getUserFromToken(request) {
@@ -14,6 +14,10 @@ async function getUserFromToken(request) {
   return decoded;
 }
 
+function getImageDimensions(buffer) {
+  return { width: null, height: null };
+}
+
 export async function GET(request) {
   try {
     await dbConnect();
@@ -22,10 +26,16 @@ export async function GET(request) {
     const page = parseInt(searchParams.get('page')) || 1;
     const limit = parseInt(searchParams.get('limit')) || 20;
     const isActive = searchParams.get('active') !== 'false';
+    const year = searchParams.get('year');
+    const location = searchParams.get('location');
+    const venue = searchParams.get('venue');
     
     const skip = (page - 1) * limit;
-    
+
     const query = { isActive };
+    if (year) query.year = parseInt(year);
+    if (location) query.location = new RegExp(location, 'i');
+    if (venue) query.venue = new RegExp(venue, 'i');
     
     const [images, total] = await Promise.all([
       ImageGallery.find(query)
@@ -35,9 +45,13 @@ export async function GET(request) {
         .limit(limit),
       ImageGallery.countDocuments(query)
     ]);
+
+    const storage = StorageFactory.getInstance();
+    const storageInfo = storage.getStorageInfo();
     
     return NextResponse.json({
       images,
+      storageInfo,
       pagination: {
         currentPage: page,
         totalPages: Math.ceil(total / limit),
@@ -64,7 +78,11 @@ export async function POST(request) {
     
     const formData = await request.formData();
     const files = formData.getAll('files');
-    const titles = formData.getAll('titles'); 
+    const titles = formData.getAll('titles');
+    const descriptions = formData.getAll('descriptions');
+    const years = formData.getAll('years');
+    const locations = formData.getAll('locations');
+    const venues = formData.getAll('venues');
     
     if (!files || files.length === 0) {
       return NextResponse.json(
@@ -89,6 +107,9 @@ export async function POST(request) {
         );
       }
     }
+
+    const storage = StorageFactory.getInstance();
+    const storageInfo = storage.getStorageInfo();
     
     const uploadedImages = [];
     let currentPosition = await ImageGallery.getNextPosition();
@@ -96,6 +117,10 @@ export async function POST(request) {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const title = titles[i] || file.name.split('.')[0];
+      const description = descriptions[i] || '';
+      const year = years[i] ? parseInt(years[i]) : undefined;
+      const location = locations[i] || '';
+      const venue = venues[i] || '';
       
       try {
         const bytes = await file.arrayBuffer();
@@ -106,28 +131,39 @@ export async function POST(request) {
         const extension = file.name.split('.').pop();
         const fileName = `${originalName}_${timestamp}.${extension}`;
 
-        const uploadResponse = await imagekit.upload({
-          file: buffer,
+        const { width, height } = getImageDimensions(buffer);
+
+        const uploadResponse = await storage.uploadFile({
+          buffer: buffer,
           fileName: fileName,
-          folder: '/nkpol_dev/gallery',
-          useUniqueFileName: true,
-          tags: ['gallery', 'nkpol_dev']
+          contentType: file.type,
+          folder: storageInfo.folder || 'nkpol_dev/gallery'
         });
 
-        const imageRecord = await ImageGallery.create({
+        const imageData = {
           title: title,
           image: {
             url: uploadResponse.url,
-            fileId: uploadResponse.fileId,
+            key: uploadResponse.key,
             thumbnailUrl: uploadResponse.thumbnailUrl,
             name: uploadResponse.name,
             size: uploadResponse.size,
-            width: uploadResponse.width,
-            height: uploadResponse.height
+            contentType: file.type,
+            width: uploadResponse.width || width,
+            height: uploadResponse.height || height,
+            etag: uploadResponse.etag,
+            storageType: uploadResponse.storageType
           },
           position: currentPosition + i,
           uploadedBy: user.userId
-        });
+        };
+
+        if (description) imageData.description = description;
+        if (year) imageData.year = year;
+        if (location) imageData.location = location;
+        if (venue) imageData.venue = venue;
+
+        const imageRecord = await ImageGallery.create(imageData);
         
         await imageRecord.populate('uploadedBy', 'username');
         uploadedImages.push(imageRecord);
@@ -144,6 +180,7 @@ export async function POST(request) {
     return NextResponse.json({
       message: `Successfully processed ${files.length} file(s)`,
       images: uploadedImages,
+      storageInfo,
       successCount: uploadedImages.filter(img => !img.error).length,
       errorCount: uploadedImages.filter(img => img.error).length
     }, { status: 201 });
@@ -182,7 +219,7 @@ export async function PUT(request) {
       }, { status: 200 });
       
     } else if (action === 'update') {
-      const { id, title, isActive } = data;
+      const { id, title, description, year, location, venue, isActive } = data;
       
       if (!id) {
         return NextResponse.json(
@@ -193,6 +230,10 @@ export async function PUT(request) {
       
       const updateData = {};
       if (title !== undefined) updateData.title = title;
+      if (description !== undefined) updateData.description = description;
+      if (year !== undefined) updateData.year = year;
+      if (location !== undefined) updateData.location = location;
+      if (venue !== undefined) updateData.venue = venue;
       if (isActive !== undefined) updateData.isActive = isActive;
       
       const updatedImage = await ImageGallery.findByIdAndUpdate(
@@ -257,12 +298,19 @@ export async function DELETE(request) {
           continue;
         }
 
+        let storage;
         try {
-          await imagekit.deleteFile(image.image.fileId);
-        } catch (imagekitError) {
-          console.error(`Failed to delete from ImageKit: ${imagekitError.message}`);
+          if (image.image.storageType === 'imagekit') {
+            storage = new (await import('@/lib/storage')).ImageKitAdapter();
+          } else {
+            storage = new (await import('@/lib/storage')).CloudflareR2Adapter();
+          }
+          
+          await storage.deleteFile(image.image.key);
+        } catch (storageError) {
+          console.error(`Failed to delete from ${image.image.storageType}: ${storageError.message}`);
         }
-        
+
         await ImageGallery.findByIdAndDelete(imageId);
         deletedImages.push(imageId);
         
