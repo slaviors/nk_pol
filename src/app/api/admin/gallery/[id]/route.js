@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import ImageGallery from '@/models/ImageGallery';
-import r2 from '@/lib/r2';
+import StorageFactory from '@/lib/storage';
 import jwt from 'jsonwebtoken';
 
 async function getUserFromToken(request) {
@@ -99,9 +99,18 @@ export async function DELETE(request, { params }) {
     }
 
     try {
-      await r2.deleteFile(image.image.key);
-    } catch (r2Error) {
-      console.error(`Failed to delete from R2: ${r2Error.message}`);
+      let storage;
+      if (image.image.storageType === 'imagekit') {
+        const { ImageKitAdapter } = await import('@/lib/storage');
+        storage = new ImageKitAdapter();
+      } else {
+        const { CloudflareR2Adapter } = await import('@/lib/storage');
+        storage = new CloudflareR2Adapter();
+      }
+      
+      await storage.deleteFile(image.image.key);
+    } catch (storageError) {
+      console.error(`Failed to delete from ${image.image.storageType}: ${storageError.message}`);
     }
 
     await ImageGallery.findByIdAndDelete(id);

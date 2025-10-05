@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import ImageGallery from '@/models/ImageGallery';
-import r2 from '@/lib/r2';
+import StorageFactory from '@/lib/storage';
 import jwt from 'jsonwebtoken';
 
 async function getUserFromToken(request) {
@@ -15,7 +15,6 @@ async function getUserFromToken(request) {
 }
 
 function getImageDimensions(buffer) {
-
   return { width: null, height: null };
 }
 
@@ -40,9 +39,13 @@ export async function GET(request) {
         .limit(limit),
       ImageGallery.countDocuments(query)
     ]);
+
+    const storage = StorageFactory.getInstance();
+    const storageInfo = storage.getStorageInfo();
     
     return NextResponse.json({
       images,
+      storageInfo,
       pagination: {
         currentPage: page,
         totalPages: Math.ceil(total / limit),
@@ -94,6 +97,9 @@ export async function POST(request) {
         );
       }
     }
+
+    const storage = StorageFactory.getInstance();
+    const storageInfo = storage.getStorageInfo();
     
     const uploadedImages = [];
     let currentPosition = await ImageGallery.getNextPosition();
@@ -113,11 +119,11 @@ export async function POST(request) {
 
         const { width, height } = getImageDimensions(buffer);
 
-        const uploadResponse = await r2.uploadFile({
+        const uploadResponse = await storage.uploadFile({
           buffer: buffer,
           fileName: fileName,
           contentType: file.type,
-          folder: 'nkpol_dev/gallery'
+          folder: storageInfo.folder || 'nkpol_dev/gallery'
         });
 
         const imageRecord = await ImageGallery.create({
@@ -129,9 +135,10 @@ export async function POST(request) {
             name: uploadResponse.name,
             size: uploadResponse.size,
             contentType: file.type,
-            width: width,
-            height: height,
-            etag: uploadResponse.etag
+            width: uploadResponse.width || width,
+            height: uploadResponse.height || height,
+            etag: uploadResponse.etag,
+            storageType: uploadResponse.storageType
           },
           position: currentPosition + i,
           uploadedBy: user.userId
@@ -152,6 +159,7 @@ export async function POST(request) {
     return NextResponse.json({
       message: `Successfully processed ${files.length} file(s)`,
       images: uploadedImages,
+      storageInfo,
       successCount: uploadedImages.filter(img => !img.error).length,
       errorCount: uploadedImages.filter(img => img.error).length
     }, { status: 201 });
@@ -265,12 +273,19 @@ export async function DELETE(request) {
           continue;
         }
 
+        let storage;
         try {
-          await r2.deleteFile(image.image.key);
-        } catch (r2Error) {
-          console.error(`Failed to delete from R2: ${r2Error.message}`);
+          if (image.image.storageType === 'imagekit') {
+            storage = new (await import('@/lib/storage')).ImageKitAdapter();
+          } else {
+            storage = new (await import('@/lib/storage')).CloudflareR2Adapter();
+          }
+          
+          await storage.deleteFile(image.image.key);
+        } catch (storageError) {
+          console.error(`Failed to delete from ${image.image.storageType}: ${storageError.message}`);
         }
-        
+
         await ImageGallery.findByIdAndDelete(imageId);
         deletedImages.push(imageId);
         

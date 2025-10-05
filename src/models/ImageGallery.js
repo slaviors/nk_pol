@@ -14,7 +14,7 @@ const ImageGallerySchema = new mongoose.Schema({
     },
     key: {
       type: String,
-      required: [true, 'R2 object key is required']
+      required: [true, 'Storage key/fileId is required']
     },
     thumbnailUrl: {
       type: String,
@@ -40,6 +40,12 @@ const ImageGallerySchema = new mongoose.Schema({
     },
     etag: {
       type: String
+    },
+    storageType: {
+      type: String,
+      enum: ['imagekit', 'r2'],
+      required: true,
+      default: 'r2'
     }
   },
   position: {
