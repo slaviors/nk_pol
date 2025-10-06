@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
@@ -11,6 +11,24 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+
+  useEffect(() => {
+    const checkExistingAuth = async () => {
+      try {
+        const response = await fetch('/api/admin/auth/me', {
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          router.push('/nk-pol-config');
+        }
+      } catch (error) {
+        console.log('Not authenticated, staying on login page');
+      }
+    };
+
+    checkExistingAuth();
+  }, [router]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,13 +51,15 @@ export default function LoginPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
-        credentials: 'include' 
+        credentials: 'include'
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        router.push('/nk-pol-config');
+        setTimeout(() => {
+          window.location.href = '/nk-pol-config';
+        }, 100);
       } else {
         setError(data.error || 'Login failed');
       }
