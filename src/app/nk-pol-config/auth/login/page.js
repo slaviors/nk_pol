@@ -57,9 +57,19 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (response.ok) {
-        setTimeout(() => {
+        console.log('Login successful, checking cookies...');
+
+        const authCheck = await fetch('/api/admin/auth/me', {
+          credentials: 'include'
+        });
+        
+        if (authCheck.ok) {
+          console.log('Cookie verified, redirecting...');
           window.location.href = '/nk-pol-config';
-        }, 100);
+        } else {
+          console.log('Cookie not set properly, auth check failed');
+          setError('Login succeeded but session could not be established. Please try again.');
+        }
       } else {
         setError(data.error || 'Login failed');
       }
