@@ -49,13 +49,19 @@ export async function POST(request) {
       { status: 200 }
     );
 
-    response.cookies.set('auth-token', token, {
+    const isProduction = process.env.NODE_ENV === 'production';
+    const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax', 
-      maxAge: 7 * 24 * 60 * 60, 
-      path: '/' 
-    });
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax', 
+      maxAge: 7 * 24 * 60 * 60,
+      path: '/',
+      ...(isProduction && process.env.VERCEL_URL && {
+        domain: `.${process.env.VERCEL_URL.replace('https://', '').replace('http://', '')}`
+      })
+    };
+
+    response.cookies.set('auth-token', token, cookieOptions);
 
     return response;
 

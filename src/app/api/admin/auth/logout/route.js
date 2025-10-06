@@ -7,13 +7,19 @@ export async function POST(request) {
       { status: 200 }
     );
 
-    response.cookies.set('auth-token', '', {
+    const isProduction = process.env.NODE_ENV === 'production';
+    const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
       maxAge: 0,
-      path: '/'
-    });
+      path: '/',
+      ...(isProduction && process.env.VERCEL_URL && {
+        domain: `.${process.env.VERCEL_URL.replace('https://', '').replace('http://', '')}`
+      })
+    };
+
+    response.cookies.set('auth-token', '', cookieOptions);
 
     return response;
 

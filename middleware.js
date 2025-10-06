@@ -2,30 +2,49 @@ import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 
 export function middleware(request) {
-  // Protect admin frontend pages
-  if (request.nextUrl.pathname.startsWith('/nk-pol-config') && 
-      !request.nextUrl.pathname.includes('/nk-pol-config/auth/login')) {
+  const { pathname } = request.nextUrl;
+
+  if (process.env.NODE_ENV === 'production') {
+    console.log('Middleware - Path:', pathname);
+    console.log('Middleware - Has auth-token:', !!request.cookies.get('auth-token')?.value);
+  }
+
+  if (pathname.startsWith('/nk-pol-config') && 
+      !pathname.includes('/nk-pol-config/auth/login')) {
     
     const token = request.cookies.get('auth-token')?.value;
     
     if (!token) {
+      console.log('No token found, redirecting to login');
       return NextResponse.redirect(new URL('/nk-pol-config/auth/login', request.url));
     }
 
     try {
       jwt.verify(token, process.env.JWT_TOKEN);
+      console.log('Token verified successfully');
     } catch (error) {
-      // Clear invalid token
+      console.log('Token verification failed:', error.message);
       const response = NextResponse.redirect(new URL('/nk-pol-config/auth/login', request.url));
-      response.cookies.delete('auth-token');
+
+      const isProduction = process.env.NODE_ENV === 'production';
+      response.cookies.set('auth-token', '', {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'none' : 'lax',
+        maxAge: 0,
+        path: '/',
+        ...(isProduction && process.env.VERCEL_URL && {
+          domain: `.${process.env.VERCEL_URL.replace('https://', '').replace('http://', '')}`
+        })
+      });
+      
       return response;
     }
   }
 
-  // Protect admin API routes
-  if (request.nextUrl.pathname.startsWith('/api/admin') && 
-      !request.nextUrl.pathname.includes('/api/admin/auth/login') &&
-      !request.nextUrl.pathname.includes('/api/admin/auth/register')) {
+  if (pathname.startsWith('/api/admin') && 
+      !pathname.includes('/api/admin/auth/login') &&
+      !pathname.includes('/api/admin/auth/register')) {
     
     const token = request.cookies.get('auth-token')?.value;
     
@@ -51,5 +70,8 @@ export function middleware(request) {
 }
 
 export const config = {
-  matcher: ['/nk-pol-config/:path*', '/api/admin/:path*']
+  matcher: [
+    '/nk-pol-config/:path*', 
+    '/api/admin/:path*'
+  ]
 };
