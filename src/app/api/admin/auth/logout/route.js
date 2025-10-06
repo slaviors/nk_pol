@@ -10,8 +10,9 @@ export async function POST(request) {
     response.cookies.set('auth-token', '', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 0 
+      sameSite: 'lax',
+      maxAge: 0,
+      path: '/'
     });
 
     return response;
