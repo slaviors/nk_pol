@@ -6,7 +6,11 @@ export function middleware(request) {
 
   if (process.env.NODE_ENV === 'production') {
     console.log('Middleware - Path:', pathname);
-    console.log('Middleware - Has auth-token:', !!request.cookies.get('auth-token')?.value);
+    const token = request.cookies.get('auth-token')?.value;
+    console.log('Middleware - Has auth-token:', !!token);
+    if (token) {
+      console.log('Middleware - Token preview:', token.substring(0, 20) + '...');
+    }
   }
 
   if (pathname.startsWith('/nk-pol-config') && 
@@ -30,12 +34,10 @@ export function middleware(request) {
       response.cookies.set('auth-token', '', {
         httpOnly: true,
         secure: isProduction,
-        sameSite: isProduction ? 'none' : 'lax',
+        sameSite: 'lax',
         maxAge: 0,
-        path: '/',
-        ...(isProduction && process.env.VERCEL_URL && {
-          domain: `.${process.env.VERCEL_URL.replace('https://', '').replace('http://', '')}`
-        })
+        path: '/'
+
       });
       
       return response;

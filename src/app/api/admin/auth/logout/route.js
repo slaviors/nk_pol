@@ -8,18 +8,14 @@ export async function POST(request) {
     );
 
     const isProduction = process.env.NODE_ENV === 'production';
-    const cookieOptions = {
+    response.cookies.set('auth-token', '', {
       httpOnly: true,
       secure: isProduction,
-      sameSite: isProduction ? 'none' : 'lax',
+      sameSite: 'lax',
       maxAge: 0,
-      path: '/',
-      ...(isProduction && process.env.VERCEL_URL && {
-        domain: `.${process.env.VERCEL_URL.replace('https://', '').replace('http://', '')}`
-      })
-    };
+      path: '/'
 
-    response.cookies.set('auth-token', '', cookieOptions);
+    });
 
     return response;
 
