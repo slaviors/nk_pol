@@ -1,4 +1,3 @@
-
 // src/app/page.js
 import { generateMetadata, jsonLdSchemas } from '@/config/metadata';
 import HeroSection from '@/components/sections/HeroSection';
