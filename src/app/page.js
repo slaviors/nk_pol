@@ -1,9 +1,11 @@
-
 import { generateMetadata, jsonLdSchemas } from '@/config/metadata';
 import HeroSection from '@/components/sections/HeroSection';
 import GallerySection from '@/components/sections/GallerySection';
-import ClientLogoSection from '@/components/backend-integration/home/ClientLogoSection';
+import ClientLogoSection from '@/components/sections/ClientLogoSection';
+import TestimonialsSection from '@/components/sections/TestimonialsSection';
 import AboutSection from '@/components/sections/AboutSection';
+import ServicesSection from '@/components/sections/ServicesSection';
+import ContactSection from '@/components/sections/ContactSection';
 
 export const metadata = generateMetadata(
   'NK POL - Kontraktor Stand Pameran Profesional & Terpercaya',
@@ -33,10 +35,12 @@ export default function Home() {
       {/* Main Content */}
       <article>
         <HeroSection />
-        <GallerySection />
-        <ClientLogoSection />
-        {/* Section lain akan ditambahkan di sini */}
         <AboutSection />
+        <ClientLogoSection />
+        <ServicesSection />
+        <GallerySection />
+        <TestimonialsSection />
+        <ContactSection />
       </article>
     </>
   );
