@@ -35,7 +35,6 @@ export default function Home() {
         <HeroSection />
         <GallerySection />
         <ClientLogoSection />
-        {/* Section lain akan ditambahkan di sini */}
         <AboutSection />
       </article>
     </>
