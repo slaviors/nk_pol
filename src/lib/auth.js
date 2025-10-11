@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-
 export async function getUserFromToken(request) {
 
   let token = request.cookies.get('auth-token')?.value;
