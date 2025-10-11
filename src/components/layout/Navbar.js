@@ -12,16 +12,45 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [indicatorStyle, setIndicatorStyle] = useState({});
   const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [activeSection, setActiveSection] = useState('home');
   const navRefs = useRef([]);
   const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
+      
+      // Scroll spy untuk detect active section
+      const aboutSection = document.getElementById('about-section');
+      if (aboutSection && pathname === '/') {
+        const aboutTop = aboutSection.offsetTop;
+        const aboutHeight = aboutSection.offsetHeight;
+        const navbarHeight = 72;
+        const isMobile = window.innerWidth < 768;
+        const extraPadding = isMobile ? 60 : 80;
+        const scrollPosition = window.scrollY + navbarHeight + extraPadding + 20; // offset untuk detection
+        
+        if (scrollPosition >= aboutTop && scrollPosition < aboutTop + aboutHeight) {
+          setActiveSection('about-section');
+        } else if (scrollPosition < aboutTop) {
+          setActiveSection('home');
+        }
+      }
     };
+    
+    const handleResize = () => {
+      // Re-calculate positioning on window resize
+      handleScroll();
+    };
+    
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [pathname]);
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
@@ -36,19 +65,56 @@ export default function Navbar() {
   }, [isMobileMenuOpen]);
 
   const navLinks = [
-    { href: '/', label: 'Beranda' },
-    { href: '/tentang', label: 'Tentang' },
-    { href: '/layanan', label: 'Layanan' },
-    { href: '/portofolio', label: 'Portofolio' },
-    { href: '/kontak', label: 'Kontak' },
+    { href: '/', label: 'Beranda', section: 'home' },
+    { href: '/', label: 'Tentang', section: 'about-section' },
+    { href: '/layanan', label: 'Layanan', section: null },
+    { href: '/portofolio', label: 'Portofolio', section: null },
+    { href: '/kontak', label: 'Kontak', section: null },
   ];
 
-  const isActive = (href) => {
-    if (href === '/') return pathname === href;
-    return pathname.startsWith(href);
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const navbarHeight = 72;
+      // Lebih banyak padding untuk desktop dan mobile
+      const isMobile = window.innerWidth < 768;
+      const extraPadding = isMobile ? 60 : 80; // Mobile butuh padding lebih karena viewport lebih kecil
+      const elementPosition = element.offsetTop - navbarHeight - extraPadding;
+      
+      window.scrollTo({
+        top: Math.max(0, elementPosition), // Pastikan tidak scroll ke posisi negatif
+        behavior: 'smooth'
+      });
+    }
   };
 
-  const activeIndex = navLinks.findIndex(link => isActive(link.href));
+  const handleLinkClick = (e, link) => {
+    if (link.section && pathname === '/') {
+      e.preventDefault();
+      setIsMobileMenuOpen(false);
+      
+      setTimeout(() => {
+        if (link.section === 'home') {
+          window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+          });
+        } else {
+          scrollToSection(link.section);
+        }
+      }, isMobileMenuOpen ? 300 : 50);
+    }
+  };
+
+  const isActive = (link) => {
+    if (pathname === '/' && link.section) {
+      return activeSection === link.section;
+    }
+    if (link.href === '/') return pathname === link.href;
+    return pathname.startsWith(link.href);
+  };
+
+  const activeIndex = navLinks.findIndex(link => isActive(link));
 
   useEffect(() => {
     const updateIndicator = () => {
@@ -102,12 +168,13 @@ export default function Navbar() {
                 />
 
                 {navLinks.map((link, index) => {
-                  const active = isActive(link.href);
+                  const active = isActive(link);
                   return (
                     <Link
-                      key={link.href}
+                      key={`${link.href}-${link.section || link.label}`}
                       ref={(el) => (navRefs.current[index] = el)}
                       href={link.href}
+                      onClick={(e) => handleLinkClick(e, link)}
                       onMouseEnter={() => setHoveredIndex(index)}
                       onMouseLeave={() => setHoveredIndex(null)}
                       className="relative px-5 py-2.5 rounded-full text-[14.5px] font-semibold transition-colors duration-300 z-10"
@@ -219,11 +286,12 @@ export default function Navbar() {
           <div className="flex-1 overflow-y-auto py-8 px-6">
             <div className="space-y-2">
               {navLinks.map((link, index) => {
-                const active = isActive(link.href);
+                const active = isActive(link);
                 return (
                   <Link
-                    key={link.href}
+                    key={`${link.href}-${link.section || link.label}`}
                     href={link.href}
+                    onClick={(e) => handleLinkClick(e, link)}
                     className={`block px-5 py-3.5 rounded-2xl text-[16px] font-semibold transition-all duration-500 ease-out ${
                       active
                         ? 'bg-black text-white scale-[1.02]'

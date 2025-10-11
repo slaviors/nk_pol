@@ -2,6 +2,7 @@
 // src/app/page.js
 import { generateMetadata, jsonLdSchemas } from '@/config/metadata';
 import HeroSection from '@/components/sections/HeroSection';
+import AboutSection from '@/components/sections/AboutSection';
 
 // Generate metadata untuk halaman home
 export const metadata = generateMetadata(
@@ -32,7 +33,7 @@ export default function Home() {
       {/* Main Content */}
       <article>
         <HeroSection />
-        {/* Section lain akan ditambahkan di sini */}
+        <AboutSection />
       </article>
     </>
   );
