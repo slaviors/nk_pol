@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import GalleryManage from '@/components/backend-integration/nk-pol-config/GalleryManage';
 
 export default function AdminPage() {
   const [user, setUser] = useState(null);
@@ -107,7 +108,7 @@ export default function AdminPage() {
         </div>
       </header>
 
-      {/* <nav className="bg-white border-b border-gray-200">
+      <nav className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex space-x-8">
             {[
@@ -130,7 +131,7 @@ export default function AdminPage() {
             ))}
           </div>
         </div>
-      </nav> */}
+      </nav>
 
       {error && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
@@ -148,11 +149,11 @@ export default function AdminPage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow">
-          {/* <div className="p-6">
-            {activeTab === 'gallery' && <GalleryPanel />}
-            {activeTab === 'testimonies' && <TestimoniesPanel />}
-            {activeTab === 'client-logos' && <ClientLogosPanel />}
-          </div> */}
+          <div className="p-6">
+            {activeTab === 'gallery' && <GalleryManage />}
+            {activeTab === 'testimonies' && <div className="text-gray-500">Testimonies management coming soon...</div>}
+            {activeTab === 'client-logos' && <div className="text-gray-500">Client Logos management coming soon...</div>}
+          </div>
         </div>
       </main>
     </div>
