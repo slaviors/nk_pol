@@ -2,17 +2,7 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import ImageGallery from '@/models/ImageGallery';
 import StorageFactory from '@/lib/storage';
-import jwt from 'jsonwebtoken';
-
-async function getUserFromToken(request) {
-  const token = request.cookies.get('auth-token')?.value;
-  if (!token) {
-    throw new Error('No token provided');
-  }
-  
-  const decoded = jwt.verify(token, process.env.JWT_TOKEN);
-  return decoded;
-}
+import { getUserFromToken } from '@/lib/auth';
 
 export async function GET(request, { params }) {
   try {
