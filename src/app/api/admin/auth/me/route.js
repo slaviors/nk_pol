@@ -8,10 +8,19 @@ export async function GET(request) {
     await dbConnect();
 
     console.log('All cookies:', request.cookies.getAll());
+
+    let token = request.cookies.get('auth-token')?.value;
     
-    const token = request.cookies.get('auth-token')?.value;
-    
-    console.log('Auth token from cookie:', token ? token.substring(0, 20) + '...' : 'NOT FOUND');
+    if (!token) {
+      const authHeader = request.headers.get('authorization');
+      console.log('Authorization header:', authHeader ? 'Present' : 'NOT FOUND');
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7);
+        console.log('Auth token from header:', token.substring(0, 20) + '...');
+      }
+    } else {
+      console.log('Auth token from cookie:', token.substring(0, 20) + '...');
+    }
     
     if (!token) {
       return NextResponse.json(
