@@ -12,8 +12,20 @@ export default function AdminPage() {
 
   const checkAuth = useCallback(async () => {
     try {
+
+      const token = localStorage.getItem('auth-token');
+      
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
       const response = await fetch('/api/admin/auth/me', {
-        credentials: 'include' 
+        credentials: 'include',
+        headers
       });
       const data = await response.json();
 
@@ -21,10 +33,12 @@ export default function AdminPage() {
         setUser(data.user);
       } else {
         console.log('Auth check failed:', data.error);
+        localStorage.removeItem('auth-token');
         router.push('/nk-pol-config/auth/login');
       }
     } catch (error) {
       console.error('Auth check error:', error);
+      localStorage.removeItem('auth-token');
       router.push('/nk-pol-config/auth/login');
     } finally {
       setLoading(false);
@@ -44,6 +58,8 @@ export default function AdminPage() {
       });
 
       if (response.ok) {
+
+        localStorage.removeItem('auth-token');
         setUser(null); 
         router.push('/nk-pol-config/auth/login');
       } else {
