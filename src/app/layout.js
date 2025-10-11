@@ -1,6 +1,7 @@
 // src/app/layout.js
 import { generateMetadata, jsonLdSchemas, siteMetadata } from '@/config/metadata';
 import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
 import './globals.css';
 
 export const metadata = generateMetadata();
@@ -75,7 +76,10 @@ export default function RootLayout({ children }) {
           {children}
         </main>
 
-        {/* Footer akan ditambahkan di sini */}
+        {/* Footer */}
+        <footer>
+          <Footer />
+        </footer>
       </body>
     </html>
   );
