@@ -7,7 +7,6 @@ import { Target, Lightbulb } from 'lucide-react';
 
 export default function AboutSection() {
   const [isVisible, setIsVisible] = useState(false);
-  const [statsVisible, setStatsVisible] = useState({});
   const sectionRef = useRef(null);
 
   useEffect(() => {
@@ -20,31 +19,19 @@ export default function AboutSection() {
       { threshold: 0.2 }
     );
 
-    if (sectionRef.current) observer.observe(sectionRef.current);
+    const currentRef = sectionRef.current;
+    if (currentRef) observer.observe(currentRef);
 
     return () => {
-      if (sectionRef.current) observer.unobserve(sectionRef.current);
+      if (currentRef) observer.unobserve(currentRef);
     };
   }, []);
-
-  useEffect(() => {
-    if (!isVisible) return;
-
-    const timings = [200, 300, 400, 500];
-    const timers = timings.map((delay, index) =>
-      setTimeout(() => {
-        setStatsVisible(prev => ({ ...prev, [index]: true }));
-      }, delay)
-    );
-
-    return () => timers.forEach(timer => clearTimeout(timer));
-  }, [isVisible]);
 
   return (
     <section
       ref={sectionRef}
       id="about-section"
-      className="relative bg-white py-0 overflow-hidden"
+      className="relative bg-white py-0 pb-16 md:pb-20 lg:pb-24 overflow-hidden"
     >
       {/* Background */}
       <div className="absolute inset-0 pointer-events-none">
@@ -75,48 +62,62 @@ export default function AboutSection() {
           <div className="grid lg:grid-cols-3 gap-12 lg:gap-16 -mt-32 lg:-mt-40 relative z-20">
             {/* Left - Main Content */}
             <div
-              className={`lg:col-span-2 bg-white rounded-3xl p-8 md:p-12 shadow-2xl border border-gray-100 transition-all duration-700 ${
+              className={`group lg:col-span-2 bg-white rounded-3xl p-8 md:p-12 shadow-2xl border border-gray-100 hover:border-red-300 transition-all duration-700 cursor-pointer transform hover:scale-[1.02] hover:shadow-3xl relative overflow-hidden ${
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
               }`}
             >
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-black leading-tight mb-8">
+              {/* Animated background gradient on hover */}
+              <div className="absolute inset-0 bg-gradient-to-br from-red-50 via-white to-red-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+              
+              {/* Floating decorative elements */}
+              <div className="absolute top-4 right-4 w-12 h-12 bg-red-100 rounded-full opacity-0 group-hover:opacity-30 transition-all duration-500 transform translate-x-4 group-hover:translate-x-0" />
+              <div className="absolute bottom-4 left-4 w-8 h-8 bg-red-200 rounded-full opacity-0 group-hover:opacity-20 transition-all duration-700 transform -translate-x-4 group-hover:translate-x-0" />
+
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-black group-hover:text-red-600 leading-tight mb-8 transition-colors duration-500">
                 Tentang NK POL
               </h2>
-              <div className="w-20 h-1 bg-red-600 rounded-full mb-8"></div>
+              <div className="w-20 h-1 bg-red-600 rounded-full mb-8 group-hover:w-32 transition-all duration-500"></div>
 
-              <p className="text-lg text-gray-600 leading-relaxed mb-6">
-                Sejak 2019, NK POL telah menjadi mitra terpercaya dalam menciptakan pengalaman pameran yang berkesan. Kami menggabungkan desain kreatif dengan teknologi terkini untuk booth pameran yang tidak hanya visual stunning tetapi juga fungsional.
+              <p className="text-lg text-gray-600 group-hover:text-gray-700 leading-relaxed mb-6 transition-colors duration-300">
+                Sejak <span className="relative">
+                  <span className="relative z-10">2019</span>
+                  <span className="absolute inset-0 bg-red-100 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-md scale-0 group-hover:scale-100 transform origin-center"></span>
+                </span>, NK POL telah menjadi <span className="relative">
+                  <span className="relative z-10">mitra terpercaya</span>
+                  <span className="absolute inset-0 bg-red-100 opacity-0 group-hover:opacity-100 transition-all duration-700 rounded-md scale-0 group-hover:scale-100 transform origin-center"></span>
+                </span> dalam menciptakan <span className="relative">
+                  <span className="relative z-10">pengalaman pameran yang berkesan</span>
+                  <span className="absolute inset-0 bg-red-100 opacity-0 group-hover:opacity-100 transition-all duration-900 rounded-md scale-0 group-hover:scale-100 transform origin-center"></span>
+                </span>. Kami menggabungkan <span className="relative">
+                  <span className="relative z-10">desain kreatif</span>
+                  <span className="absolute inset-0 bg-red-100 opacity-0 group-hover:opacity-100 transition-all duration-600 rounded-md scale-0 group-hover:scale-100 transform origin-center"></span>
+                </span> dengan <span className="relative">
+                  <span className="relative z-10">teknologi terkini</span>
+                  <span className="absolute inset-0 bg-red-100 opacity-0 group-hover:opacity-100 transition-all duration-800 rounded-md scale-0 group-hover:scale-100 transform origin-center"></span>
+                </span> untuk booth pameran yang <span className="relative">
+                  <span className="relative z-10">fungsional</span>
+                  <span className="absolute inset-0 bg-red-100 opacity-0 group-hover:opacity-100 transition-all duration-1000 rounded-md scale-0 group-hover:scale-100 transform origin-center"></span>
+                </span>.
               </p>
 
-              <p className="text-lg text-gray-600 leading-relaxed mb-8">
-                Dengan tim desainer dan teknisi profesional, kami berkomitmen menghadirkan solusi pameran terpadu dari konsep hingga instalasi dengan standar kualitas internasional.
+              <p className="text-lg text-gray-600 group-hover:text-gray-700 leading-relaxed mb-8 transition-colors duration-300">
+                Dengan <span className="relative">
+                  <span className="relative z-10">tim profesional</span>
+                  <span className="absolute inset-0 bg-red-100 opacity-0 group-hover:opacity-100 transition-all duration-500 rounded-md scale-0 group-hover:scale-100 transform origin-center"></span>
+                </span>, kami berkomitmen menghadirkan <span className="relative">
+                  <span className="relative z-10">solusi terpadu</span>
+                  <span className="absolute inset-0 bg-red-100 opacity-0 group-hover:opacity-100 transition-all duration-700 rounded-md scale-0 group-hover:scale-100 transform origin-center"></span>
+                </span> dari <span className="relative">
+                  <span className="relative z-10">konsep hingga instalasi</span>
+                  <span className="absolute inset-0 bg-red-100 opacity-0 group-hover:opacity-100 transition-all duration-900 rounded-md scale-0 group-hover:scale-100 transform origin-center"></span>
+                </span> dengan <span className="relative">
+                  <span className="relative z-10">standar internasional</span>
+                  <span className="absolute inset-0 bg-red-100 opacity-0 group-hover:opacity-100 transition-all duration-1100 rounded-md scale-0 group-hover:scale-100 transform origin-center"></span>
+                </span>.
               </p>
-
-              {/* Stats Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[
-                  { value: '200+', label: 'Klien' },
-                  { value: '500+', label: 'Proyek' },
-                  { value: '5+', label: 'Tahun' },
-                  { value: '100%', label: 'Puas' },
-                ].map((stat, index) => (
-                  <div
-                    key={index}
-                    className={`text-center p-4 rounded-2xl bg-gray-50 hover:bg-black hover:text-white transition-all duration-500 transform ${
-                      statsVisible[index]
-                        ? 'opacity-100 scale-100'
-                        : 'opacity-0 scale-90'
-                    }`}
-                  >
-                    <div className="text-3xl md:text-4xl font-bold text-red-600 hover:text-white transition-colors duration-300">
-                      {stat.value}
-                    </div>
-                    <div className="text-sm text-gray-600 hover:text-gray-300 transition-colors duration-300 mt-1">
-                      {stat.label}
-                    </div>
-                  </div>
-                ))}
-              </div>
+              
+              {/* Hover indicator */}
+              <div className="absolute bottom-0 right-0 w-0 h-0 bg-red-100 transition-all duration-500 group-hover:w-20 group-hover:h-20 rounded-tl-3xl" />
             </div>
 
             {/* Right - Visi Misi */}
@@ -193,32 +194,6 @@ export default function AboutSection() {
                 <div className="absolute bottom-0 right-0 w-0 h-0 bg-red-50 transition-all duration-500 group-hover:w-16 group-hover:h-16 rounded-tl-3xl" />
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Bottom CTA */}
-        <div className="container-custom mt-20">
-          <div
-            className={`p-12 rounded-3xl bg-gradient-to-r from-black to-gray-900 text-white text-center transition-all duration-700 ${
-              isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-            }`}
-            style={{ transitionDelay: '500ms' }}
-          >
-            <h3 className="text-3xl md:text-4xl font-bold mb-4">
-              Siap Mewujudkan Pameran Impian?
-            </h3>
-            <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
-              Hubungi tim kami untuk konsultasi gratis dan solusi booth pameran terbaik untuk brand Anda.
-            </p>
-            <a
-              href="/kontak"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-red-600 hover:bg-red-700 text-white font-semibold transition-all duration-300 hover:shadow-2xl hover:shadow-red-600/50 transform hover:scale-105"
-            >
-              Hubungi Kami
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7m0 0l-7 7m7-7H5" />
-              </svg>
-            </a>
           </div>
         </div>
       </div>
