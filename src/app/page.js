@@ -1,10 +1,9 @@
 
-// src/app/page.js
 import { generateMetadata, jsonLdSchemas } from '@/config/metadata';
 import HeroSection from '@/components/sections/HeroSection';
+import GallerySection from '@/components/sections/GallerySection';
 import AboutSection from '@/components/sections/AboutSection';
 
-// Generate metadata untuk halaman home
 export const metadata = generateMetadata(
   'NK POL - Kontraktor Stand Pameran Profesional & Terpercaya',
   'NK POL adalah kontraktor pameran terpadu sejak 2019. Kami menyediakan jasa desain, konstruksi, dan instalasi booth pameran berkualitas tinggi dengan harga kompetitif. Hubungi kami untuk konsultasi gratis!',
@@ -33,6 +32,8 @@ export default function Home() {
       {/* Main Content */}
       <article>
         <HeroSection />
+        <GallerySection />
+        {/* Section lain akan ditambahkan di sini */}
         <AboutSection />
       </article>
     </>
