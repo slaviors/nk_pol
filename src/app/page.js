@@ -3,6 +3,7 @@ import { generateMetadata, jsonLdSchemas } from '@/config/metadata';
 import HeroSection from '@/components/sections/HeroSection';
 import GallerySection from '@/components/sections/GallerySection';
 import ClientLogoSection from '@/components/backend-integration/home/ClientLogoSection';
+import TestimonySection from '@/components/backend-integration/home/TestimonySection';
 import AboutSection from '@/components/sections/AboutSection';
 
 export const metadata = generateMetadata(
@@ -33,9 +34,10 @@ export default function Home() {
       {/* Main Content */}
       <article>
         <HeroSection />
+        <AboutSection />
         <GallerySection />
         <ClientLogoSection />
-        <AboutSection />
+        <TestimonySection />
       </article>
     </>
   );
