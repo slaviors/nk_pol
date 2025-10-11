@@ -34,11 +34,10 @@ export default function Home() {
       {/* Main Content */}
       <article>
         <HeroSection />
+        <AboutSection />
         <GallerySection />
         <ClientLogoSection />
         <TestimonySection />
-        {/* Section lain akan ditambahkan di sini */}
-        <AboutSection />
       </article>
     </>
   );
