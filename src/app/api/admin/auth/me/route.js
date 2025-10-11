@@ -6,8 +6,12 @@ import jwt from 'jsonwebtoken';
 export async function GET(request) {
   try {
     await dbConnect();
+
+    console.log('All cookies:', request.cookies.getAll());
     
     const token = request.cookies.get('auth-token')?.value;
+    
+    console.log('Auth token from cookie:', token ? token.substring(0, 20) + '...' : 'NOT FOUND');
     
     if (!token) {
       return NextResponse.json(
@@ -17,6 +21,7 @@ export async function GET(request) {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_TOKEN);
+    console.log('Token decoded successfully for user:', decoded.username);
 
     const user = await User.findById(decoded.userId).select('-password');
     if (!user) {

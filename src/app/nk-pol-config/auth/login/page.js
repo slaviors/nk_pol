@@ -16,7 +16,8 @@ export default function LoginPage() {
     const checkExistingAuth = async () => {
       try {
         const response = await fetch('/api/admin/auth/me', {
-          credentials: 'include'
+          credentials: 'include',
+          cache: 'no-store'
         });
         
         if (response.ok) {
@@ -51,24 +52,39 @@ export default function LoginPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
-        credentials: 'include'
+        credentials: 'include',
+        cache: 'no-store'
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        console.log('Login successful, checking cookies...');
+        console.log('Login successful, waiting for cookie to be set...');
 
-        const authCheck = await fetch('/api/admin/auth/me', {
-          credentials: 'include'
-        });
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        let authSuccess = false;
+        for (let i = 0; i < 3; i++) {
+          const authCheck = await fetch('/api/admin/auth/me', {
+            credentials: 'include',
+            cache: 'no-store'
+          });
+          
+          if (authCheck.ok) {
+            authSuccess = true;
+            console.log('Cookie verified on attempt', i + 1);
+            break;
+          }
+
+          await new Promise(resolve => setTimeout(resolve, 300));
+        }
         
-        if (authCheck.ok) {
-          console.log('Cookie verified, redirecting...');
+        if (authSuccess) {
+
           window.location.href = '/nk-pol-config';
         } else {
-          console.log('Cookie not set properly, auth check failed');
-          setError('Login succeeded but session could not be established. Please try again.');
+          console.error('Cookie not set properly after 3 attempts');
+          setError('Login succeeded but session could not be established. Please try refreshing the page.');
         }
       } else {
         setError(data.error || 'Login failed');
