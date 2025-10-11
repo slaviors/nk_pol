@@ -47,8 +47,15 @@ export function middleware(request) {
   if (pathname.startsWith('/api/admin') && 
       !pathname.includes('/api/admin/auth/login') &&
       !pathname.includes('/api/admin/auth/register')) {
+
+    let token = request.cookies.get('auth-token')?.value;
     
-    const token = request.cookies.get('auth-token')?.value;
+    if (!token) {
+      const authHeader = request.headers.get('authorization');
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7);
+      }
+    }
     
     if (!token) {
       return NextResponse.json(

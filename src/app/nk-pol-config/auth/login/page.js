@@ -15,16 +15,32 @@ export default function LoginPage() {
   useEffect(() => {
     const checkExistingAuth = async () => {
       try {
+
+        const token = localStorage.getItem('auth-token');
+        
+        const headers = {
+          'Content-Type': 'application/json'
+        };
+        
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        
         const response = await fetch('/api/admin/auth/me', {
           credentials: 'include',
-          cache: 'no-store'
+          cache: 'no-store',
+          headers
         });
         
         if (response.ok) {
           router.push('/nk-pol-config');
+        } else {
+
+          localStorage.removeItem('auth-token');
         }
       } catch (error) {
         console.log('Not authenticated, staying on login page');
+        localStorage.removeItem('auth-token');
       }
     };
 
@@ -59,32 +75,15 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (response.ok) {
-        console.log('Login successful, waiting for cookie to be set...');
+        console.log('Login successful!');
 
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        let authSuccess = false;
-        for (let i = 0; i < 3; i++) {
-          const authCheck = await fetch('/api/admin/auth/me', {
-            credentials: 'include',
-            cache: 'no-store'
-          });
-          
-          if (authCheck.ok) {
-            authSuccess = true;
-            console.log('Cookie verified on attempt', i + 1);
-            break;
-          }
-
-          await new Promise(resolve => setTimeout(resolve, 300));
-        }
-        
-        if (authSuccess) {
+        if (data.token) {
+          localStorage.setItem('auth-token', data.token);
+          console.log('Token stored in localStorage');
 
           window.location.href = '/nk-pol-config';
         } else {
-          console.error('Cookie not set properly after 3 attempts');
-          setError('Login succeeded but session could not be established. Please try refreshing the page.');
+          setError('Login succeeded but no token received.');
         }
       } else {
         setError(data.error || 'Login failed');
