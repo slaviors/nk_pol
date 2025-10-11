@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import GalleryManage from '@/components/backend-integration/nk-pol-config/GalleryManage';
 import ClientLogoManage from '@/components/backend-integration/nk-pol-config/ClientLogoManage';
+import TestimonyManage from '@/components/backend-integration/nk-pol-config/TestimonyManage';
 
 export default function AdminPage() {
   const [user, setUser] = useState(null);
@@ -152,7 +153,7 @@ export default function AdminPage() {
         <div className="bg-white rounded-lg shadow">
           <div className="p-6">
             {activeTab === 'gallery' && <GalleryManage />}
-            {activeTab === 'testimonies' && <div className="text-gray-500">Testimonies management coming soon...</div>}
+            {activeTab === 'testimonies' && <TestimonyManage />}
             {activeTab === 'client-logos' && <ClientLogoManage />}
           </div>
         </div>
