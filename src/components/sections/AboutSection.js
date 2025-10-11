@@ -4,6 +4,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Target, Lightbulb } from 'lucide-react';
+import Logo from '@/components/ui/Logo';
 
 export default function AboutSection() {
   const [isVisible, setIsVisible] = useState(false);
@@ -31,7 +32,7 @@ export default function AboutSection() {
     <section
       ref={sectionRef}
       id="about-section"
-      className="relative bg-white py-0 pb-16 md:pb-20 lg:pb-24 overflow-hidden"
+      className="relative bg-white py-0 pb-12 md:pb-14 lg:pb-16 overflow-hidden"
     >
       {/* Background */}
       <div className="absolute inset-0 pointer-events-none">
@@ -42,7 +43,7 @@ export default function AboutSection() {
       <div className="relative z-10">
         {/* Hero Image Section - Full Width Horizontal */}
         <div
-          className={`relative w-full h-96 md:h-[500px] lg:h-[600px] overflow-hidden transition-all duration-1000 ${
+          className={`relative w-full h-64 md:h-80 lg:h-96 overflow-hidden transition-all duration-1000 ${
             isVisible ? 'opacity-100' : 'opacity-0'
           }`}
         >
@@ -59,26 +60,36 @@ export default function AboutSection() {
 
         {/* Content Section */}
         <div className="container-custom relative">
-          <div className="grid lg:grid-cols-3 gap-12 lg:gap-16 -mt-32 lg:-mt-40 relative z-20">
+          <div className="grid lg:grid-cols-3 gap-8 lg:gap-10 -mt-20 lg:-mt-24 relative z-20">
             {/* Left - Main Content */}
             <div
-              className={`group lg:col-span-2 bg-white rounded-3xl p-8 md:p-12 shadow-2xl border border-gray-100 hover:border-red-300 transition-all duration-700 cursor-pointer transform hover:scale-[1.02] hover:shadow-3xl relative overflow-hidden ${
+              className={`group lg:col-span-2 bg-white rounded-3xl p-6 md:p-8 lg:p-10 shadow-2xl border border-gray-100 hover:border-red-300 transition-all duration-700 cursor-pointer transform hover:scale-[1.02] hover:shadow-3xl relative overflow-hidden ${
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
               }`}
             >
               {/* Animated background gradient on hover */}
               <div className="absolute inset-0 bg-gradient-to-br from-red-50 via-white to-red-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
               
+              {/* Logo at top right - Mobile */}
+              <div className="absolute top-4 right-4 z-10 md:hidden">
+                <Logo width={80} height={26} />
+              </div>
+              
+              {/* Logo at top right - Desktop */}
+              <div className="absolute md:top-8 md:right-8 lg:top-6 lg:right-10 z-10 hidden md:block">
+                <Logo width={100} height={33} />
+              </div>
+              
               {/* Floating decorative elements */}
               <div className="absolute top-4 right-4 w-12 h-12 bg-red-100 rounded-full opacity-0 group-hover:opacity-30 transition-all duration-500 transform translate-x-4 group-hover:translate-x-0" />
               <div className="absolute bottom-4 left-4 w-8 h-8 bg-red-200 rounded-full opacity-0 group-hover:opacity-20 transition-all duration-700 transform -translate-x-4 group-hover:translate-x-0" />
 
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-black group-hover:text-red-600 leading-tight mb-8 transition-colors duration-500">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-black group-hover:text-red-600 leading-tight mb-5 transition-colors duration-500 pr-20 md:pr-0">
                 Tentang NK POL
               </h2>
-              <div className="w-20 h-1 bg-red-600 rounded-full mb-8 group-hover:w-32 transition-all duration-500"></div>
+              <div className="w-20 h-1 bg-red-600 rounded-full mb-5 group-hover:w-32 transition-all duration-500"></div>
 
-              <p className="text-lg text-gray-600 group-hover:text-gray-700 leading-relaxed mb-6 transition-colors duration-300">
+              <p className="text-base md:text-lg text-gray-600 group-hover:text-gray-700 leading-relaxed mb-4 transition-colors duration-300">
                 Sejak <span className="relative">
                   <span className="relative z-10">2019</span>
                   <span className="absolute inset-0 bg-red-100 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-md scale-0 group-hover:scale-100 transform origin-center"></span>
@@ -100,7 +111,7 @@ export default function AboutSection() {
                 </span>.
               </p>
 
-              <p className="text-lg text-gray-600 group-hover:text-gray-700 leading-relaxed mb-8 transition-colors duration-300">
+              <p className="text-base md:text-lg text-gray-600 group-hover:text-gray-700 leading-relaxed mb-6 transition-colors duration-300">
                 Dengan <span className="relative">
                   <span className="relative z-10">tim profesional</span>
                   <span className="absolute inset-0 bg-red-100 opacity-0 group-hover:opacity-100 transition-all duration-500 rounded-md scale-0 group-hover:scale-100 transform origin-center"></span>
@@ -121,10 +132,10 @@ export default function AboutSection() {
             </div>
 
             {/* Right - Visi Misi */}
-            <div className="space-y-6">
+            <div className="space-y-5">
               {/* Visi Card */}
               <div
-                className={`group relative overflow-hidden rounded-3xl p-8 bg-white border-2 border-gray-100 hover:border-red-600 shadow-lg transition-all duration-500 cursor-pointer transform ${
+                className={`group relative overflow-hidden rounded-3xl p-6 bg-white border-2 border-gray-100 hover:border-red-600 shadow-lg transition-all duration-500 cursor-pointer transform ${
                   isVisible
                     ? 'opacity-100 scale-100'
                     : 'opacity-0 scale-90'
@@ -133,11 +144,11 @@ export default function AboutSection() {
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-red-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
 
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-lg bg-red-100 group-hover:bg-red-600 transition-all duration-300 flex items-center justify-center">
                     <Target className="w-5 h-5 text-red-600 group-hover:text-white transition-colors duration-300" />
                   </div>
-                  <h3 className="text-xl font-bold text-black group-hover:text-red-600 transition-colors duration-300">
+                  <h3 className="text-lg font-bold text-black group-hover:text-red-600 transition-colors duration-300">
                     Visi
                   </h3>
                 </div>
@@ -151,7 +162,7 @@ export default function AboutSection() {
 
               {/* Misi Card */}
               <div
-                className={`group relative overflow-hidden rounded-3xl p-8 bg-white border-2 border-gray-100 hover:border-red-600 shadow-lg transition-all duration-500 cursor-pointer transform ${
+                className={`group relative overflow-hidden rounded-3xl p-6 bg-white border-2 border-gray-100 hover:border-red-600 shadow-lg transition-all duration-500 cursor-pointer transform ${
                   isVisible
                     ? 'opacity-100 scale-100'
                     : 'opacity-0 scale-90'
@@ -160,11 +171,11 @@ export default function AboutSection() {
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-red-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
 
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-lg bg-red-100 group-hover:bg-red-600 transition-all duration-300 flex items-center justify-center">
                     <Lightbulb className="w-5 h-5 text-red-600 group-hover:text-white transition-colors duration-300" />
                   </div>
-                  <h3 className="text-xl font-bold text-black group-hover:text-red-600 transition-colors duration-300">
+                  <h3 className="text-lg font-bold text-black group-hover:text-red-600 transition-colors duration-300">
                     Misi
                   </h3>
                 </div>

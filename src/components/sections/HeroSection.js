@@ -65,10 +65,10 @@ export default function HeroSection() {
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
             >
-              Stand Pameran
+              Kontraktor Stand
               <br />
               <span className="relative inline-block">
-                <span className="relative z-10 text-black">Berkualitas</span>
+                <span className="relative z-10 text-black"> Pameran Berkualitas</span>
                 <span className="absolute bottom-3 left-0 right-0 h-4 bg-red-600 opacity-20 -rotate-1 rounded-lg"></span>
               </span>
               <br />
@@ -144,7 +144,7 @@ export default function HeroSection() {
               <div className="relative h-[450px] xl:h-[500px] rounded-3xl overflow-hidden bg-white shadow-2xl border border-gray-100 group">
                 <Image
                   src="/images/home.jpeg"
-                  alt="Stand Pameran Profesional NK POL - Kontraktor Booth Exhibition Jakarta"
+                  alt="Kontraktor Stand Pameran Profesional NK POL - Kontraktor Booth Exhibition Jakarta"
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                   priority
