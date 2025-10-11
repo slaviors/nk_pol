@@ -38,6 +38,8 @@ export default function Home() {
         <GallerySection />
         <ClientLogoSection />
         <TestimonySection />
+        {/* Section lain akan ditambahkan di sini */}
+        <AboutSection />
       </article>
     </>
   );
