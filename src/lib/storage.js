@@ -47,7 +47,7 @@ class ImageKitAdapter extends StorageAdapter {
 
       return {
         url: uploadResponse.url,
-        thumbnailUrl: uploadResponse.thumbnailUrl,
+        thumbnailUrl: uploadResponse.url,
         key: uploadResponse.fileId,
         fileId: uploadResponse.fileId,
         name: uploadResponse.name,
