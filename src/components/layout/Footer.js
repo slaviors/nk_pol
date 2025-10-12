@@ -60,7 +60,7 @@ export default function Footer() {
       icon: MapPin,
       label: 'Workshop & Office',
       value: 'RT.10/RW.3, Joglo, Kembangan, West Jakarta City, Jakarta 11640',
-      href: null,
+      href: 'https://maps.app.goo.gl/4fCTybQbpotj8kDr9',
     },
   ];
 
