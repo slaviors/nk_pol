@@ -1,34 +1,86 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function ClientLogoSection() {
   const [logos, setLogos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  useEffect(() => {
-    fetchLogos();
-  }, []);
+  const cacheRef = useRef({
+    data: [],
+    timestamp: null,
+    hash: null
+  });
 
-  const fetchLogos = async () => {
+  const generateHash = (data) => {
+    if (!data || data.length === 0) return null;
+    return data.map(l => `${l._id}-${l.title}`).join('|');
+  };
+
+  const fetchLogos = async (isInitialLoad = false) => {
     try {
-      setLoading(true);
-      const response = await fetch('/api/public/clientLogo');
+      if (isInitialLoad) {
+        setLoading(true);
+      } else {
+        setIsRefreshing(true);
+      }
+
+      const response = await fetch('/api/public/clientLogo', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      });
       const data = await response.json();
       
       if (response.ok) {
-        setLogos(data.logos || []);
+        const newLogos = data.logos || [];
+        const newHash = generateHash(newLogos);
+
+        if (newHash !== cacheRef.current.hash) {
+          console.log('📝 Client logo data updated - refreshing display');
+          setLogos(newLogos);
+
+          cacheRef.current = {
+            data: newLogos,
+            timestamp: Date.now(),
+            hash: newHash
+          };
+        } else {
+          console.log('✓ Client logo data unchanged - using cache');
+        }
+        
+        if (error) setError('');
       } else {
-        setError(data.error || 'Failed to load logos');
+        if (isInitialLoad) {
+          setError(data.error || 'Failed to load logos');
+        }
       }
     } catch (err) {
-      setError('Error loading logos');
       console.error('Logo fetch error:', err);
+      if (isInitialLoad) {
+        setError('Error loading logos');
+      }
     } finally {
-      setLoading(false);
+      if (isInitialLoad) {
+        setLoading(false);
+      }
+      setIsRefreshing(false);
     }
   };
+
+  useEffect(() => {
+    fetchLogos(true);
+
+    const refreshInterval = setInterval(() => {
+      fetchLogos(false); 
+    }, 30000); 
+
+    return () => clearInterval(refreshInterval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (loading) {
     return (
@@ -48,10 +100,9 @@ export default function ClientLogoSection() {
   }
 
   if (error || logos.length === 0) {
-    return null; // Don't show section if no logos
+    return null;
   }
 
-  // Duplicate logos for infinite scroll effect
   const duplicatedLogos = [...logos, ...logos, ...logos];
 
   return (
