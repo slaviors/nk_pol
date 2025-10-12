@@ -21,19 +21,32 @@ export default function Navbar() {
       setIsScrolled(window.scrollY > 10);
       
       // Scroll spy untuk detect active section
-      const aboutSection = document.getElementById('about-section');
-      if (aboutSection && pathname === '/') {
-        const aboutTop = aboutSection.offsetTop;
-        const aboutHeight = aboutSection.offsetHeight;
+      if (pathname === '/') {
+        const aboutSection = document.getElementById('about-section');
+        const servicesSection = document.getElementById('services-section');
+        const gallerySection = document.getElementById('gallery');
         const navbarHeight = 72;
         const isMobile = window.innerWidth < 768;
         const extraPadding = isMobile ? 60 : 80;
         const scrollPosition = window.scrollY + navbarHeight + extraPadding + 20; // offset untuk detection
         
-        if (scrollPosition >= aboutTop && scrollPosition < aboutTop + aboutHeight) {
-          setActiveSection('about-section');
-        } else if (scrollPosition < aboutTop) {
-          setActiveSection('home');
+        if (aboutSection && servicesSection && gallerySection) {
+          const aboutTop = aboutSection.offsetTop;
+          const aboutHeight = aboutSection.offsetHeight;
+          const servicesTop = servicesSection.offsetTop;
+          const servicesHeight = servicesSection.offsetHeight;
+          const galleryTop = gallerySection.offsetTop;
+          const galleryHeight = gallerySection.offsetHeight;
+          
+          if (scrollPosition >= galleryTop && scrollPosition < galleryTop + galleryHeight) {
+            setActiveSection('gallery');
+          } else if (scrollPosition >= servicesTop && scrollPosition < servicesTop + servicesHeight) {
+            setActiveSection('services-section');
+          } else if (scrollPosition >= aboutTop && scrollPosition < aboutTop + aboutHeight) {
+            setActiveSection('about-section');
+          } else if (scrollPosition < aboutTop) {
+            setActiveSection('home');
+          }
         }
       }
     };
@@ -67,8 +80,8 @@ export default function Navbar() {
   const navLinks = [
     { href: '/', label: 'Beranda', section: 'home' },
     { href: '/', label: 'Tentang', section: 'about-section' },
-    { href: '/layanan', label: 'Layanan', section: null },
-    { href: '/portofolio', label: 'Portofolio', section: null },
+    { href: '/', label: 'Layanan', section: 'services-section' },
+    { href: '/', label: 'Portofolio', section: 'gallery' },
     { href: '/kontak', label: 'Kontak', section: null },
   ];
 
