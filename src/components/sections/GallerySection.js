@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 
 export default function GallerySection() {
@@ -9,28 +9,81 @@ export default function GallerySection() {
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
 
-  useEffect(() => {
-    fetchGalleryImages();
-  }, []);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const fetchGalleryImages = async () => {
+  const cacheRef = useRef({
+    data: [],
+    timestamp: null,
+    hash: null
+  });
+
+  const generateHash = (data) => {
+    if (!data || data.length === 0) return null;
+    return data.map(img => `${img._id}-${img.title}`).join('|');
+  };
+
+  const fetchGalleryImages = async (isInitialLoad = false) => {
     try {
-      setLoading(true);
-      const response = await fetch('/api/public/imageGallery?limit=4');
+      if (isInitialLoad) {
+        setLoading(true);
+      } else {
+        setIsRefreshing(true);
+      }
+
+      const response = await fetch('/api/public/imageGallery?limit=4', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      });
       const data = await response.json();
       
       if (response.ok) {
-        setImages(data.images || []);
+        const newImages = data.images || [];
+        const newHash = generateHash(newImages);
+
+        if (newHash !== cacheRef.current.hash) {
+          console.log('📝 Gallery data updated - refreshing display');
+          setImages(newImages);
+
+          cacheRef.current = {
+            data: newImages,
+            timestamp: Date.now(),
+            hash: newHash
+          };
+        } else {
+          console.log('✓ Gallery data unchanged - using cache');
+        }
+        
+        if (error) setError(null);
       } else {
-        setError(data.error || 'Failed to load gallery');
+        if (isInitialLoad) {
+          setError(data.error || 'Failed to load gallery');
+        }
       }
     } catch (err) {
-      setError('Network error: ' + err.message);
       console.error('Gallery fetch error:', err);
+      if (isInitialLoad) {
+        setError('Network error: ' + err.message);
+      }
     } finally {
-      setLoading(false);
+      if (isInitialLoad) {
+        setLoading(false);
+      }
+      setIsRefreshing(false);
     }
   };
+
+  useEffect(() => {
+    fetchGalleryImages(true);
+
+    const refreshInterval = setInterval(() => {
+      fetchGalleryImages(false); 
+    }, 30000); 
+
+    return () => clearInterval(refreshInterval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); 
 
   const openLightbox = (image) => {
     setSelectedImage(image);
@@ -85,7 +138,7 @@ export default function GallerySection() {
     <>
       <section id="gallery" className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
-          {/* Section Header */}
+
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Galeri Proyek Kami
@@ -95,7 +148,7 @@ export default function GallerySection() {
             </p>
           </div>
 
-          {/* Gallery Grid */}
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {images.map((image, index) => (
               <div
@@ -103,7 +156,7 @@ export default function GallerySection() {
                 className="group relative bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer"
                 onClick={() => openLightbox(image)}
               >
-                {/* Image Container */}
+
                 <div className="relative aspect-square overflow-hidden">
                   <Image
                     src={image.image.thumbnailUrl || image.image.url}
@@ -112,8 +165,7 @@ export default function GallerySection() {
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     className="object-cover group-hover:scale-110 transition-transform duration-300"
                   />
-                  
-                  {/* Overlay on hover */}
+
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
                       <h3 className="font-semibold text-lg mb-1">{image.title}</h3>
@@ -123,13 +175,13 @@ export default function GallerySection() {
                     </div>
                   </div>
 
-                  {/* Position Badge */}
+
                   <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">
                     {index + 1}
                   </div>
                 </div>
 
-                {/* Card Info (always visible) */}
+
                 <div className="p-4">
                   <h3 className="font-semibold text-gray-900 mb-2 line-clamp-1">
                     {image.title}
@@ -158,13 +210,13 @@ export default function GallerySection() {
         </div>
       </section>
 
-      {/* Lightbox Modal */}
+
       {selectedImage && (
         <div
           className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
           onClick={closeLightbox}
         >
-          {/* Close button */}
+
           <button
             onClick={closeLightbox}
             className="absolute top-4 right-4 text-white hover:text-gray-300 text-4xl font-light z-10"
@@ -173,7 +225,7 @@ export default function GallerySection() {
             ×
           </button>
 
-          {/* Previous button */}
+
           {images.length > 1 && (
             <button
               onClick={(e) => {
@@ -187,7 +239,7 @@ export default function GallerySection() {
             </button>
           )}
 
-          {/* Next button */}
+
           {images.length > 1 && (
             <button
               onClick={(e) => {
@@ -201,7 +253,7 @@ export default function GallerySection() {
             </button>
           )}
 
-          {/* Image Container */}
+
           <div
             className="relative max-w-5xl max-h-[90vh] w-full"
             onClick={(e) => e.stopPropagation()}
@@ -216,7 +268,7 @@ export default function GallerySection() {
               />
             </div>
 
-            {/* Image Info */}
+
             <div className="bg-white rounded-b-lg p-6">
               <h3 className="text-2xl font-bold text-gray-900 mb-2">
                 {selectedImage.title}
