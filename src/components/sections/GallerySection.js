@@ -1,36 +1,103 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
+import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import { ArrowRight, Eye } from "lucide-react";
+import GalleryLightbox from "../ui/GalleryLightbox";
 
 export default function GallerySection() {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef(null);
 
-  useEffect(() => {
-    fetchGalleryImages();
-  }, []);
+  const cacheRef = useRef({
+    data: [],
+    timestamp: null,
+    hash: null,
+  });
 
-  const fetchGalleryImages = async () => {
+  const generateHash = (data) => {
+    if (!data || data.length === 0) return null;
+    return data.map((img) => `${img._id}-${img.title}`).join("|");
+  };
+
+  const fetchGalleryImages = async (isInitialLoad = false) => {
     try {
-      setLoading(true);
-      const response = await fetch('/api/public/imageGallery?limit=4');
-      const data = await response.json();
-      
-      if (response.ok) {
-        setImages(data.images || []);
+      if (isInitialLoad) {
+        setLoading(true);
       } else {
-        setError(data.error || 'Failed to load gallery');
+        setIsRefreshing(true);
+      }
+
+      const response = await fetch("/api/public/imageGallery?limit=3", {
+        cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache",
+        },
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        let newImages = data.images || [];
+        const limitedImages = newImages.slice(0, 3);
+        const newHash = generateHash(limitedImages);
+
+        if (newHash !== cacheRef.current.hash || isInitialLoad) {
+          setImages(limitedImages);
+          cacheRef.current = {
+            data: limitedImages,
+            timestamp: Date.now(),
+            hash: newHash,
+          };
+        }
+
+        if (error) setError(null);
+      } else {
+        if (isInitialLoad) {
+          setError(data.error || "Failed to load gallery");
+        }
       }
     } catch (err) {
-      setError('Network error: ' + err.message);
-      console.error('Gallery fetch error:', err);
+      if (isInitialLoad) {
+        setError("Network error: " + err.message);
+      }
     } finally {
-      setLoading(false);
+      if (isInitialLoad) {
+        setLoading(false);
+      }
+      setIsRefreshing(false);
     }
   };
+
+  useEffect(() => {
+    fetchGalleryImages(true);
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    const refreshInterval = setInterval(() => {
+      fetchGalleryImages(false);
+    }, 30000);
+
+    return () => {
+      clearInterval(refreshInterval);
+      observer.disconnect();
+    };
+  }, []);
 
   const openLightbox = (image) => {
     setSelectedImage(image);
@@ -41,25 +108,39 @@ export default function GallerySection() {
   };
 
   const navigateImage = (direction) => {
-    const currentIndex = images.findIndex(img => img._id === selectedImage._id);
+    const currentIndex = images.findIndex(
+      (img) => img._id === selectedImage._id
+    );
     let newIndex;
-    
-    if (direction === 'next') {
+
+    if (direction === "next") {
       newIndex = (currentIndex + 1) % images.length;
     } else {
       newIndex = (currentIndex - 1 + images.length) % images.length;
     }
-    
+
     setSelectedImage(images[newIndex]);
   };
 
   if (loading) {
     return (
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <p className="mt-4 text-gray-600">Loading gallery...</p>
+      <section className="py-16 md:py-24 lg:py-32 bg-gradient-to-br from-white via-gray-50 to-white">
+        <div className="container-custom">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+            <div className="space-y-6">
+              <div className="animate-pulse bg-gray-200 h-12 md:h-14 lg:h-16 w-3/4 rounded-lg"></div>
+              <div className="animate-pulse bg-gray-100 h-6 w-full rounded"></div>
+              <div className="animate-pulse bg-gray-100 h-6 w-2/3 rounded"></div>
+              <div className="animate-pulse bg-gray-200 h-12 w-48 rounded-full mt-8"></div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="animate-pulse bg-gray-100 aspect-[16/10] rounded-3xl"></div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="animate-pulse bg-gray-100 aspect-square rounded-2xl"></div>
+                <div className="animate-pulse bg-gray-100 aspect-square rounded-2xl"></div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -68,10 +149,14 @@ export default function GallerySection() {
 
   if (error) {
     return (
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center text-red-600">
-            <p>Failed to load gallery: {error}</p>
+      <section className="py-16 md:py-24 bg-gradient-to-br from-white via-gray-50 to-white">
+        <div className="container-custom">
+          <div className="text-center">
+            <div className="inline-block p-6 md:p-8 bg-red-50 border border-red-200 rounded-2xl">
+              <p className="text-red-600 font-medium text-base md:text-lg">
+                Gagal memuat galeri: {error}
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -79,174 +164,274 @@ export default function GallerySection() {
   }
 
   if (images.length === 0) {
-    return null;   }
+    return null;
+  }
 
   return (
     <>
-      <section id="gallery" className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          {/* Section Header */}
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Galeri Proyek Kami
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Lihat berbagai proyek stand pameran berkualitas yang telah kami kerjakan
-            </p>
-          </div>
+      <section
+        ref={sectionRef}
+        id="gallery"
+        className="py-16 md:py-24 lg:py-32 bg-gradient-to-br from-white via-gray-50 to-white relative overflow-hidden"
+      >
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-20 -right-20 w-64 h-64 md:w-80 md:h-80 bg-red-100 rounded-full blur-3xl opacity-40" />
+          <div className="absolute bottom-20 -left-20 w-48 h-48 md:w-60 md:h-60 bg-gray-100 rounded-full blur-3xl opacity-30" />
+        </div>
 
-          {/* Gallery Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {images.map((image, index) => (
-              <div
-                key={image._id}
-                className="group relative bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer"
-                onClick={() => openLightbox(image)}
-              >
-                {/* Image Container */}
-                <div className="relative aspect-square overflow-hidden">
-                  <Image
-                    src={image.image.thumbnailUrl || image.image.url}
-                    alt={image.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    className="object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
-                  
-                  {/* Overlay on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                      <h3 className="font-semibold text-lg mb-1">{image.title}</h3>
-                      {image.year && (
-                        <p className="text-sm opacity-90">📅 {image.year}</p>
-                      )}
-                    </div>
+        <div className="container-custom relative z-10">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 xl:gap-20 items-center">
+            {/* Left Side - Content */}
+            <div className="opacity-100 translate-x-0">
+              <div className="space-y-6 md:space-y-8">
+                <div>
+                  <h2 className="text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-bold text-black mb-4 md:mb-6 leading-[1.15]">
+                    Portfolio <span className="text-red-600">Terbaik</span> Kami
+                  </h2>
+                  <p className="text-base md:text-lg lg:text-xl text-gray-600 leading-relaxed max-w-xl">
+                    Koleksi karya stand pameran terbaik yang telah kami selesaikan. Setiap proyek menampilkan dedikasi terhadap inovasi desain dan kualitas konstruksi.
+                  </p>
+                </div>
+
+                {/* Gallery Highlights */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-red-600 rounded-full"></div>
+                    <span className="text-gray-700 font-medium">
+                      Beragam industri & jenis acara
+                    </span>
                   </div>
-
-                  {/* Position Badge */}
-                  <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">
-                    {index + 1}
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-red-600 rounded-full"></div>
+                    <span className="text-gray-700 font-medium">
+                      Desain kreatif & eksekusi presisi
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-red-600 rounded-full"></div>
+                    <span className="text-gray-700 font-medium">
+                      Solusi booth custom & modular
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-red-600 rounded-full"></div>
+                    <span className="text-gray-700 font-medium">
+                      Kepercayaan klien jangka panjang
+                    </span>
                   </div>
                 </div>
 
-                {/* Card Info (always visible) */}
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 mb-2 line-clamp-1">
-                    {image.title}
-                  </h3>
-                  {image.description && (
-                    <p className="text-sm text-gray-600 line-clamp-2 mb-2">
-                      {image.description}
-                    </p>
-                  )}
-                  <div className="flex flex-wrap gap-2 text-xs text-gray-500">
-                    {image.location && (
-                      <span className="flex items-center gap-1">
-                        📍 {image.location}
-                      </span>
-                    )}
-                    {image.venue && (
-                      <span className="flex items-center gap-1">
-                        🏢 {image.venue}
-                      </span>
-                    )}
-                  </div>
+                {/* Enhanced CTA */}
+                <div className="pt-2">
+                  <Link
+                    href="/portofolio"
+                    className="group relative inline-flex items-center justify-center gap-3 px-7 py-3.5 rounded-full bg-black text-white text-base font-semibold overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-black/30"
+                  >
+                    <span className="relative z-10">Lihat Semua Portfolio</span>
+                    <ArrowRight className="relative z-10 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
+                    <span className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-700 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out" />
+                  </Link>
+                  <p className="text-sm text-gray-500 mt-3">
+                    Temukan inspirasi untuk proyek Anda
+                  </p>
                 </div>
               </div>
-            ))}
+            </div>
+
+            {/* Right Side - Clean Gallery Layout */}
+            <div className="opacity-100 translate-x-0">
+              {images && images.length > 0 ? (
+                <div className="space-y-4">
+                  {/* Main Featured Image */}
+                  {images[0] && (
+                    <div
+                      className="group relative bg-gray-900 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-1"
+                      onClick={() => openLightbox(images[0])}
+                    >
+                      <div className="relative aspect-[3/2] overflow-hidden">
+                        {images[0].image?.url ||
+                        images[0].image?.thumbnailUrl ? (
+                          <img
+                            src={
+                              images[0].image?.thumbnailUrl ||
+                              images[0].image?.url
+                            }
+                            alt={images[0].title || "Gallery Image"}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
+                            <span className="text-gray-300 text-sm">
+                              No image
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="transform translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
+                              <div className="w-14 h-14 border-2 border-white rounded-full flex items-center justify-center backdrop-blur-sm bg-white/10">
+                                <Eye className="w-6 h-6 text-white" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Badge */}
+                        <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1.5 rounded-full font-semibold text-sm shadow-lg">
+                          Featured
+                        </div>
+
+                        {/* Title on hover */}
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <h3 className="font-bold text-white text-base line-clamp-1">
+                            {images[0].title || "Proyek Unggulan"}
+                          </h3>{" "}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Two Small Images Side by Side */}
+                  <div className="grid grid-cols-2 gap-3 md:gap-4">
+                    {images[1] && (
+                      <div
+                        className="group relative bg-gray-900 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-500 cursor-pointer transform hover:-translate-y-1"
+                        onClick={() => openLightbox(images[1])}
+                      >
+                        <div className="relative aspect-square overflow-hidden">
+                          {images[1].image?.url ||
+                          images[1].image?.thumbnailUrl ? (
+                            <img
+                              src={
+                                images[1].image?.thumbnailUrl ||
+                                images[1].image?.url
+                              }
+                              alt={images[1].title || "Gallery Image"}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
+                              <span className="text-gray-300 text-xs">
+                                No image
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="transform translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
+                                <div className="w-8 h-8 md:w-10 md:h-10 border-2 border-white rounded-full flex items-center justify-center backdrop-blur-sm bg-white/10">
+                                  <Eye className="w-3 h-3 md:w-4 md:h-4 text-white" />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Title on hover */}
+                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 md:p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <h3 className="font-semibold text-white text-xs md:text-sm line-clamp-1">
+                              {images[1].title || "Proyek Kreatif"}
+                            </h3>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {images[2] && (
+                      <div
+                        className="group relative bg-gray-900 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-500 cursor-pointer transform hover:-translate-y-1"
+                        onClick={() => openLightbox(images[2])}
+                      >
+                        <div className="relative aspect-square overflow-hidden">
+                          {images[2].image?.url ||
+                          images[2].image?.thumbnailUrl ? (
+                            <img
+                              src={
+                                images[2].image?.thumbnailUrl ||
+                                images[2].image?.url
+                              }
+                              alt={images[2].title || "Gallery Image"}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
+                              <span className="text-gray-300 text-xs">
+                                No image
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="transform translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
+                                <div className="w-8 h-8 md:w-10 md:h-10 border-2 border-white rounded-full flex items-center justify-center backdrop-blur-sm bg-white/10">
+                                  <Eye className="w-3 h-3 md:w-4 md:h-4 text-white" />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Title on hover */}
+                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 md:p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <h3 className="font-semibold text-white text-xs md:text-sm line-clamp-1">
+                              {images[2].title || "Desain Inovatif"}
+                            </h3>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : null}
+            </div>
           </div>
         </div>
       </section>
 
       {/* Lightbox Modal */}
       {selectedImage && (
-        <div
-          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
-          onClick={closeLightbox}
-        >
-          {/* Close button */}
-          <button
-            onClick={closeLightbox}
-            className="absolute top-4 right-4 text-white hover:text-gray-300 text-4xl font-light z-10"
-            aria-label="Close"
-          >
-            ×
-          </button>
-
-          {/* Previous button */}
-          {images.length > 1 && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                navigateImage('prev');
-              }}
-              className="absolute left-4 text-white hover:text-gray-300 text-5xl font-light z-10"
-              aria-label="Previous"
-            >
-              ‹
-            </button>
-          )}
-
-          {/* Next button */}
-          {images.length > 1 && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                navigateImage('next');
-              }}
-              className="absolute right-4 text-white hover:text-gray-300 text-5xl font-light z-10"
-              aria-label="Next"
-            >
-              ›
-            </button>
-          )}
-
-          {/* Image Container */}
-          <div
-            className="relative max-w-5xl max-h-[90vh] w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="relative w-full h-full">
-              <Image
-                src={selectedImage.image.url}
-                alt={selectedImage.title}
-                width={selectedImage.image.width || 1200}
-                height={selectedImage.image.height || 800}
-                className="w-full h-auto max-h-[80vh] object-contain"
-              />
-            </div>
-
-            {/* Image Info */}
-            <div className="bg-white rounded-b-lg p-6">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                {selectedImage.title}
-              </h3>
-              {selectedImage.description && (
-                <p className="text-gray-600 mb-4">
-                  {selectedImage.description}
-                </p>
-              )}
-              <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-                {selectedImage.year && (
-                  <span className="flex items-center gap-1">
-                    📅 Year: {selectedImage.year}
-                  </span>
-                )}
-                {selectedImage.location && (
-                  <span className="flex items-center gap-1">
-                    📍 Location: {selectedImage.location}
-                  </span>
-                )}
-                {selectedImage.venue && (
-                  <span className="flex items-center gap-1">
-                    🏢 Venue: {selectedImage.venue}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+        <GalleryLightbox
+          images={images}
+          selectedImage={selectedImage}
+          onClose={closeLightbox}
+          onNavigate={navigateImage}
+        />
       )}
+
+      <style jsx>{`
+        .line-clamp-1 {
+          display: -webkit-box;
+          -webkit-line-clamp: 1;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .container-custom {
+          max-width: 1280px;
+          margin: 0 auto;
+          padding: 0 1rem;
+        }
+        @media (min-width: 640px) {
+          .container-custom {
+            padding: 0 1.5rem;
+          }
+        }
+        @media (min-width: 1024px) {
+          .container-custom {
+            padding: 0 2rem;
+          }
+        }
+      `}</style>
     </>
   );
 }
