@@ -127,7 +127,7 @@ export default function ClientLogoSection() {
                     <img
                       src={logo.image.thumbnailUrl || logo.image.url}
                       alt={logo.title}
-                      className="max-h-full w-auto object-contain"
+                      className="max-h-full max-w-16 lg:max-w-24 w-auto object-contain"
                     />
                   </div>
                 ))}
@@ -143,7 +143,7 @@ export default function ClientLogoSection() {
                     <img
                       src={logo.image.thumbnailUrl || logo.image.url}
                       alt={logo.title}
-                      className="max-h-full w-auto object-contain"
+                      className="max-h-full max-w-24 sm:max-w-28 md:max-w-32 lg:max-w-36 w-auto object-contain"
                     />
                   </div>
                 ))}
@@ -156,6 +156,7 @@ export default function ClientLogoSection() {
       <style jsx>{`
         .marquee-wrapper {
           display: flex;
+          gap: 1rem;
           animation: scroll 40s linear infinite;
           will-change: transform;
         }
