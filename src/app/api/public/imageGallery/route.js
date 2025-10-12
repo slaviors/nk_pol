@@ -1,3 +1,5 @@
+// src/app/api/public/imageGallery/route.js
+
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import ImageGallery from '@/models/ImageGallery';
@@ -8,7 +10,8 @@ export async function GET(request) {
     
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page')) || 1;
-    const limit = parseInt(searchParams.get('limit')) || 4;     const year = searchParams.get('year');
+    const limit = parseInt(searchParams.get('limit')) || 4;
+    const year = searchParams.get('year');
     const location = searchParams.get('location');
     const venue = searchParams.get('venue');
     
@@ -24,9 +27,12 @@ export async function GET(request) {
         .sort({ position: 1 })
         .skip(skip)
         .limit(limit)
-        .select('title description year location venue image.url image.thumbnailUrl image.contentType image.width image.height position createdAt')
-        .lean(),       ImageGallery.countDocuments(query)
+        .select('title description year location venue image position createdAt')
+        .lean(),
+      ImageGallery.countDocuments(query)
     ]);
+    
+    console.log('✅ API Response - First Image:', images[0]); // Debug log
     
     return NextResponse.json({
       images,
