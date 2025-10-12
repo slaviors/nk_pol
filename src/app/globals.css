@@ -1,26 +1,420 @@
+/* src/app/globals.css */
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@layer base {
+  * {
+    @apply border-gray-200;
+  }
+  
+  body {
+    @apply bg-white text-black;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* Headings */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* Links */
+  a {
+    @apply transition-colors duration-300;
+  }
+
+  /* Selection */
+  ::selection {
+    @apply bg-black text-white;
+  }
+
+  ::-moz-selection {
+    @apply bg-black text-white;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Custom smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-50;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full;
+  transition: background-color 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400;
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(209 213 219) rgb(249 250 251);
+}
+
+/* Smooth backdrop blur animation */
+@supports (backdrop-filter: blur(0)) {
+  .backdrop-blur-xl {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  
+  .backdrop-blur-md {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+}
+
+/* Hardware acceleration for smooth animations */
+.transition-all,
+.transition-transform,
+.transition-opacity,
+.transition-colors {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Disable animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Focus visible styles */
+*:focus-visible {
+  @apply outline-none ring-2 ring-black ring-offset-2 rounded-lg;
+}
+
+/* Remove focus ring for mouse users */
+*:focus:not(:focus-visible) {
+  @apply outline-none;
+}
+
+/* Button reset */
+button {
+  @apply cursor-pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:disabled {
+  @apply cursor-not-allowed opacity-50;
+}
+
+/* Image optimization */
+img {
+  @apply max-w-full h-auto;
+}
+
+/* Smooth font rendering */
+@layer utilities {
+  .text-smooth {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  .gpu-accelerate {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(220, 38, 38, 0.6);
+  }
+}
+
+@keyframes rotate-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes slide-up-bounce {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.6s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.5s ease-out forwards;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-rotate-slow {
+  animation: rotate-slow 20s linear infinite;
+}
+
+.animate-slide-up-bounce {
+  animation: slide-up-bounce 0.8s ease-out forwards;
+}
+
+/* Loading skeleton */
+.skeleton {
+  @apply bg-gray-200 rounded-lg;
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Gradient text */
+.gradient-text {
+  @apply bg-clip-text text-transparent;
+  background-image: linear-gradient(135deg, #000000 0%, #374151 100%);
+}
+
+.gradient-text-red {
+  @apply bg-clip-text text-transparent;
+  background-image: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+}
+
+/* Container */
+.container-custom {
+  @apply max-w-[1400px] mx-auto px-6 lg:px-8;
+}
+
+/* Custom shadow utilities */
+@layer utilities {
+  .shadow-3xl {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  }
+  
+  .shadow-glow {
+    box-shadow: 0 0 30px rgba(220, 38, 38, 0.3);
+  }
+  
+  .shadow-glow-hover {
+    box-shadow: 0 0 40px rgba(220, 38, 38, 0.4);
+  }
+}
+
+/* Card hover effect */
+.card-hover {
+  @apply transition-all duration-500 ease-out;
+  @apply hover:shadow-2xl hover:shadow-black/10 hover:-translate-y-1;
+}
+
+/* Glass morphism */
+.glass {
+  @apply bg-white/80 backdrop-blur-xl border border-gray-200/50;
+}
+
+.glass-dark {
+  @apply bg-black/80 backdrop-blur-xl border border-white/10;
+}
+
+/* Button styles */
+.btn-primary {
+  @apply px-7 py-3 rounded-full bg-black text-white text-sm font-semibold;
+  @apply transition-all duration-500 ease-out;
+  @apply hover:scale-105 hover:shadow-2xl hover:shadow-black/20;
+  @apply active:scale-95;
+}
+
+.btn-secondary {
+  @apply px-7 py-3 rounded-full bg-gray-100 text-gray-900 text-sm font-semibold;
+  @apply transition-all duration-500 ease-out;
+  @apply hover:bg-gray-200 hover:scale-105;
+  @apply active:scale-95;
+}
+
+.btn-outline {
+  @apply px-7 py-3 rounded-full border-2 border-black text-black text-sm font-semibold;
+  @apply transition-all duration-500 ease-out;
+  @apply hover:bg-black hover:text-white hover:scale-105;
+  @apply active:scale-95;
+}
+
+/* Section spacing */
+.section-padding {
+  @apply py-16 md:py-24 lg:py-32;
+}
+
+.section-padding-sm {
+  @apply py-12 md:py-16 lg:py-20;
+}
+
+/* Text utilities */
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Hide scrollbar but keep functionality */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Mobile touch improvements */
+@media (hover: none) and (pointer: coarse) {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  button,
+  a {
+    @apply active:scale-95;
+  }
+}
+
+/* Print styles */
+@media print {
+  *,
+  *::before,
+  *::after {
+    background: transparent !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  a,
+  a:visited {
+    text-decoration: underline;
+  }
+
+  img {
+    page-break-inside: avoid;
+  }
+
+  p,
+  h2,
+  h3 {
+    orphans: 3;
+    widows: 3;
+  }
+
+  h2,
+  h3 {
+    page-break-after: avoid;
+  }
 }

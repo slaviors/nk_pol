@@ -1,6 +1,10 @@
 'use client';
 
+<<<<<<< HEAD
 import { useState } from 'react';
+=======
+import { useState, useEffect } from 'react';
+>>>>>>> ef5bc5dbf4f425b7eae86a76c7c317759a8c41ca
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
@@ -12,6 +16,44 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const router = useRouter();
 
+<<<<<<< HEAD
+=======
+  useEffect(() => {
+    const checkExistingAuth = async () => {
+      try {
+
+        const token = localStorage.getItem('auth-token');
+        
+        const headers = {
+          'Content-Type': 'application/json'
+        };
+        
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        
+        const response = await fetch('/api/admin/auth/me', {
+          credentials: 'include',
+          cache: 'no-store',
+          headers
+        });
+        
+        if (response.ok) {
+          router.push('/nk-pol-config');
+        } else {
+
+          localStorage.removeItem('auth-token');
+        }
+      } catch (error) {
+        console.log('Not authenticated, staying on login page');
+        localStorage.removeItem('auth-token');
+      }
+    };
+
+    checkExistingAuth();
+  }, [router]);
+
+>>>>>>> ef5bc5dbf4f425b7eae86a76c7c317759a8c41ca
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -33,13 +75,31 @@ export default function LoginPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
+<<<<<<< HEAD
         credentials: 'include' 
+=======
+        credentials: 'include',
+        cache: 'no-store'
+>>>>>>> ef5bc5dbf4f425b7eae86a76c7c317759a8c41ca
       });
 
       const data = await response.json();
 
       if (response.ok) {
+<<<<<<< HEAD
         router.push('/nk-pol-config');
+=======
+        console.log('Login successful!');
+
+        if (data.token) {
+          localStorage.setItem('auth-token', data.token);
+          console.log('Token stored in localStorage');
+
+          window.location.href = '/nk-pol-config';
+        } else {
+          setError('Login succeeded but no token received.');
+        }
+>>>>>>> ef5bc5dbf4f425b7eae86a76c7c317759a8c41ca
       } else {
         setError(data.error || 'Login failed');
       }

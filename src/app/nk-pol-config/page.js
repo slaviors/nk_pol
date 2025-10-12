@@ -2,6 +2,12 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+<<<<<<< HEAD
+=======
+import GalleryManage from '@/components/backend-integration/nk-pol-config/GalleryManage';
+import ClientLogoManage from '@/components/backend-integration/nk-pol-config/ClientLogoManage';
+import TestimonyManage from '@/components/backend-integration/nk-pol-config/TestimonyManage';
+>>>>>>> ef5bc5dbf4f425b7eae86a76c7c317759a8c41ca
 
 export default function AdminPage() {
   const [user, setUser] = useState(null);
@@ -12,8 +18,25 @@ export default function AdminPage() {
 
   const checkAuth = useCallback(async () => {
     try {
+<<<<<<< HEAD
       const response = await fetch('/api/admin/auth/me', {
         credentials: 'include' 
+=======
+
+      const token = localStorage.getItem('auth-token');
+      
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      const response = await fetch('/api/admin/auth/me', {
+        credentials: 'include',
+        headers
+>>>>>>> ef5bc5dbf4f425b7eae86a76c7c317759a8c41ca
       });
       const data = await response.json();
 
@@ -21,10 +44,18 @@ export default function AdminPage() {
         setUser(data.user);
       } else {
         console.log('Auth check failed:', data.error);
+<<<<<<< HEAD
+=======
+        localStorage.removeItem('auth-token');
+>>>>>>> ef5bc5dbf4f425b7eae86a76c7c317759a8c41ca
         router.push('/nk-pol-config/auth/login');
       }
     } catch (error) {
       console.error('Auth check error:', error);
+<<<<<<< HEAD
+=======
+      localStorage.removeItem('auth-token');
+>>>>>>> ef5bc5dbf4f425b7eae86a76c7c317759a8c41ca
       router.push('/nk-pol-config/auth/login');
     } finally {
       setLoading(false);
@@ -44,6 +75,11 @@ export default function AdminPage() {
       });
 
       if (response.ok) {
+<<<<<<< HEAD
+=======
+
+        localStorage.removeItem('auth-token');
+>>>>>>> ef5bc5dbf4f425b7eae86a76c7c317759a8c41ca
         setUser(null); 
         router.push('/nk-pol-config/auth/login');
       } else {
@@ -91,7 +127,11 @@ export default function AdminPage() {
         </div>
       </header>
 
+<<<<<<< HEAD
       {/* <nav className="bg-white border-b border-gray-200">
+=======
+      <nav className="bg-white border-b border-gray-200">
+>>>>>>> ef5bc5dbf4f425b7eae86a76c7c317759a8c41ca
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex space-x-8">
             {[
@@ -114,7 +154,11 @@ export default function AdminPage() {
             ))}
           </div>
         </div>
+<<<<<<< HEAD
       </nav> */}
+=======
+      </nav>
+>>>>>>> ef5bc5dbf4f425b7eae86a76c7c317759a8c41ca
 
       {error && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
@@ -132,11 +176,19 @@ export default function AdminPage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow">
+<<<<<<< HEAD
           {/* <div className="p-6">
             {activeTab === 'gallery' && <GalleryPanel />}
             {activeTab === 'testimonies' && <TestimoniesPanel />}
             {activeTab === 'client-logos' && <ClientLogosPanel />}
           </div> */}
+=======
+          <div className="p-6">
+            {activeTab === 'gallery' && <GalleryManage />}
+            {activeTab === 'testimonies' && <TestimonyManage />}
+            {activeTab === 'client-logos' && <ClientLogoManage />}
+          </div>
+>>>>>>> ef5bc5dbf4f425b7eae86a76c7c317759a8c41ca
         </div>
       </main>
     </div>
