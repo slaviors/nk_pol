@@ -33,12 +33,7 @@ export default function HeroSection() {
 
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden bg-white pt-14">
-      {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Red Accent Lines */}
-        <div className="absolute top-32 right-1/3 w-0.5 h-48 bg-gradient-to-b from-red-600 to-transparent opacity-50" />
-        <div className="absolute top-2/3 left-16 w-40 h-0.5 bg-gradient-to-r from-red-600 to-transparent opacity-50" />
-        <div className="absolute bottom-40 right-24 w-0.5 h-32 bg-gradient-to-b from-red-600 to-transparent opacity-40" />
 
         {/* Subtle Grid Pattern */}
         <div 

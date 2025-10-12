@@ -31,7 +31,7 @@ export class CloudflareR2 {
       const result = await r2Client.send(command);
       
       const url = `${this.publicUrl}/${key}`;
-      const thumbnailUrl = `${this.publicUrl}/${key}?w=300&h=300&fit=crop`;
+      const thumbnailUrl = `${this.publicUrl}/${key}`;
       
       return {
         url,
@@ -82,8 +82,8 @@ export class CloudflareR2 {
     return `${this.publicUrl}/${key}`;
   }
 
-  generateThumbnailUrl(key, width = 300, height = 300) {
-    return `${this.publicUrl}/${key}?w=${width}&h=${height}&fit=crop`;
+  generateThumbnailUrl(key, width = null, height = null) {
+    return `${this.publicUrl}/${key}`;
   }
 }
 
