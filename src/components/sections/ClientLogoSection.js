@@ -108,101 +108,89 @@ export default function ClientLogoSection() {
 
       <div className="container-custom relative z-10">
         {/* Logo Marquee */}
-        <div className="relative group">
+        <div className="relative">
           {/* Gradient Overlays */}
           <div className="absolute left-0 top-0 bottom-0 w-12 md:w-20 bg-gradient-to-r from-white via-white to-transparent z-20 pointer-events-none"></div>
           <div className="absolute right-0 top-0 bottom-0 w-12 md:w-20 bg-gradient-to-l from-white via-white to-transparent z-20 pointer-events-none"></div>
 
           {/* Marquee Container */}
-          <div className="overflow-hidden">
-            <div className="marquee-wrapper">
-              <div className="marquee-group">
-                {logos.map((logo, index) => (
-                  <div
-                    key={`original-${logo._id}-${index}`}
-                    className="flex-shrink-0 flex items-center justify-center h-12 sm:h-14 md:h-16 lg:h-18 p-2 transition-all duration-300 hover:scale-110 opacity-70 hover:opacity-100"
-                    title={logo.title}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={logo.image.thumbnailUrl || logo.image.url}
-                      alt={logo.title}
-                      className="max-h-full max-w-16 lg:max-w-24 w-auto object-contain"
-                    />
-                  </div>
-                ))}
-              </div>
-              <div className="marquee-group" aria-hidden="true">
-                {logos.map((logo, index) => (
-                  <div
-                    key={`clone-${logo._id}-${index}`}
-                    className="flex-shrink-0 flex items-center justify-center h-12 sm:h-14 md:h-16 lg:h-18 p-2 transition-all duration-300 hover:scale-110 opacity-70 hover:opacity-100"
-                    title={logo.title}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={logo.image.thumbnailUrl || logo.image.url}
-                      alt={logo.title}
-                      className="max-h-full max-w-24 sm:max-w-28 md:max-w-32 lg:max-w-36 w-auto object-contain"
-                    />
-                  </div>
-                ))}
-              </div>
+          <div className="marquee-container w-full flex items-center overflow-hidden">
+            <div className="marquee-content flex">
+              {/* Original logos */}
+              {logos.map((logo, index) => (
+                <div
+                  key={`original-${logo._id}-${index}`}
+                  className="marquee-item flex-shrink-0 w-32 sm:w-36 md:w-40 lg:w-48 mx-3 md:mx-4 p-2 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                  title={logo.title}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={logo.image.thumbnailUrl || logo.image.url}
+                    alt={logo.title}
+                    className="max-h-12 sm:max-h-14 md:max-h-16 lg:max-h-20 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity duration-300"
+                  />
+                </div>
+              ))}
+              {/* Duplicate logos for seamless loop */}
+              {logos.map((logo, index) => (
+                <div
+                  key={`duplicate-${logo._id}-${index}`}
+                  className="marquee-item flex-shrink-0 w-32 sm:w-36 md:w-40 lg:w-48 mx-3 md:mx-4 p-2 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                  title={logo.title}
+                  aria-hidden="true"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={logo.image.thumbnailUrl || logo.image.url}
+                    alt={logo.title}
+                    className="max-h-12 sm:max-h-14 md:max-h-16 lg:max-h-20 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity duration-300"
+                  />
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </div>
 
       <style jsx>{`
-        .marquee-wrapper {
-          display: flex;
-          gap: 1rem;
-          animation: scroll 40s linear infinite;
+        .marquee-container {
+          position: relative;
+        }
+
+        .marquee-content {
+          animation: marquee 40s linear infinite;
           will-change: transform;
         }
 
-        .marquee-wrapper:hover {
+        .marquee-content:hover {
           animation-play-state: paused;
         }
 
-        .marquee-group {
-          display: flex;
-          gap: 1rem;
-          flex-shrink: 0;
-          min-width: 100%;
-          justify-content: space-around;
-        }
-
-        @media (min-width: 768px) {
-          .marquee-group {
-            gap: 1.4rem;
-          }
-        }
-
-        @keyframes scroll {
-          from {
+        @keyframes marquee {
+          0% {
             transform: translateX(0);
           }
-          to {
-            transform: translateX(-100%);
+          100% {
+            transform: translateX(-50%);
           }
         }
 
+        /* Responsive animation speeds */
         @media (max-width: 1024px) {
-          .marquee-wrapper {
-            animation-duration: 32s;
+          .marquee-content {
+            animation-duration: 35s;
           }
         }
 
         @media (max-width: 768px) {
-          .marquee-wrapper {
-            animation-duration: 24s;
+          .marquee-content {
+            animation-duration: 28s;
           }
         }
 
         @media (max-width: 640px) {
-          .marquee-wrapper {
-            animation-duration: 20s;
+          .marquee-content {
+            animation-duration: 22s;
           }
         }
       `}</style>
