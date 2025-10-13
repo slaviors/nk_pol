@@ -2,7 +2,7 @@ import { generateMetadata, jsonLdSchemas } from '@/config/metadata';
 import HeroSection from '@/components/sections/HeroSection';
 import GallerySection from '@/components/sections/GallerySection';
 import ClientLogoSection from '@/components/sections/ClientLogoSection';
-import TestimonySection from '@/components/backend-integration/home/TestimonySection';
+import TestimonialsSection from '@/components/sections/TestimonialsSection';
 import AboutSection from '@/components/sections/AboutSection';
 import ServicesSection from '@/components/sections/ServicesSection';
 
@@ -38,7 +38,7 @@ export default function Home() {
         <ClientLogoSection />
         <ServicesSection />
         <GallerySection />
-        <TestimonySection />
+        <TestimonialsSection />
       </article>
     </>
   );

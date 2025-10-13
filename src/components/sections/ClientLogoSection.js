@@ -77,7 +77,6 @@ export default function ClientLogoSection() {
     }, 30000); 
 
     return () => clearInterval(refreshInterval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (loading) {
@@ -123,7 +122,6 @@ export default function ClientLogoSection() {
                   className="marquee-item flex-shrink-0 w-32 sm:w-36 md:w-40 lg:w-48 mx-3 md:mx-4 p-2 flex items-center justify-center transition-all duration-300 hover:scale-110"
                   title={logo.title}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={logo.image.thumbnailUrl || logo.image.url}
                     alt={logo.title}
@@ -139,7 +137,6 @@ export default function ClientLogoSection() {
                   title={logo.title}
                   aria-hidden="true"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={logo.image.thumbnailUrl || logo.image.url}
                     alt={logo.title}

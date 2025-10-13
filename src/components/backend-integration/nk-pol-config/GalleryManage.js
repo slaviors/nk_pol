@@ -545,7 +545,6 @@ export default function GalleryManage() {
                         {index + 1}
                       </div>
                       <div className="flex-shrink-0">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={image.image.thumbnailUrl || image.image.url}
                           alt={image.title}
@@ -640,7 +639,6 @@ export default function GalleryManage() {
                     
                     {/* Image thumbnail */}
                     <div className="flex-shrink-0">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={image.image.thumbnailUrl || image.image.url}
                         alt={image.title}
