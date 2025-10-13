@@ -32,8 +32,6 @@ export async function GET(request) {
       ImageGallery.countDocuments(query)
     ]);
     
-    console.log('✅ API Response - First Image:', images[0]); // Debug log
-    
     return NextResponse.json({
       images,
       pagination: {
