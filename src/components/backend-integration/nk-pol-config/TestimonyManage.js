@@ -429,7 +429,6 @@ export default function TestimonyManage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div className="md:col-span-1">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={testimony.profileImage.thumbnailUrl || testimony.profileImage.url}
                         alt={testimony.name}
@@ -514,7 +513,6 @@ export default function TestimonyManage() {
                       <span className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold mb-2">
                         {index + 1}
                       </span>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={testimony.profileImage.thumbnailUrl || testimony.profileImage.url}
                         alt={testimony.name}

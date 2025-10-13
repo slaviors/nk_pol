@@ -393,7 +393,6 @@ export default function ClientLogoManage() {
 
                   <div className="space-y-3">
                     <div className="flex items-center justify-center mb-2">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={logo.image.thumbnailUrl || logo.image.url}
                         alt={logo.title}
@@ -440,7 +439,6 @@ export default function ClientLogoManage() {
                     </div>
 
                     <div className="flex items-center justify-center h-20 bg-gray-50 rounded">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={logo.image.thumbnailUrl || logo.image.url}
                         alt={logo.title}
