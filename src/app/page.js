@@ -5,6 +5,7 @@ import ClientLogoSection from '@/components/sections/ClientLogoSection';
 import TestimonialsSection from '@/components/sections/TestimonialsSection';
 import AboutSection from '@/components/sections/AboutSection';
 import ServicesSection from '@/components/sections/ServicesSection';
+import ContactSection from '@/components/sections/ContactSection';
 
 export const metadata = generateMetadata(
   'NK POL - Kontraktor Stand Pameran Profesional & Terpercaya',
@@ -39,6 +40,7 @@ export default function Home() {
         <ServicesSection />
         <GallerySection />
         <TestimonialsSection />
+        <ContactSection />
       </article>
     </>
   );
