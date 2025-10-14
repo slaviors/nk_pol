@@ -25,20 +25,25 @@ export default function Navbar() {
         const aboutSection = document.getElementById('about-section');
         const servicesSection = document.getElementById('services-section');
         const gallerySection = document.getElementById('gallery');
+        const contactSection = document.getElementById('contact');
         const navbarHeight = 72;
         const isMobile = window.innerWidth < 768;
         const extraPadding = isMobile ? 60 : 80;
         const scrollPosition = window.scrollY + navbarHeight + extraPadding + 20; // offset untuk detection
         
-        if (aboutSection && servicesSection && gallerySection) {
+        if (aboutSection && servicesSection && gallerySection && contactSection) {
           const aboutTop = aboutSection.offsetTop;
           const aboutHeight = aboutSection.offsetHeight;
           const servicesTop = servicesSection.offsetTop;
           const servicesHeight = servicesSection.offsetHeight;
           const galleryTop = gallerySection.offsetTop;
           const galleryHeight = gallerySection.offsetHeight;
+          const contactTop = contactSection.offsetTop;
+          const contactHeight = contactSection.offsetHeight;
           
-          if (scrollPosition >= galleryTop && scrollPosition < galleryTop + galleryHeight) {
+          if (scrollPosition >= contactTop && scrollPosition < contactTop + contactHeight) {
+            setActiveSection('contact');
+          } else if (scrollPosition >= galleryTop && scrollPosition < galleryTop + galleryHeight) {
             setActiveSection('gallery');
           } else if (scrollPosition >= servicesTop && scrollPosition < servicesTop + servicesHeight) {
             setActiveSection('services-section');
@@ -82,7 +87,7 @@ export default function Navbar() {
     { href: '/', label: 'Tentang', section: 'about-section' },
     { href: '/', label: 'Layanan', section: 'services-section' },
     { href: '/', label: 'Portofolio', section: 'gallery' },
-    { href: '/kontak', label: 'Kontak', section: null },
+    { href: '/', label: 'Kontak', section: 'contact' },
   ];
 
   const scrollToSection = (sectionId) => {
