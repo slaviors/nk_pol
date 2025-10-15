@@ -1,8 +1,6 @@
-// src/app/api/public/imageGallery/route.js
-
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
-import ImageGallery from '@/models/ImageGallery';
+import GalleryPost from '@/models/GalleryPost';
 
 export async function GET(request) {
   try {
@@ -10,43 +8,49 @@ export async function GET(request) {
     
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page')) || 1;
-    const limit = parseInt(searchParams.get('limit')) || 4;
+    const limit = parseInt(searchParams.get('limit')) || 12;
     const year = searchParams.get('year');
     const location = searchParams.get('location');
-    const venue = searchParams.get('venue');
     
     const skip = (page - 1) * limit;
 
     const query = { isActive: true };
     if (year) query.year = parseInt(year);
     if (location) query.location = new RegExp(location, 'i');
-    if (venue) query.venue = new RegExp(venue, 'i');
     
-    const [images, total] = await Promise.all([
-      ImageGallery.find(query)
+    const [posts, total] = await Promise.all([
+      GalleryPost.find(query)
         .sort({ position: 1 })
         .skip(skip)
         .limit(limit)
-        .select('title description year location venue image position createdAt')
+        .select('title description year location venue images thumbnailIndex createdAt')
         .lean(),
-      ImageGallery.countDocuments(query)
+      GalleryPost.countDocuments(query)
     ]);
+
+    const postsWithThumbnails = posts.map(post => {
+      const thumbnailIndex = Math.min(post.thumbnailIndex || 0, post.images.length - 1);
+      return {
+        ...post,
+        thumbnail: post.images[thumbnailIndex]
+      };
+    });
     
     return NextResponse.json({
-      images,
+      posts: postsWithThumbnails,
       pagination: {
         currentPage: page,
         totalPages: Math.ceil(total / limit),
-        totalImages: total,
+        totalPosts: total,
         hasNextPage: page < Math.ceil(total / limit),
         hasPrevPage: page > 1
       }
     }, { status: 200 });
     
   } catch (error) {
-    console.error('Public Gallery GET error:', error);
+    console.error('Public Gallery POST GET error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch gallery images' },
+      { error: 'Failed to fetch gallery posts' },
       { status: 500 }
     );
   }

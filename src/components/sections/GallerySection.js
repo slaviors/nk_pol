@@ -22,7 +22,7 @@ export default function GallerySection() {
 
   const generateHash = (data) => {
     if (!data || data.length === 0) return null;
-    return data.map((img) => `${img._id}-${img.title}`).join("|");
+    return data.map((post) => `${post._id}-${post.title}-${post.images?.length || 0}`).join("|");
   };
 
   const fetchGalleryImages = async (isInitialLoad = false) => {
@@ -33,7 +33,7 @@ export default function GallerySection() {
         setIsRefreshing(true);
       }
 
-      const response = await fetch("/api/public/imageGallery?limit=3", {
+      const response = await fetch("/api/public/galleryPost?limit=3", {
         cache: "no-store",
         headers: {
           "Cache-Control": "no-cache",
@@ -42,14 +42,14 @@ export default function GallerySection() {
       const data = await response.json();
 
       if (response.ok) {
-        let newImages = data.images || [];
-        const limitedImages = newImages.slice(0, 3);
-        const newHash = generateHash(limitedImages);
+        let newPosts = data.posts || [];
+        const limitedPosts = newPosts.slice(0, 3);
+        const newHash = generateHash(limitedPosts);
 
         if (newHash !== cacheRef.current.hash || isInitialLoad) {
-          setImages(limitedImages);
+          setImages(limitedPosts);
           cacheRef.current = {
-            data: limitedImages,
+            data: limitedPosts,
             timestamp: Date.now(),
             hash: newHash,
           };
@@ -109,7 +109,7 @@ export default function GallerySection() {
 
   const navigateImage = (direction) => {
     const currentIndex = images.findIndex(
-      (img) => img._id === selectedImage._id
+      (post) => post._id === selectedImage._id
     );
     let newIndex;
 
@@ -250,12 +250,12 @@ export default function GallerySection() {
                       onClick={() => openLightbox(images[0])}
                     >
                       <div className="relative aspect-[3/2] overflow-hidden">
-                        {images[0].image?.url ||
-                        images[0].image?.thumbnailUrl ? (
+                        {images[0].thumbnail?.url ||
+                        images[0].thumbnail?.thumbnailUrl ? (
                           <img
                             src={
-                              images[0].image?.thumbnailUrl ||
-                              images[0].image?.url
+                              images[0].thumbnail?.thumbnailUrl ||
+                              images[0].thumbnail?.url
                             }
                             alt={images[0].title || "Gallery Image"}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
@@ -302,12 +302,12 @@ export default function GallerySection() {
                         onClick={() => openLightbox(images[1])}
                       >
                         <div className="relative aspect-square overflow-hidden">
-                          {images[1].image?.url ||
-                          images[1].image?.thumbnailUrl ? (
+                          {images[1].thumbnail?.url ||
+                          images[1].thumbnail?.thumbnailUrl ? (
                             <img
                               src={
-                                images[1].image?.thumbnailUrl ||
-                                images[1].image?.url
+                                images[1].thumbnail?.thumbnailUrl ||
+                                images[1].thumbnail?.url
                               }
                               alt={images[1].title || "Gallery Image"}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
@@ -347,12 +347,12 @@ export default function GallerySection() {
                         onClick={() => openLightbox(images[2])}
                       >
                         <div className="relative aspect-square overflow-hidden">
-                          {images[2].image?.url ||
-                          images[2].image?.thumbnailUrl ? (
+                          {images[2].thumbnail?.url ||
+                          images[2].thumbnail?.thumbnailUrl ? (
                             <img
                               src={
-                                images[2].image?.thumbnailUrl ||
-                                images[2].image?.url
+                                images[2].thumbnail?.thumbnailUrl ||
+                                images[2].thumbnail?.url
                               }
                               alt={images[2].title || "Gallery Image"}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
