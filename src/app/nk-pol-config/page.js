@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import GalleryManage from '@/components/backend-integration/nk-pol-config/GalleryManage';
+import GalleryPostManage from '@/components/backend-integration/nk-pol-config/GalleryPostManage';
 import ClientLogoManage from '@/components/backend-integration/nk-pol-config/ClientLogoManage';
 import TestimonyManage from '@/components/backend-integration/nk-pol-config/TestimonyManage';
 
@@ -114,7 +114,7 @@ export default function AdminPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex space-x-8">
             {[
-              { id: 'gallery', name: 'Gallery', count: '4 max' },
+              { id: 'gallery-posts', name: 'Gallery Posts', count: '' },
               { id: 'testimonies', name: 'Testimonies', count: '' },
               { id: 'client-logos', name: 'Client Logos', count: '' },
             ].map((tab) => (
@@ -152,7 +152,7 @@ export default function AdminPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow">
           <div className="p-6">
-            {activeTab === 'gallery' && <GalleryManage />}
+            {activeTab === 'gallery-posts' && <GalleryPostManage />}
             {activeTab === 'testimonies' && <TestimonyManage />}
             {activeTab === 'client-logos' && <ClientLogoManage />}
           </div>

@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const ImageGallerySchema = new mongoose.Schema({
+const GalleryPostSchema = new mongoose.Schema({
   title: {
     type: String,
     required: [true, 'Please provide a title'],
@@ -27,7 +27,7 @@ const ImageGallerySchema = new mongoose.Schema({
     trim: true,
     maxlength: [200, 'Venue cannot exceed 200 characters']
   },
-  image: {
+  images: [{
     url: {
       type: String,
       required: [true, 'Image URL is required']
@@ -66,7 +66,17 @@ const ImageGallerySchema = new mongoose.Schema({
       enum: ['imagekit', 'r2'],
       required: true,
       default: 'r2'
+    },
+    isThumbnail: {
+      type: Boolean,
+      default: false
     }
+  }],
+  thumbnailIndex: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 3
   },
   position: {
     type: Number,
@@ -86,22 +96,32 @@ const ImageGallerySchema = new mongoose.Schema({
   timestamps: true
 });
 
-ImageGallerySchema.index({ position: 1, isActive: 1 });
+GalleryPostSchema.pre('save', function(next) {
+  if (this.images && this.images.length > 4) {
+    next(new Error('Maximum 4 images allowed per post'));
+  }
+  if (this.images && this.images.length < 1) {
+    next(new Error('At least 1 image is required'));
+  }
+  next();
+});
 
-ImageGallerySchema.index({ year: 1 });
-ImageGallerySchema.index({ location: 1 });
-ImageGallerySchema.index({ venue: 1 });
+GalleryPostSchema.index({ position: 1, isActive: 1 });
+GalleryPostSchema.index({ year: 1 });
+GalleryPostSchema.index({ location: 1 });
+GalleryPostSchema.index({ venue: 1 });
+GalleryPostSchema.index({ createdAt: -1 });
 
-ImageGallerySchema.statics.getNextPosition = async function() {
-  const lastImage = await this.findOne({ isActive: true })
+GalleryPostSchema.statics.getNextPosition = async function() {
+  const lastPost = await this.findOne({ isActive: true })
     .sort({ position: -1 })
     .select('position');
   
-  return lastImage ? lastImage.position + 1 : 0;
+  return lastPost ? lastPost.position + 1 : 0;
 };
 
-ImageGallerySchema.statics.reorderPositions = async function(imageIds) {
-  const bulkOps = imageIds.map((id, index) => ({
+GalleryPostSchema.statics.reorderPositions = async function(postIds) {
+  const bulkOps = postIds.map((id, index) => ({
     updateOne: {
       filter: { _id: id },
       update: { position: index }
@@ -111,4 +131,11 @@ ImageGallerySchema.statics.reorderPositions = async function(imageIds) {
   return await this.bulkWrite(bulkOps);
 };
 
-export default mongoose.models.ImageGallery || mongoose.model('ImageGallery', ImageGallerySchema);
+GalleryPostSchema.methods.getThumbnail = function() {
+  if (!this.images || this.images.length === 0) return null;
+  
+  const thumbnailIndex = Math.min(this.thumbnailIndex, this.images.length - 1);
+  return this.images[thumbnailIndex];
+};
+
+export default mongoose.models.GalleryPost || mongoose.model('GalleryPost', GalleryPostSchema);
