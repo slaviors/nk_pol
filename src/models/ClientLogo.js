@@ -31,7 +31,7 @@ const ClientLogoSchema = new mongoose.Schema({
     contentType: {
       type: String,
       required: [true, 'Content type is required'],
-      enum: ['image/png', 'image/svg+xml']
+      enum: ['image/png', 'image/svg+xml', 'image/jpeg', 'image/jpg']
     },
     width: {
       type: Number

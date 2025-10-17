@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Testimony from '@/models/Testimony';
+import User from '@/models/User';
 import StorageFactory from '@/lib/storage';
 import { getUserFromToken } from '@/lib/auth';
 
@@ -14,7 +15,7 @@ export async function GET(request, { params }) {
   try {
     await dbConnect();
     
-    const { id } = params;
+    const { id } = await params;
     
     const testimony = await Testimony.findById(id)
       .populate('uploadedBy', 'username');
@@ -43,7 +44,7 @@ export async function PUT(request, { params }) {
 
     await getUserFromToken(request);
     
-    const { id } = params;
+    const { id } = await params;
     const contentType = request.headers.get('content-type');
 
     let updateData = {};
@@ -199,7 +200,7 @@ export async function DELETE(request, { params }) {
 
     await getUserFromToken(request);
     
-    const { id } = params;
+    const { id } = await params;
 
     const testimony = await Testimony.findById(id);
     if (!testimony) {
