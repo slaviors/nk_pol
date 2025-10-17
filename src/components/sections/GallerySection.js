@@ -3,13 +3,11 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { ArrowRight, Eye } from "lucide-react";
-import GalleryLightbox from "../ui/GalleryLightbox";
 
 export default function GallerySection() {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedImage, setSelectedImage] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
@@ -98,29 +96,6 @@ export default function GallerySection() {
       observer.disconnect();
     };
   }, []);
-
-  const openLightbox = (image) => {
-    setSelectedImage(image);
-  };
-
-  const closeLightbox = () => {
-    setSelectedImage(null);
-  };
-
-  const navigateImage = (direction) => {
-    const currentIndex = images.findIndex(
-      (post) => post._id === selectedImage._id
-    );
-    let newIndex;
-
-    if (direction === "next") {
-      newIndex = (currentIndex + 1) % images.length;
-    } else {
-      newIndex = (currentIndex - 1 + images.length) % images.length;
-    }
-
-    setSelectedImage(images[newIndex]);
-  };
 
   if (loading) {
     return (
@@ -245,9 +220,9 @@ export default function GallerySection() {
                 <div className="space-y-4">
                   {/* Main Featured Image */}
                   {images[0] && (
-                    <div
-                      className="group relative bg-gray-900 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-1"
-                      onClick={() => openLightbox(images[0])}
+                    <Link
+                      href="/portofolio"
+                      className="group relative bg-gray-900 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-1 block"
                     >
                       <div className="relative aspect-[3/2] overflow-hidden">
                         {images[0].images && images[0].images.length > 0 ? (
@@ -290,17 +265,17 @@ export default function GallerySection() {
                           </h3>{" "}
                         </div>
                       </div>
-                    </div>
+                    </Link>
                   )}
 
                   {/* Two Small Images Side by Side */}
                   <div className="grid grid-cols-2 gap-3 md:gap-4">
                     {images[1] && (
-                      <div
-                        className="group relative bg-gray-900 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-500 cursor-pointer transform hover:-translate-y-1"
-                        onClick={() => openLightbox(images[1])}
+                      <Link
+                        href="/portofolio"
+                        className="group relative bg-gray-900 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-500 cursor-pointer transform hover:-translate-y-1 h-full block"
                       >
-                        <div className="relative aspect-square overflow-hidden">
+                        <div className="relative overflow-hidden h-full min-h-[200px] max-h-[400px]">
                           {images[1].images && images[1].images.length > 0 ? (
                             <img
                               src={
@@ -336,15 +311,15 @@ export default function GallerySection() {
                             </h3>
                           </div>
                         </div>
-                      </div>
+                      </Link>
                     )}
 
                     {images[2] && (
-                      <div
-                        className="group relative bg-gray-900 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-500 cursor-pointer transform hover:-translate-y-1"
-                        onClick={() => openLightbox(images[2])}
+                      <Link
+                        href="/portofolio"
+                        className="group relative bg-gray-900 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-500 cursor-pointer transform hover:-translate-y-1 h-full block"
                       >
-                        <div className="relative aspect-square overflow-hidden">
+                        <div className="relative overflow-hidden h-full min-h-[200px] max-h-[400px]">
                           {images[2].images && images[2].images.length > 0 ? (
                             <img
                               src={
@@ -380,7 +355,7 @@ export default function GallerySection() {
                             </h3>
                           </div>
                         </div>
-                      </div>
+                      </Link>
                     )}
                   </div>
                 </div>
@@ -389,16 +364,6 @@ export default function GallerySection() {
           </div>
         </div>
       </section>
-
-      {/* Lightbox Modal */}
-      {selectedImage && (
-        <GalleryLightbox
-          images={images}
-          selectedImage={selectedImage}
-          onClose={closeLightbox}
-          onNavigate={navigateImage}
-        />
-      )}
 
       <style jsx>{`
         .line-clamp-1 {
