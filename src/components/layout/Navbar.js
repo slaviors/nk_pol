@@ -94,10 +94,8 @@ export default function Navbar() {
     const element = document.getElementById(sectionId);
     if (element) {
       const navbarHeight = 72;
-      // Lebih banyak padding untuk desktop dan mobile
-      const isMobile = window.innerWidth < 768;
-      const extraPadding = isMobile ? 60 : 80; // Mobile butuh padding lebih karena viewport lebih kecil
-      const elementPosition = element.offsetTop - navbarHeight - extraPadding;
+      // Tanpa padding tambahan - section langsung di bawah navbar
+      const elementPosition = element.offsetTop - navbarHeight;
       
       window.scrollTo({
         top: Math.max(0, elementPosition), // Pastikan tidak scroll ke posisi negatif
@@ -125,9 +123,17 @@ export default function Navbar() {
   };
 
   const isActive = (link) => {
+    // Jika di halaman portfolio, tidak ada yang aktif
+    if (pathname === '/portofolio') {
+      return false;
+    }
+    
+    // Jika di homepage dan ada section
     if (pathname === '/' && link.section) {
       return activeSection === link.section;
     }
+    
+    // Default: check pathname
     if (link.href === '/') return pathname === link.href;
     return pathname.startsWith(link.href);
   };
@@ -182,6 +188,7 @@ export default function Navbar() {
                     width: indicatorStyle.width,
                     left: indicatorStyle.left,
                     transform: 'translateX(0)',
+                    opacity: activeIndex === -1 && hoveredIndex === null ? 0 : 1,
                   }}
                 />
 
@@ -195,7 +202,7 @@ export default function Navbar() {
                       onClick={(e) => handleLinkClick(e, link)}
                       onMouseEnter={() => setHoveredIndex(index)}
                       onMouseLeave={() => setHoveredIndex(null)}
-                      className="relative px-5 py-2.5 rounded-full text-[14.5px] font-semibold transition-colors duration-300 z-10"
+                      className="relative px-5 py-2.5 rounded-full text-[14.5px] font-semibold transition-colors duration-300 z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2"
                     >
                       <span 
                         className={`transition-colors duration-300 ${
@@ -216,7 +223,7 @@ export default function Navbar() {
             <div className="hidden lg:block">
               <Link
                 href="/mulai"
-                className="group relative inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full bg-black text-white text-[14.5px] font-semibold overflow-hidden transition-all duration-500 ease-out hover:scale-[1.06] hover:shadow-2xl hover:shadow-black/20"
+                className="group relative inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full bg-black text-white text-[14.5px] font-semibold overflow-hidden transition-all duration-500 ease-out hover:scale-[1.06] hover:shadow-2xl hover:shadow-black/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2"
               >
                 <span className="relative z-10 transition-all duration-300 group-hover:-translate-y-[1px]">
                   Mulai Sekarang
@@ -236,7 +243,7 @@ export default function Navbar() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden relative w-11 h-11 rounded-full bg-gray-100 flex items-center justify-center transition-all duration-500 hover:bg-gray-200 active:scale-90"
+              className="lg:hidden relative w-11 h-11 rounded-full bg-gray-100 flex items-center justify-center transition-all duration-500 hover:bg-gray-200 active:scale-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-600"
               aria-label="Toggle menu"
             >
               <div className="w-5 flex flex-col items-end gap-[4.5px]">
