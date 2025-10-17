@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import ClientLogo from '@/models/ClientLogo';
+import User from '@/models/User';
 import StorageFactory from '@/lib/storage';
 import { getUserFromToken } from '@/lib/auth';
 
@@ -73,11 +74,11 @@ export async function POST(request) {
       );
     }
 
-    const allowedTypes = ['image/png', 'image/svg+xml'];
+    const allowedTypes = ['image/png', 'image/svg+xml', 'image/jpeg', 'image/jpg'];
     for (const file of files) {
       if (!allowedTypes.includes(file.type)) {
         return NextResponse.json(
-          { error: `Invalid file type: ${file.type}. Only PNG and SVG are allowed for client logos.` },
+          { error: `Invalid file type: ${file.type}. Only PNG, JPG, and SVG are allowed for client logos.` },
           { status: 400 }
         );
       }

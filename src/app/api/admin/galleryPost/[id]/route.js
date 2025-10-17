@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import GalleryPost from '@/models/GalleryPost';
+import User from '@/models/User';
 import StorageFactory from '@/lib/storage';
 import { getUserFromToken } from '@/lib/auth';
 
@@ -8,7 +9,7 @@ export async function GET(request, { params }) {
   try {
     await dbConnect();
     
-    const { id } = params;
+    const { id } = await params;
     const post = await GalleryPost.findById(id)
       .populate('uploadedBy', 'username');
 
@@ -35,7 +36,7 @@ export async function PUT(request, { params }) {
     await dbConnect();
     await getUserFromToken(request);
     
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
 
     const post = await GalleryPost.findById(id);
@@ -80,7 +81,7 @@ export async function DELETE(request, { params }) {
     await dbConnect();
     await getUserFromToken(request);
     
-    const { id } = params;
+    const { id } = await params;
     const post = await GalleryPost.findById(id);
     
     if (!post) {

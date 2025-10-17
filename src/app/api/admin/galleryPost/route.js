@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import GalleryPost from '@/models/GalleryPost';
+import User from '@/models/User';
 import StorageFactory from '@/lib/storage';
 import { getUserFromToken } from '@/lib/auth';
 

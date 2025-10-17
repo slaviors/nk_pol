@@ -250,12 +250,11 @@ export default function GallerySection() {
                       onClick={() => openLightbox(images[0])}
                     >
                       <div className="relative aspect-[3/2] overflow-hidden">
-                        {images[0].thumbnail?.url ||
-                        images[0].thumbnail?.thumbnailUrl ? (
+                        {images[0].images && images[0].images.length > 0 ? (
                           <img
                             src={
-                              images[0].thumbnail?.thumbnailUrl ||
-                              images[0].thumbnail?.url
+                              images[0].images[images[0].thumbnailIndex || 0]?.thumbnailUrl ||
+                              images[0].images[images[0].thumbnailIndex || 0]?.url
                             }
                             alt={images[0].title || "Gallery Image"}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
@@ -302,12 +301,11 @@ export default function GallerySection() {
                         onClick={() => openLightbox(images[1])}
                       >
                         <div className="relative aspect-square overflow-hidden">
-                          {images[1].thumbnail?.url ||
-                          images[1].thumbnail?.thumbnailUrl ? (
+                          {images[1].images && images[1].images.length > 0 ? (
                             <img
                               src={
-                                images[1].thumbnail?.thumbnailUrl ||
-                                images[1].thumbnail?.url
+                                images[1].images[images[1].thumbnailIndex || 0]?.thumbnailUrl ||
+                                images[1].images[images[1].thumbnailIndex || 0]?.url
                               }
                               alt={images[1].title || "Gallery Image"}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
@@ -347,12 +345,11 @@ export default function GallerySection() {
                         onClick={() => openLightbox(images[2])}
                       >
                         <div className="relative aspect-square overflow-hidden">
-                          {images[2].thumbnail?.url ||
-                          images[2].thumbnail?.thumbnailUrl ? (
+                          {images[2].images && images[2].images.length > 0 ? (
                             <img
                               src={
-                                images[2].thumbnail?.thumbnailUrl ||
-                                images[2].thumbnail?.url
+                                images[2].images[images[2].thumbnailIndex || 0]?.thumbnailUrl ||
+                                images[2].images[images[2].thumbnailIndex || 0]?.url
                               }
                               alt={images[2].title || "Gallery Image"}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"

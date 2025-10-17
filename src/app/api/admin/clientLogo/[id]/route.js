@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import ClientLogo from '@/models/ClientLogo';
+import User from '@/models/User';
 import StorageFactory from '@/lib/storage';
 import { getUserFromToken } from '@/lib/auth';
 
@@ -8,7 +9,7 @@ export async function GET(request, { params }) {
   try {
     await dbConnect();
     
-    const { id } = params;
+    const { id } = await params;
     
     const logo = await ClientLogo.findById(id)
       .populate('uploadedBy', 'username');
@@ -37,7 +38,7 @@ export async function PUT(request, { params }) {
 
     await getUserFromToken(request);
     
-    const { id } = params;
+    const { id } = await params;
     const { title, isActive, position } = await request.json();
     
     const updateData = {};
@@ -78,7 +79,7 @@ export async function DELETE(request, { params }) {
 
     await getUserFromToken(request);
     
-    const { id } = params;
+    const { id } = await params;
 
     const logo = await ClientLogo.findById(id);
     if (!logo) {
