@@ -56,15 +56,15 @@ export default function HeroSection() {
 
             {/* Main Heading */}
             <h1
-              className={`text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-bold leading-[1.15] text-black transition-all duration-700 delay-100 ${
+              className={`text-[2.25rem] md:text-5xl lg:text-5xl xl:text-6xl font-bold leading-[1.15] text-black transition-all duration-700 delay-100 ${
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
             >
               Kontraktor Stand
               <br />
-              <span className="relative inline-block">
-                <span className="relative z-10 text-black"> Pameran Berkualitas</span>
-                <span className="absolute bottom-3 left-0 right-0 h-4 bg-red-600 opacity-20 -rotate-1 rounded-lg"></span>
+              Pameran <span className="relative inline-block group/highlight whitespace-nowrap">
+                <span className="relative z-10 text-black px-2 md:px-3">Berkualitas</span>
+                <span className="absolute bottom-0 md:bottom-1 left-2 right-2 h-2.5 md:h-4 bg-red-600 opacity-25 rounded-sm transform transition-all duration-500 group-hover/highlight:opacity-35 group-hover/highlight:h-3 md:group-hover/highlight:h-5"></span>
               </span>
               <br />
               untuk Brand Anda
@@ -85,14 +85,19 @@ export default function HeroSection() {
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
             >
-              <Link
-                href="/kontak"
-                className="group relative inline-flex items-center justify-center gap-3 px-7 py-3.5 rounded-full bg-black text-white text-base font-semibold overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-black/30"
+              <button
+                onClick={() => {
+                  const contactSection = document.getElementById('contact');
+                  if (contactSection) {
+                    contactSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }
+                }}
+                className="group relative inline-flex items-center justify-center gap-3 px-7 py-3.5 rounded-full bg-black text-white text-base font-semibold overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-black/30 cursor-pointer"
               >
                 <span className="relative z-10">Konsultasi Gratis</span>
                 <ArrowRight className="relative z-10 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
                 <span className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-700 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out" />
-              </Link>
+              </button>
 
               <Link
                 href="/portofolio"
