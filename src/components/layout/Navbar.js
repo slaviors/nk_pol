@@ -142,7 +142,8 @@ export default function Navbar() {
 
   useEffect(() => {
     const updateIndicator = () => {
-      const index = hoveredIndex !== null ? hoveredIndex : activeIndex;
+      // Only update indicator for active item, not on hover
+      const index = activeIndex;
       if (index !== -1 && navRefs.current[index]) {
         const element = navRefs.current[index];
         setIndicatorStyle({
@@ -155,7 +156,7 @@ export default function Navbar() {
     updateIndicator();
     window.addEventListener('resize', updateIndicator);
     return () => window.removeEventListener('resize', updateIndicator);
-  }, [activeIndex, hoveredIndex]);
+  }, [activeIndex]);
 
   return (
     <>
@@ -181,19 +182,20 @@ export default function Navbar() {
             {/* Desktop Navigation with sliding indicator */}
             <div className="hidden lg:flex items-center">
               <div className="relative flex items-center bg-gray-50/80 backdrop-blur-sm rounded-full px-1.5 py-1.5 gap-0.5">
-                {/* Sliding indicator background */}
+                {/* Sliding indicator background - only moves with active */}
                 <div
                   className="absolute top-1.5 bottom-1.5 bg-black rounded-full transition-all duration-500 ease-out shadow-lg shadow-black/10"
                   style={{
                     width: indicatorStyle.width,
                     left: indicatorStyle.left,
                     transform: 'translateX(0)',
-                    opacity: activeIndex === -1 && hoveredIndex === null ? 0 : 1,
+                    opacity: activeIndex === -1 ? 0 : 1,
                   }}
                 />
 
                 {navLinks.map((link, index) => {
                   const active = isActive(link);
+                  const isHovered = hoveredIndex === index;
                   return (
                     <Link
                       key={`${link.href}-${link.section || link.label}`}
@@ -206,9 +208,11 @@ export default function Navbar() {
                     >
                       <span 
                         className={`transition-colors duration-300 ${
-                          (active && hoveredIndex === null) || hoveredIndex === index
+                          active
                             ? 'text-white' 
-                            : 'text-gray-600'
+                            : isHovered 
+                              ? 'text-black' 
+                              : 'text-gray-600'
                         }`}
                       >
                         {link.label}

@@ -23,14 +23,12 @@ export default function ContactSection() {
       
       <div className="w-full max-w-[1400px] mx-auto px-6 lg:px-12 xl:px-16 relative z-10">
         {/* Header */}
-        <div className="text-center mb-16">
-          <div className="inline-block mb-4">
-            <span className="inline-block w-12 h-1 bg-red-600 rounded"></span>
-          </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 tracking-tight">
-            Hubungi <span className="text-red-600">Kami</span>
+        <div className="text-center mb-16 md:mb-20 group cursor-default">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-black group-hover:text-red-600 mb-4 leading-tight transition-all duration-700">
+            Hubungi Kami
           </h2>
-          <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          <div className="w-24 h-1 bg-red-600 rounded-full mx-auto mb-6 transition-all duration-700 group-hover:w-32"></div>
+          <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed transition-all duration-700 group-hover:text-gray-800">
             Konsultasikan kebutuhan stand pameran Anda bersama tim profesional kami
           </p>
         </div>
