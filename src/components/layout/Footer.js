@@ -67,6 +67,7 @@ export default function Footer() {
   const quickLinks = [
     { name: 'Beranda', href: '/' },
     { name: 'Tentang Kami', href: '#about-section' },
+    { name: 'Layanan', href: '#services-section' },
     { name: 'Portfolio', href: '/portofolio' },
     { name: 'Kontak', href: '/kontak' },
   ];
