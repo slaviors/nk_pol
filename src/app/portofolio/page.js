@@ -295,12 +295,22 @@ export default function PortofolioPage() {
                 {/* Main Image */}
                 <div className="relative bg-gray-100 rounded-xl overflow-hidden canvas-bg">
                   {selectedPost.images && selectedPost.images[currentImageIndex] && (
-                    <img
-                      src={selectedPost.images[currentImageIndex].url}
-                      alt={`${selectedPost.title} - Image ${currentImageIndex + 1}`}
-                      className="w-full h-auto object-contain"
-                      style={{ maxHeight: '50vh' }}
-                    />
+                    <>
+                      <img
+                        src={selectedPost.images[currentImageIndex].url}
+                        alt={`${selectedPost.title} - Image ${currentImageIndex + 1}`}
+                        className="w-full h-auto object-contain"
+                        style={{ maxHeight: '50vh' }}
+                      />
+                      {/* Watermark on Main Image */}
+                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 opacity-20 pointer-events-none">
+                        <img
+                          src="/images/assets/logo.png"
+                          alt="NK POL"
+                          className="w-16 h-16 md:w-20 md:h-20 object-contain grayscale"
+                        />
+                      </div>
+                    </>
                   )}
                 </div>
 
@@ -350,7 +360,7 @@ export default function PortofolioPage() {
                           e.stopPropagation();
                           setCurrentImageIndex(idx);
                         }}
-                        className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
+                        className={`relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
                           idx === currentImageIndex
                             ? 'border-red-600 ring-4 ring-red-100 scale-105'
                             : 'border-gray-200 hover:border-red-300'
@@ -361,6 +371,14 @@ export default function PortofolioPage() {
                           alt={`Thumbnail ${idx + 1}`}
                           className="w-full h-full object-cover"
                         />
+                        {/* Watermark on Thumbnail */}
+                        <div className="absolute bottom-1 left-1/2 -translate-x-1/2 opacity-30 pointer-events-none">
+                          <img
+                            src="/images/assets/logo.png"
+                            alt="NK POL"
+                            className="w-8 h-8 object-contain grayscale"
+                          />
+                        </div>
                       </button>
                     ))}
                   </div>
