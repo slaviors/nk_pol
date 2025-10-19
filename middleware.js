@@ -3,31 +3,6 @@ import { NextResponse } from 'next/server';
 export function middleware(request) {
   const { pathname } = request.nextUrl;
 
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Middleware - Path:', pathname);
-  }
-
-
-  if (pathname.startsWith('/nk-pol-config') &&
-    !pathname.includes('/nk-pol-config/auth/login')) {
-
-
-    const authHeader = request.headers.get('authorization');
-    const hasToken = authHeader && authHeader.startsWith('Bearer ');
-
-    if (!hasToken) {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('No token found, redirecting to login');
-      }
-      return NextResponse.redirect(new URL('/nk-pol-config/auth/login', request.url));
-    }
-
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Token found, allowing access');
-    }
-  }
-
-
   if (pathname.startsWith('/api/admin') &&
     !pathname.includes('/api/admin/auth/login') &&
     !pathname.includes('/api/admin/auth/register')) {
@@ -46,8 +21,5 @@ export function middleware(request) {
 }
 
 export const config = {
-  matcher: [
-    '/nk-pol-config/:path*',
-    '/api/admin/:path*'
-  ]
+  matcher: ['/api/admin/:path*']
 };
