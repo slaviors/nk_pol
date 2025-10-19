@@ -47,8 +47,8 @@ export default function Footer() {
     {
       icon: Phone,
       label: 'Telepon',
-      value: '+62 XXX XXX XXXX',
-      href: 'tel:+62XXXXXXXXXX',
+      value: '+62 896 7890 1569',
+      href: 'https://wa.me/6289678901569',
     },
     {
       icon: Mail,
