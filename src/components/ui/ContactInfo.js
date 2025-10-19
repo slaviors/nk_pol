@@ -54,13 +54,7 @@ export default function ContactInfo() {
               href="tel:+6285817818051" 
               className="block hover:text-red-600 transition-colors font-medium text-sm"
             >
-              +62 858-1781-8051
-            </a>
-            <a 
-              href="tel:+6288801232923" 
-              className="block hover:text-red-600 transition-colors font-medium text-sm"
-            >
-              +62 888-0123-2923
+              +62 896-7890-1569
             </a>
           </div>
         </ContactInfoCard>
