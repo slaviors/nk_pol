@@ -4,11 +4,18 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Play, Users, Award, Star, ChevronDown } from 'lucide-react';
+import { ArrowRight, Play, Users, BadgeCheck, Briefcase } from 'lucide-react';
 
 export default function HeroSection() {
   const [isVisible, setIsVisible] = useState(false);
   const [scrollAnimation, setScrollAnimation] = useState(true);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const heroImages = [
+    '/images/hero-1.jpeg',
+    '/images/hero-2.jpeg',
+    '/images/hero-3.jpeg',
+  ];
 
   useEffect(() => {
     setIsVisible(true);
@@ -25,30 +32,46 @@ export default function HeroSection() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Auto-slide images every 10 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [heroImages.length]);
+
   const stats = [
     { icon: Users, value: '200+', label: 'Klien Puas' },
-    { icon: Award, value: '500+', label: 'Proyek Selesai' },
-    { icon: Star, value: '5 Tahun', label: 'Pengalaman' },
+    { icon: BadgeCheck, value: '1000+', label: 'Proyek Selesai' },
+    { icon: Briefcase, value: '5+', label: 'Tahun Pengalaman' },
   ];
 
   return (
-    <section className="relative h-screen flex items-center justify-center overflow-hidden bg-white pt-14">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <section 
+      className="relative flex items-center justify-center overflow-hidden bg-white"
+      style={{ minHeight: 'calc(100vh - 72px)' }}
+    >
+      <div className="hidden lg:block absolute inset-0 overflow-hidden pointer-events-none">
 
-        {/* Subtle Grid Pattern */}
+        {/* Base Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-100 via-white to-red-50" />
+
+        {/* Dot Pattern - Only on Large screens */}
         <div 
-          className="absolute inset-0 opacity-[0.02]"
+          className="lg:block absolute inset-0 opacity-30"
           style={{
-            backgroundImage: `
-              linear-gradient(rgba(0,0,0,.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(0,0,0,.1) 1px, transparent 1px)
-            `,
-            backgroundSize: '50px 50px'
+            backgroundImage: `radial-gradient(circle, rgba(0,0,0,0.15) 1.5px, transparent 1.5px)`,
+            backgroundSize: '25px 25px'
           }}
         />
+
+        {/* Large Abstract Shapes */}
+        <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-red-600/10 rounded-full" />
+        <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-gray-900/8 rounded-full" />
       </div>
 
-      <div className="container-custom relative z-10 py-8 md:py-12 lg:py-16">
+      <div className="container-custom relative z-10 pb-4 md:pb-6 lg:pb-8">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           
           {/* Left Content */}
@@ -140,19 +163,66 @@ export default function HeroSection() {
                 isVisible ? 'opacity-100 scale-100 rotate-0' : 'opacity-0 scale-95 rotate-3'
               }`}
             >
-              {/* Main Image Container */}
               <div className="relative h-[450px] xl:h-[500px] rounded-3xl overflow-hidden bg-white shadow-2xl border border-gray-100 group">
-                <Image
-                  src="/images/hero.jpeg"
-                  alt="Kontraktor Stand Pameran Profesional NK POL - Kontraktor Booth Exhibition Jakarta"
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                />
+                {/* Image Slideshow with Fade Effect */}
+                {heroImages.map((image, index) => (
+                  <Image
+                    key={image}
+                    src={image}
+                    alt={`Kontraktor Stand Pameran Profesional NK POL - Kontraktor Booth Exhibition Jakarta ${index + 1}`}
+                    fill
+                    className={`object-cover transition-all duration-[2000ms] group-hover:scale-105 ${
+                      index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    priority={index === 0}
+                    loading={index === 0 ? 'eager' : 'lazy'}
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                  />
+                ))}
                 
                 {/* Hover Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                {/* Slideshow Indicators */}
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                  {heroImages.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={`relative h-1.5 rounded-full transition-all duration-500 ${
+                        index === currentImageIndex 
+                          ? 'w-8 bg-white' 
+                          : 'w-1.5 bg-white/50 hover:bg-white/75'
+                      }`}
+                      aria-label={`Go to slide ${index + 1}`}
+                    >
+                      {index === currentImageIndex && (
+                        <span className="absolute inset-0 bg-red-600 rounded-full animate-[slideProgress_10s_linear]" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Navigation Arrows */}
+                <button
+                  onClick={() => setCurrentImageIndex((prev) => (prev - 1 + heroImages.length) % heroImages.length)}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white hover:scale-110 z-20"
+                  aria-label="Previous image"
+                >
+                  <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                
+                <button
+                  onClick={() => setCurrentImageIndex((prev) => (prev + 1) % heroImages.length)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white hover:scale-110 z-20"
+                  aria-label="Next image"
+                >
+                  <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
 
                 {/* Floating Accent Circles */}
                 <div className="absolute -top-4 -right-4 w-16 h-16 rounded-full bg-red-600 opacity-20 blur-xl animate-pulse"></div>
@@ -161,7 +231,6 @@ export default function HeroSection() {
 
               {/* Decorative Frame */}
               <div className="absolute -top-6 -right-6 w-full h-full border-2 border-red-600 rounded-3xl opacity-30 -z-10 pointer-events-none"></div>
-              <div className="absolute top-8 left-8 w-12 h-12 border border-gray-300 rounded-full opacity-40 animate-bounce" style={{ animationDelay: '2s' }}></div>
             </div>
           </div>
         </div>
