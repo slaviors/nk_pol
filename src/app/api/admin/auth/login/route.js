@@ -1,13 +1,57 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
+import AuthLog from '@/models/AuthLog';
 import jwt from 'jsonwebtoken';
+import { loginRateLimit, getClientIP } from '@/lib/ratelimit';
 
 export async function POST(request) {
+  const ip = getClientIP(request);
+  const userAgent = request.headers.get('user-agent');
+  let username = '';
+
   try {
+
+    const rateLimitResult = await loginRateLimit.limit(ip);
+
+    if (!rateLimitResult.success) {
+      const resetTime = Math.ceil((rateLimitResult.reset - Date.now()) / 1000 / 60);
+
+
+      await dbConnect();
+      if (username) {
+        await AuthLog.logEvent({
+          username,
+          action: 'rate_limited',
+          ip,
+          userAgent,
+          success: false,
+          failureReason: 'rate_limited'
+        });
+      }
+
+      return NextResponse.json(
+        {
+          error: 'Too many login attempts. Please try again later.',
+          retryAfter: resetTime
+        },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': resetTime.toString(),
+            'X-RateLimit-Limit': rateLimitResult.limit.toString(),
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': rateLimitResult.reset.toString()
+          }
+        }
+      );
+    }
+
+
     await dbConnect();
-    
-    const { username, password } = await request.json();
+
+    const { username: user, password } = await request.json();
+    username = user;
 
     if (!username || !password) {
       return NextResponse.json(
@@ -16,58 +60,84 @@ export async function POST(request) {
       );
     }
 
-    const user = await User.findOne({ username });
-    if (!user) {
+    const userDoc = await User.findOne({ username });
+    if (!userDoc) {
+
+      await AuthLog.logEvent({
+        username,
+        action: 'login_failed',
+        ip,
+        userAgent,
+        success: false,
+        failureReason: 'invalid_username'
+      });
+
       return NextResponse.json(
         { error: 'Invalid credentials' },
         { status: 401 }
       );
     }
 
-    const isMatch = await user.comparePassword(password);
+    const isMatch = await userDoc.comparePassword(password);
     if (!isMatch) {
+
+      await AuthLog.logEvent({
+        userId: userDoc._id,
+        username,
+        action: 'login_failed',
+        ip,
+        userAgent,
+        success: false,
+        failureReason: 'invalid_password'
+      });
+
       return NextResponse.json(
         { error: 'Invalid credentials' },
         { status: 401 }
       );
     }
+
 
     const token = jwt.sign(
-      { userId: user._id, username: user.username },
+      {
+        userId: userDoc._id,
+        username: userDoc.username,
+        tokenVersion: userDoc.tokenVersion || 0
+      },
       process.env.JWT_TOKEN,
-      { expiresIn: '7d' }
+      {
+        expiresIn: '24h',
+        issuer: 'nk-pol-api',
+        audience: 'nk-pol-admin'
+      }
     );
 
-    console.log('Token created for user:', username);
+
+    await AuthLog.logEvent({
+      userId: userDoc._id,
+      username,
+      action: 'login_success',
+      ip,
+      userAgent,
+      success: true
+    });
+
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Login successful for user:', username);
+    }
 
     const response = NextResponse.json(
-      { 
+      {
         message: 'Login successful',
         user: {
-          id: user._id,
-          username: user.username
+          id: userDoc._id,
+          username: userDoc.username
         },
-
         token: token
       },
       { status: 200 }
     );
-
-    const isProduction = process.env.NODE_ENV === 'production';
-    const maxAge = 7 * 24 * 60 * 60;
-
-    response.cookies.set('auth-token', token, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: 'lax',
-      maxAge: maxAge,
-      path: '/'
-    });
-
-    const cookieString = `auth-token=${token}; HttpOnly; ${isProduction ? 'Secure;' : ''} SameSite=Lax; Max-Age=${maxAge}; Path=/`;
-    response.headers.append('Set-Cookie', cookieString);
-
-    console.log('Set-Cookie header:', cookieString);
 
     return response;
 
