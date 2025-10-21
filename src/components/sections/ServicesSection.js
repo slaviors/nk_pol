@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { Sparkles, Hammer, Palette, Zap, Package, Briefcase, ChevronDown } from 'lucide-react';
+import { Hammer, Palette, PackageOpen, Briefcase, ChevronDown, Store, Repeat } from 'lucide-react';
 
 export default function ServicesSection() {
   const [isVisible, setIsVisible] = useState(false);
@@ -104,34 +104,34 @@ export default function ServicesSection() {
 
   const services = [
     {
-      icon: Sparkles,
+      icon: Store,
       title: 'Desain Booth & Konsep Pameran',
-      description: 'Kami menciptakan desain booth yang kreatif, fungsional, dan sesuai karakter brand Anda. Setiap konsep kami rancang secara detail untuk menarik perhatian pengunjung dan memperkuat identitas merek di setiap pameran. Dari ide ke visual yang memukau — kami wujudkan ruang pameran yang bercerita.',
+      description: 'Kami menciptakan desain booth yang kreatif, fungsional, dan sesuai karakter brand Anda untuk menarik perhatian pengunjung.',
     },
     {
       icon: Hammer,
       title: 'Produksi & Konstruksi Booth',
-      description: 'NK POL memiliki tim teknisi dan tukang berpengalaman yang memastikan setiap booth dibangun dengan kualitas konstruksi tinggi dan presisi sempurna. Kami mengutamakan ketepatan waktu dan keamanan struktur, agar setiap proyek dapat berdiri kokoh dan siap tampil tepat jadwal.',
+      description: 'Tim teknisi berpengalaman memastikan booth dibangun dengan kualitas tinggi, presisi sempurna, dan tepat waktu.',
     },
     {
       icon: Palette,
       title: 'Dekorasi Event & Area Publik',
-      description: 'Kami juga menangani dekorasi event, area mall, dan ruang komersial lainnya. Setiap proyek dikerjakan dengan perpaduan estetika, konsep visual, dan kebutuhan fungsional agar ruang terasa hidup dan menarik.',
+      description: 'Menangani dekorasi event, area mall, dan ruang komersial dengan perpaduan estetika dan kebutuhan fungsional.',
     },
     {
-      icon: Zap,
+      icon: Repeat,
       title: 'Instalasi & Dismantle',
-      description: 'Tim kami memastikan proses pemasangan hingga pembongkaran booth (dismantle) berjalan cepat, aman, dan efisien. Kami memahami pentingnya waktu dan koordinasi di lapangan — karena itu, setiap tahap kami kelola secara profesional agar acara berjalan lancar dari awal hingga akhir.',
+      description: 'Proses pemasangan hingga pembongkaran booth yang cepat, aman, dan efisien dengan koordinasi profesional.',
     },
     {
-      icon: Package,
+      icon: PackageOpen,
       title: 'Sewa Perlengkapan Pameran',
-      description: 'NK POL juga menyediakan layanan penyewaan perlengkapan pameran seperti furniture, display system, lighting, hingga backdrop dan partisi. Dengan banyak pilihan dan kualitas peralatan terbaik, kami mempermudah Anda untuk mendapatkan solusi lengkap dalam satu tempat.',
+      description: 'Menyediakan furniture, display system, lighting, backdrop, dan partisi dengan kualitas terbaik.',
     },
     {
       icon: Briefcase,
       title: 'Manajemen Proyek Pameran',
-      description: 'Kami membantu klien dalam perencanaan dan koordinasi keseluruhan proyek pameran, mulai dari layout area, timeline pekerjaan, hingga pengawasan di lokasi. Tujuannya sederhana: agar setiap detail berjalan sesuai rencana dan menghasilkan pameran yang sukses tanpa hambatan.',
+      description: 'Perencanaan dan koordinasi lengkap mulai dari layout, timeline, hingga pengawasan di lokasi.',
     },
   ];
 
@@ -192,7 +192,7 @@ export default function ServicesSection() {
           {/* LEFT - Service Cards Grid (Desktop) / Stack Carousel (Mobile) */}
           
           {/* Desktop View - Dropdown Accordion */}
-          <div className="hidden sm:block space-y-3">
+          <div className="hidden sm:block space-y-2">
             {services.map((service, index) => {
               const Icon = service.icon;
               const isActive = activeCard === index;
@@ -212,37 +212,37 @@ export default function ServicesSection() {
                     className="w-full text-left"
                   >
                     <div
-                      className={`relative bg-white rounded-2xl border-2 transition-all duration-500 overflow-hidden group ${
+                      className={`relative bg-white rounded-xl border-2 transition-all duration-500 overflow-hidden group ${
                         isActive
-                          ? 'border-red-600 shadow-2xl'
-                          : 'border-gray-200 hover:border-gray-300 shadow-md hover:shadow-lg'
+                          ? 'border-red-600 shadow-xl'
+                          : 'border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md'
                       }`}
                     >
                       {/* Header - Always Visible */}
-                      <div className="flex items-center gap-4 p-5 md:p-6">
+                      <div className="flex items-center gap-3 p-4">
                         {/* Icon */}
-                        <div className={`flex-shrink-0 flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-xl transition-all duration-500 ${
+                        <div className={`flex-shrink-0 flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-lg transition-all duration-500 ${
                           isActive 
                             ? 'bg-gradient-to-br from-red-600 to-red-700 text-white shadow-lg scale-110' 
                             : 'bg-red-50 text-red-600 group-hover:bg-red-100'
                         }`}>
-                          <Icon className="w-6 h-6 md:w-7 md:h-7" />
+                          <Icon className="w-5 h-5 md:w-6 md:h-6" />
                           {/* Pulse effect for active */}
                           {isActive && (
-                            <div className="absolute inset-0 rounded-xl bg-red-600  opacity-20" />
+                            <div className="absolute inset-0 rounded-lg bg-red-600  opacity-20" />
                           )}
                         </div>
 
                         {/* Title */}
                         <div className="flex-1 min-w-0">
-                          <h3 className={`text-base md:text-lg font-bold leading-tight transition-colors duration-300 mb-1 ${
+                          <h3 className={`text-sm md:text-base font-bold leading-tight transition-colors duration-300 ${
                             isActive ? 'text-red-600' : 'text-gray-800 group-hover:text-black'
                           }`}>
                             {service.title}
                           </h3>
                           {/* Short preview when closed */}
                           {!isActive && (
-                            <p className="text-xs md:text-sm text-gray-500 line-clamp-1">
+                            <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">
                               {service.description}
                             </p>
                           )}
@@ -250,7 +250,7 @@ export default function ServicesSection() {
 
                         {/* Chevron */}
                         <ChevronDown
-                          className={`flex-shrink-0 w-5 h-5 md:w-6 md:h-6 transition-all duration-500 ${
+                          className={`flex-shrink-0 w-5 h-5 transition-all duration-500 ${
                             isActive
                               ? 'text-red-600 rotate-180'
                               : 'text-gray-400 rotate-0 group-hover:text-gray-600'
@@ -262,13 +262,13 @@ export default function ServicesSection() {
                       <div
                         className={`transition-all duration-500 ease-in-out ${
                           isActive
-                            ? 'max-h-96 opacity-100'
+                            ? 'max-h-40 opacity-100'
                             : 'max-h-0 opacity-0'
                         }`}
                       >
-                        <div className="px-5 md:px-6 pb-5 md:pb-6 border-t border-gray-100">
+                        <div className="px-4 pb-4 border-t border-gray-100">
                           {/* Description */}
-                          <p className="text-sm md:text-base text-gray-600 leading-relaxed pt-4">
+                          <p className="text-sm text-gray-600 leading-relaxed pt-3">
                             {service.description}
                           </p>
                         </div>
@@ -276,12 +276,12 @@ export default function ServicesSection() {
 
                       {/* Active Bottom Border */}
                       {isActive && (
-                        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 via-red-500 to-red-600 rounded-b-2xl" />
+                        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 via-red-500 to-red-600 rounded-b-xl" />
                       )}
 
                       {/* Corner Accent */}
                       {isActive && (
-                        <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-red-600/10 to-transparent rounded-bl-3xl pointer-events-none" />
+                        <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-red-600/10 to-transparent rounded-bl-3xl pointer-events-none" />
                       )}
                     </div>
                   </button>
@@ -291,7 +291,7 @@ export default function ServicesSection() {
           </div>
 
           {/* Mobile View - Dropdown Accordion */}
-          <div className="sm:hidden space-y-3">
+          <div className="sm:hidden space-y-2">
             {services.map((service, index) => {
               const Icon = service.icon;
               const isActive = activeCard === index;
@@ -311,24 +311,24 @@ export default function ServicesSection() {
                     className="w-full text-left"
                   >
                     <div
-                      className={`relative bg-white rounded-2xl border-2 transition-all duration-500 overflow-hidden ${
+                      className={`relative bg-white rounded-xl border-2 transition-all duration-500 overflow-hidden ${
                         isActive
-                          ? 'border-red-600 shadow-2xl'
-                          : 'border-gray-200 hover:border-gray-300 shadow-md'
+                          ? 'border-red-600 shadow-xl'
+                          : 'border-gray-200 hover:border-gray-300 shadow-sm'
                       }`}
                     >
                       {/* Header - Always Visible */}
-                      <div className="flex items-center gap-3 p-4">
+                      <div className="flex items-center gap-3 p-3">
                         {/* Icon */}
-                        <div className={`flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-500 ${
+                        <div className={`flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-500 ${
                           isActive 
                             ? 'bg-gradient-to-br from-red-600 to-red-700 text-white shadow-lg scale-110' 
                             : 'bg-red-50 text-red-600'
                         }`}>
-                          <Icon className="w-6 h-6" />
+                          <Icon className="w-5 h-5" />
                           {/* Pulse effect for active */}
                           {isActive && (
-                            <div className="absolute inset-0 rounded-xl bg-red-600  opacity-20" />
+                            <div className="absolute inset-0 rounded-lg bg-red-600  opacity-20" />
                           )}
                         </div>
 
@@ -343,7 +343,7 @@ export default function ServicesSection() {
 
                         {/* Chevron */}
                         <ChevronDown
-                          className={`flex-shrink-0 w-5 h-5 transition-all duration-500 ${
+                          className={`flex-shrink-0 w-4 h-4 transition-all duration-500 ${
                             isActive
                               ? 'text-red-600 rotate-180'
                               : 'text-gray-400 rotate-0'
@@ -355,13 +355,13 @@ export default function ServicesSection() {
                       <div
                         className={`transition-all duration-500 ease-in-out ${
                           isActive
-                            ? 'max-h-96 opacity-100'
+                            ? 'max-h-32 opacity-100'
                             : 'max-h-0 opacity-0'
                         }`}
                       >
-                        <div className="px-4 pb-4 border-t border-gray-100">
+                        <div className="px-3 pb-3 border-t border-gray-100">
                           {/* Description */}
-                          <p className="text-sm text-gray-600 leading-relaxed pt-3">
+                          <p className="text-xs text-gray-600 leading-relaxed pt-2.5">
                             {service.description}
                           </p>
                         </div>
@@ -369,12 +369,12 @@ export default function ServicesSection() {
 
                       {/* Active Bottom Border */}
                       {isActive && (
-                        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 via-red-500 to-red-600 rounded-b-2xl" />
+                        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 via-red-500 to-red-600 rounded-b-xl" />
                       )}
 
                       {/* Corner Accent */}
                       {isActive && (
-                        <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-red-600/10 to-transparent rounded-bl-3xl pointer-events-none" />
+                        <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-red-600/10 to-transparent rounded-bl-3xl pointer-events-none" />
                       )}
                     </div>
                   </button>
@@ -435,31 +435,6 @@ export default function ServicesSection() {
                   />
                 ))}
               </div>
-            </div>
-
-            {/* CTA Card */}
-            <div className="relative bg-gradient-to-br from-red-600 to-red-700 rounded-3xl p-8 md:p-10 overflow-hidden shadow-xl group hover:shadow-2xl transition-all duration-500">
-              {/* Background Pattern */}
-              <div className="absolute inset-0 opacity-10">
-                <div className="absolute top-0 right-0 w-40 h-40 bg-white rounded-full -translate-y-1/2 translate-x-1/2" />
-                <div className="absolute bottom-0 left-0 w-32 h-32 bg-white rounded-full translate-y-1/2 -translate-x-1/2" />
-              </div>
-
-              <div className="relative z-10">
-                <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 leading-tight">
-                  Siap Wujudkan Booth Impian Anda?
-                </h3>
-                <p className="text-red-50 text-sm md:text-base mb-6 leading-relaxed">
-                  Konsultasikan kebutuhan pameran Anda dengan tim profesional kami. Kami siap membantu dari konsep hingga eksekusi.
-                </p>
-                
-                <button className="w-full bg-white text-red-600 font-bold py-4 px-6 rounded-xl hover:bg-red-50 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 group-hover:scale-105">
-                  Hubungi Kami Sekarang
-                </button>
-              </div>
-
-              {/* Decorative Element */}
-              <div className="absolute -bottom-2 -right-2 w-24 h-24 bg-red-800 rounded-full opacity-20 group-hover:scale-150 transition-transform duration-700" />
             </div>
           </div>
         </div>
