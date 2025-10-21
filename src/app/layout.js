@@ -2,6 +2,7 @@
 import { generateMetadata, jsonLdSchemas, siteMetadata } from '@/config/metadata';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import FloatingWhatsApp from '@/components/ui/FloatingWhatsApp';
 import './globals.css';
 
 export const metadata = generateMetadata();
@@ -80,6 +81,9 @@ export default function RootLayout({ children }) {
         <footer>
           <Footer />
         </footer>
+
+        {/* Floating WhatsApp Button (Mobile Only) */}
+        <FloatingWhatsApp />
       </body>
     </html>
   );

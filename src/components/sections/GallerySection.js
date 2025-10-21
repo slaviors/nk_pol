@@ -378,11 +378,7 @@ export default function GallerySection() {
           -webkit-box-orient: vertical;
           overflow: hidden;
         }
-        .container-custom {
-          max-width: 1280px;
-          margin: 0 auto;
-          padding: 0 1rem;
-        }
+          
         @media (min-width: 640px) {
           .container-custom {
             padding: 0 1.5rem;
