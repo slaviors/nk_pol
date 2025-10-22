@@ -48,7 +48,7 @@ export default function AboutSection() {
           }`}
         >
           <Image
-            src="/images/home.jpeg"
+            src="/images/team.jpeg"
             alt="Tim Profesional NK POL - Kontraktor Pameran Jakarta"
             fill
             className="object-cover"

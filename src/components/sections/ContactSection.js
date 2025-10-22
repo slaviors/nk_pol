@@ -6,14 +6,36 @@ export default function ContactSection() {
 
   return (
     <section id="contact" className="min-h-screen py-24 bg-gradient-to-b from-white via-gray-50 to-white relative overflow-hidden flex items-center">
-      {/* Dot Pattern Background - Visible on all devices */}
-      <div 
-        className="absolute inset-0 opacity-50"
-        style={{
-          backgroundImage: `radial-gradient(circle, rgba(0,0,0,0.15) 1.5px, transparent 1.5px)`,
-          backgroundSize: '25px 25px'
-        }}
-      />
+      {/* Grid Lines Background with Vignette */}
+      <div className="absolute inset-0 opacity-80">
+        <div 
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, rgba(0,0,0,0.15) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(0,0,0,0.15) 1px, transparent 1px)
+            `,
+            backgroundSize: '40px 40px'
+          }}
+        />
+        {/* Dots at Grid Intersections */}
+        <div 
+          className="absolute"
+          style={{
+            inset: '1.31rem',
+            backgroundImage: `radial-gradient(circle, rgba(0,0,0,0.2) 2px, transparent 2px)`,
+            backgroundSize: '40px 40px',
+            backgroundPosition: '-0.5px -0.5px'
+          }}
+        />
+        {/* White Vignette Overlay */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: `radial-gradient(circle at center, transparent 0%, transparent 25%, rgba(255,255,255,0.7) 70%, white 90%)`
+          }}
+        />
+      </div>
       
       {/* Decorative elements */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-red-600 opacity-5 rounded-full blur-3xl"></div>
