@@ -42,7 +42,7 @@ export default function HeroSection() {
   }, [heroImages.length]);
 
   const stats = [
-    { icon: Users, value: '200+', label: 'Klien Puas' },
+    { icon: Users, value: '200+', label: 'Klien' },
     { icon: BadgeCheck, value: '1000+', label: 'Proyek Selesai' },
     { icon: Briefcase, value: '5+', label: 'Tahun Pengalaman' },
   ];
@@ -68,7 +68,14 @@ export default function HeroSection() {
 
         {/* Large Abstract Shapes */}
         <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-red-600/10 rounded-full" />
-        <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-gray-900/8 rounded-full" />
+        <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] rounded-full overflow-hidden">
+          <Image
+            src="/images/background/brushed-metal.jpg"
+            alt="Brushed Metal Texture"
+            fill
+            className="object-cover opacity-35"
+          />
+        </div>
       </div>
 
       <div className="container-custom relative z-10 pb-4 md:pb-6 lg:pb-8">

@@ -6,16 +6,14 @@ export default function ContactSection() {
 
   return (
     <section id="contact" className="min-h-screen py-24 bg-gradient-to-b from-white via-gray-50 to-white relative overflow-hidden flex items-center">
-      {/* Grid Lines Background */}
-      <div className="absolute inset-0 opacity-[0.03]">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `
-            linear-gradient(to right, #000 1px, transparent 1px),
-            linear-gradient(to bottom, #000 1px, transparent 1px)
-          `,
-          backgroundSize: '80px 80px'
-        }}></div>
-      </div>
+      {/* Dot Pattern Background - Visible on all devices */}
+      <div 
+        className="absolute inset-0 opacity-50"
+        style={{
+          backgroundImage: `radial-gradient(circle, rgba(0,0,0,0.15) 1.5px, transparent 1.5px)`,
+          backgroundSize: '25px 25px'
+        }}
+      />
       
       {/* Decorative elements */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-red-600 opacity-5 rounded-full blur-3xl"></div>
