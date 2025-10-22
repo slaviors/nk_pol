@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { ArrowRight, Eye } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function GallerySection() {
   const [images, setImages] = useState([]);
@@ -246,9 +246,6 @@ export default function GallerySection() {
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                           <div className="absolute inset-0 flex items-center justify-center">
                             <div className="transform translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                              <div className="w-14 h-14 border-2 border-white rounded-full flex items-center justify-center backdrop-blur-sm bg-white/10">
-                                <Eye className="w-6 h-6 text-white" />
-                              </div>
                             </div>
                           </div>
                         </div>
@@ -297,9 +294,6 @@ export default function GallerySection() {
                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                             <div className="absolute inset-0 flex items-center justify-center">
                               <div className="transform translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                                <div className="w-8 h-8 md:w-10 md:h-10 border-2 border-white rounded-full flex items-center justify-center backdrop-blur-sm bg-white/10">
-                                  <Eye className="w-3 h-3 md:w-4 md:h-4 text-white" />
-                                </div>
                               </div>
                             </div>
                           </div>
@@ -341,9 +335,6 @@ export default function GallerySection() {
                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                             <div className="absolute inset-0 flex items-center justify-center">
                               <div className="transform translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                                <div className="w-8 h-8 md:w-10 md:h-10 border-2 border-white rounded-full flex items-center justify-center backdrop-blur-sm bg-white/10">
-                                  <Eye className="w-3 h-3 md:w-4 md:h-4 text-white" />
-                                </div>
                               </div>
                             </div>
                           </div>

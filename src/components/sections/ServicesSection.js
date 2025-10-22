@@ -156,10 +156,16 @@ export default function ServicesSection() {
       id="services-section"
       className="relative bg-white py-16 md:py-20 lg:py-24 overflow-hidden"
     >
-      {/* Background */}
+      {/* Background Image */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 right-0 w-96 h-96 bg-red-50 rounded-full blur-3xl opacity-20" />
-        <div className="absolute bottom-1/4 left-0 w-80 h-80 bg-gray-50 rounded-full blur-3xl opacity-15" />
+        <Image
+          src="/images/background/brushed-metal.jpg"
+          alt="Brushed Metal Background"
+          fill
+          className="object-cover opacity-30"
+          priority
+        />
+        <div className="absolute inset-0 bg-white/40" />
       </div>
 
       <div className="container-custom relative z-10">
