@@ -10,6 +10,7 @@ export default function HeroSection() {
   const [isVisible, setIsVisible] = useState(false);
   const [scrollAnimation, setScrollAnimation] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [parallaxOffset, setParallaxOffset] = useState({ x: 0, y: 0 });
 
   const heroImages = [
     '/images/hero-1.jpeg',
@@ -21,11 +22,19 @@ export default function HeroSection() {
     setIsVisible(true);
     
     const handleScroll = () => {
-      if (window.scrollY > 100) {
+      const scrollY = window.scrollY;
+      
+      if (scrollY > 100) {
         setScrollAnimation(false);
       } else {
         setScrollAnimation(true);
       }
+      
+      // Parallax effect calculation
+      setParallaxOffset({
+        x: scrollY * 0.15,
+        y: scrollY * 0.3
+      });
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -57,23 +66,62 @@ export default function HeroSection() {
         {/* Base Gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-gray-100 via-white to-red-50" />
 
-        {/* Dot Pattern - Only on Large screens */}
-        <div 
-          className="lg:block absolute inset-0 opacity-30"
-          style={{
-            backgroundImage: `radial-gradient(circle, rgba(0,0,0,0.15) 1.5px, transparent 1.5px)`,
-            backgroundSize: '25px 25px'
-          }}
-        />
+        {/* Grid Lines with Dots and Vignette */}
+        <div className="absolute inset-0 opacity-50">
+          <div 
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `
+                linear-gradient(to right, rgba(0,0,0,0.15) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0,0,0,0.15) 1px, transparent 1px)
+              `,
+              backgroundSize: '40px 40px'
+            }}
+          />
+          {/* Dots at Grid Intersections */}
+          <div 
+            className="absolute"
+            style={{
+              inset: '1.31rem',
+              backgroundImage: `radial-gradient(circle, rgba(0,0,0,0.15) 2px, transparent 2px)`,
+              backgroundSize: '40px 40px',
+              backgroundPosition: '-0.5px -0.5px'
+            }}
+          />
+          {/* White Vignette Overlay */}
+          <div 
+            className="absolute inset-0"
+            style={{
+              background: `radial-gradient(circle at center, transparent 0%, transparent 25%, rgba(255,255,255,0.7) 70%, white 90%)`
+            }}
+          />
+        </div>
 
-        {/* Large Abstract Shapes */}
-        <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-red-600/10 rounded-full" />
-        <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] rounded-full overflow-hidden">
+        {/* Large Abstract Shapes with Parallax */}
+        <div 
+          className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full overflow-hidden transition-transform duration-300 ease-out"
+          style={{
+            transform: `translate(${parallaxOffset.x}px, ${-parallaxOffset.y}px) rotate(${parallaxOffset.x * 0.1}deg)`
+          }}
+        >
           <Image
             src="/images/background/brushed-metal.jpg"
             alt="Brushed Metal Texture"
             fill
             className="object-cover opacity-35"
+          />
+        </div>
+        <div 
+          className="absolute -bottom-40 -left-40 w-[600px] h-[600px] rounded-full overflow-hidden transition-transform duration-300 ease-out"
+          style={{
+            transform: `translate(${-parallaxOffset.x * 0.8}px, ${parallaxOffset.y * 1.2}px) rotate(${-parallaxOffset.x * 0.15}deg)`
+          }}
+        >
+          <Image
+            src="/images/background/brushed-metal.jpg"
+            alt="Brushed Metal Texture"
+            fill
+            className="object-cover opacity-40"
           />
         </div>
       </div>
