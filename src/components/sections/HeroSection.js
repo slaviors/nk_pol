@@ -13,9 +13,9 @@ export default function HeroSection() {
   const [parallaxOffset, setParallaxOffset] = useState({ x: 0, y: 0 });
 
   const heroImages = [
-    '/images/hero-1.jpeg',
-    '/images/hero-2.jpeg',
     '/images/hero-3.jpeg',
+    '/images/hero-2.jpeg',
+    '/images/hero-1.jpeg',
   ];
 
   useEffect(() => {

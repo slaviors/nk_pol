@@ -121,7 +121,7 @@ export default function PortofolioPage() {
     <>
       <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-white">
         {/* Hero Header */}
-        <div className="bg-gradient-to-br from-black via-gray-900 to-black text-white py-16 md:py-24 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-black via-gray-900 to-black text-white py-12 md:py-16 relative overflow-hidden">
           {/* Background Pattern */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute inset-0" style={{
