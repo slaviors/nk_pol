@@ -59,13 +59,6 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className="antialiased bg-white text-black">
-        {/* Skip to main content for accessibility */}
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-6 focus:py-3 focus:bg-black focus:text-white focus:rounded-lg focus:font-semibold"
-        >
-          Lewati ke konten utama
-        </a>
 
         {/* Header */}
         <header className="sticky top-0 z-50 bg-white border-b border-gray-200">

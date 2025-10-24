@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 
 export default function GallerySection() {
@@ -99,8 +100,20 @@ export default function GallerySection() {
 
   if (loading) {
     return (
-      <section className="py-16 md:py-24 lg:py-32 bg-gradient-to-br from-white via-gray-50 to-white">
-        <div className="container-custom">
+      <section className="py-16 md:py-24 lg:py-32 bg-white relative overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 pointer-events-none">
+          <Image
+            src="/images/background/brushed-metal.jpg"
+            alt="Brushed Metal Background"
+            fill
+            className="object-cover opacity-30"
+            priority
+          />
+          <div className="absolute inset-0 bg-white/40" />
+        </div>
+
+        <div className="container-custom relative z-10">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
             <div className="space-y-6">
               <div className="animate-pulse bg-gray-200 h-12 md:h-14 lg:h-16 w-3/4 rounded-lg"></div>
@@ -124,8 +137,20 @@ export default function GallerySection() {
 
   if (error) {
     return (
-      <section className="py-16 md:py-24 bg-gradient-to-br from-white via-gray-50 to-white">
-        <div className="container-custom">
+      <section className="py-16 md:py-24 bg-white relative overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 pointer-events-none">
+          <Image
+            src="/images/background/brushed-metal.jpg"
+            alt="Brushed Metal Background"
+            fill
+            className="object-cover opacity-30"
+            priority
+          />
+          <div className="absolute inset-0 bg-white/40" />
+        </div>
+
+        <div className="container-custom relative z-10">
           <div className="text-center">
             <div className="inline-block p-6 md:p-8 bg-red-50 border border-red-200 rounded-2xl">
               <p className="text-red-600 font-medium text-base md:text-lg">
@@ -147,12 +172,18 @@ export default function GallerySection() {
       <section
         ref={sectionRef}
         id="gallery"
-        className="py-16 md:py-24 lg:py-32 bg-gradient-to-br from-white via-gray-50 to-white relative overflow-hidden"
+        className="py-16 md:py-24 lg:py-32 bg-white relative overflow-hidden"
       >
-        {/* Animated Background Elements */}
+        {/* Background Image */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-20 -right-20 w-64 h-64 md:w-80 md:h-80 bg-red-100 rounded-full blur-3xl opacity-40" />
-          <div className="absolute bottom-20 -left-20 w-48 h-48 md:w-60 md:h-60 bg-gray-100 rounded-full blur-3xl opacity-30" />
+          <Image
+            src="/images/background/brushed-metal.jpg"
+            alt="Brushed Metal Background"
+            fill
+            className="object-cover opacity-40"
+            priority
+          />
+          <div className="absolute inset-0 bg-white/40" />
         </div>
 
         <div className="container-custom relative z-10">

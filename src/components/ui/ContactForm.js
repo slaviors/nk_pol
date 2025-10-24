@@ -7,8 +7,6 @@ import FormTextarea from './FormTextarea';
 export default function ContactForm() {
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
-    phone: '',
     message: ''
   });
   const [errors, setErrors] = useState({});
@@ -21,18 +19,6 @@ export default function ContactForm() {
 
     if (!formData.name.trim()) {
       newErrors.name = 'Nama harus diisi';
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email harus diisi';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Format email tidak valid';
-    }
-
-    if (!formData.phone.trim()) {
-      newErrors.phone = 'Nomor telepon harus diisi';
-    } else if (!/^[0-9+\-\s()]{8,}$/.test(formData.phone)) {
-      newErrors.phone = 'Nomor telepon tidak valid';
     }
 
     if (!formData.message.trim()) {
@@ -70,9 +56,7 @@ export default function ContactForm() {
     setIsSubmitting(true);
 
     const message = `*Pesan dari Website NK POL*%0A%0A` +
-      `*Nama:* ${formData.name}%0A` +
-      `*Email:* ${formData.email}%0A` +
-      `*Telepon:* ${formData.phone}%0A%0A` +
+      `*Nama:* ${formData.name}%0A%0A` +
       `*Pesan:*%0A${formData.message}`;
 
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`;
@@ -82,8 +66,6 @@ export default function ContactForm() {
     setTimeout(() => {
       setFormData({
         name: '',
-        email: '',
-        phone: '',
         message: ''
       });
       setIsSubmitting(false);
@@ -113,48 +95,16 @@ export default function ContactForm() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           <FormInput
-            label="Nama Lengkap"
+            label="Nama"
             name="name"
             type="text"
             value={formData.name}
             onChange={handleChange}
             error={errors.name}
-            placeholder="Masukkan nama lengkap Anda"
+            placeholder="Masukkan nama Anda"
             icon={
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            }
-            required
-          />
-
-          <FormInput
-            label="Email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            error={errors.email}
-            placeholder="nama@email.com"
-            icon={
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-            }
-            required
-          />
-
-          <FormInput
-            label="Nomor Telepon"
-            name="phone"
-            type="tel"
-            value={formData.phone}
-            onChange={handleChange}
-            error={errors.phone}
-            placeholder="08123456789"
-            icon={
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
             }
             required

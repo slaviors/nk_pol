@@ -26,12 +26,13 @@ export default function FormInput({
           name={name}
           value={value}
           onChange={onChange}
-          className={`w-full ${icon ? 'pl-12' : 'pl-4'} pr-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-600/20 transition-all duration-300 ${
+          className={`w-full ${icon ? 'pl-12' : 'pl-4'} pr-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-0 focus:shadow-none transition-all duration-300 ${
             error 
               ? 'border-red-300 bg-red-50' 
               : 'border-gray-200 hover:border-gray-300 focus:border-red-600'
           }`}
           placeholder={placeholder}
+          style={{ outline: 'none', boxShadow: 'none' }}
         />
       </div>
       {error && (

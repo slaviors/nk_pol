@@ -54,15 +54,18 @@ export default function ContactSection() {
         </div>
 
         {/* Content Grid */}
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* Contact Form */}
-          <ContactForm />
+        <div className="space-y-8 lg:space-y-12">
+          {/* Form & Map Grid */}
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
+            {/* Contact Form */}
+            <ContactForm />
 
-          {/* Map & Contact Info */}
-          <div className="space-y-6">
+            {/* Map */}
             <ContactMap />
-            <ContactInfo />
           </div>
+
+          {/* Contact Information - Full Width Below */}
+          <ContactInfo />
         </div>
       </div>
     </section>

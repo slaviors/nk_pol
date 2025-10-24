@@ -246,7 +246,7 @@ export default function TestimonySection() {
           src="/images/background/brushed-metal.jpg"
           alt="Brushed Metal Background"
           fill
-          className="object-cover opacity-30"
+          className="object-cover opacity-40"
           priority
         />
         <div className="absolute inset-0 bg-white/40" />

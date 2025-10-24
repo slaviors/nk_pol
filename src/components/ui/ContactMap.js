@@ -20,23 +20,6 @@ export default function ContactMap() {
 
   return (
     <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border-2 border-gray-100 hover:border-red-600/20">
-      {/* Location Tabs */}
-      <div className="bg-gray-50 border-b border-gray-200 p-2 flex gap-2">
-        {locations.map((location, index) => (
-          <button
-            key={index}
-            onClick={() => setActiveLocation(index)}
-            className={`flex-1 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300 ${
-              activeLocation === index
-                ? 'bg-red-600 text-white shadow-md'
-                : 'bg-white text-gray-600 hover:bg-gray-100'
-            }`}
-          >
-            {location.name}
-          </button>
-        ))}
-      </div>
-
       {/* Map Container */}
       <div className="relative h-[400px] lg:h-[500px]">
         <iframe
@@ -49,21 +32,38 @@ export default function ContactMap() {
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
           title={`Lokasi ${locations[activeLocation].name}`}
-          className="grayscale hover:grayscale-0 transition-all duration-500"
+          className="lg:grayscale lg:hover:grayscale-0 transition-all duration-500"
         ></iframe>
+      </div>
+
+      {/* Location Switcher - Below Map */}
+      <div className="px-3 py-2.5 bg-gray-50">
+        <div className="flex items-stretch gap-2">
+          {locations.map((location, index) => (
+            <button
+              key={index}
+              onClick={() => setActiveLocation(index)}
+              className={`flex-1 px-3 py-3 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-300 min-h-[44px] flex items-center justify-center ${
+                activeLocation === index
+                  ? 'bg-red-600 text-white shadow-md'
+                  : 'bg-white text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              {location.name}
+            </button>
+          ))}
+        </div>
         
-        {/* Map Overlay */}
-        <div className="absolute top-4 left-4 right-4 bg-white/95 backdrop-blur-sm px-4 py-3 rounded-xl shadow-lg border border-gray-200">
-          <div className="flex items-start gap-3">
-            <div className="w-3 h-3 bg-red-600 rounded-full animate-pulse mt-1 flex-shrink-0"></div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-gray-900 mb-1">
-                {locations[activeLocation].name}
-              </p>
-              <p className="text-xs text-gray-600 line-clamp-2">
-                {locations[activeLocation].address}
-              </p>
-            </div>
+        {/* Address - Desktop Only */}
+        <div className="hidden lg:block mt-3 px-3 py-2 bg-white rounded-lg border border-gray-200">
+          <div className="flex items-start gap-2">
+            <svg className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <p className="text-xs text-gray-700 leading-relaxed">
+              {locations[activeLocation].address}
+            </p>
           </div>
         </div>
       </div>
