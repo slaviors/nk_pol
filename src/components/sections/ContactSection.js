@@ -1,8 +1,12 @@
+'use client';
+
 import ContactForm from '@/components/ui/ContactForm';
 import ContactMap from '@/components/ui/ContactMap';
 import ContactInfo from '@/components/ui/ContactInfo';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function ContactSection() {
+  const t = useTranslation();
 
   return (
     <section id="contact" className="min-h-screen py-24 bg-gradient-to-b from-white via-gray-50 to-white relative overflow-hidden flex items-center">
@@ -45,11 +49,11 @@ export default function ContactSection() {
         {/* Header */}
         <div className="text-center mb-16 md:mb-20 group cursor-default">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-black group-hover:text-red-600 mb-4 leading-tight transition-all duration-700">
-            Hubungi Kami
+            {t.contact.title}
           </h2>
           <div className="w-24 h-1 bg-red-600 rounded-full mx-auto mb-6 transition-all duration-700 group-hover:w-32"></div>
           <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed transition-all duration-700 group-hover:text-gray-800">
-            Konsultasikan kebutuhan stand pameran Anda bersama tim profesional kami
+            {t.contact.subtitle}
           </p>
         </div>
 

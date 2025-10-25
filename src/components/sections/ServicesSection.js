@@ -4,6 +4,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Hammer, Palette, PackageOpen, Briefcase, ChevronDown, Store, Repeat } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function ServicesSection() {
   const [isVisible, setIsVisible] = useState(false);
@@ -15,6 +16,7 @@ export default function ServicesSection() {
   const [touchEnd, setTouchEnd] = useState(0);
   const sectionRef = useRef(null);
   const mobileCardsRef = useRef(null);
+  const t = useTranslation();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -105,33 +107,33 @@ export default function ServicesSection() {
   const services = [
     {
       icon: Store,
-      title: 'Desain Booth & Konsep Pameran',
-      description: 'Kami menciptakan desain booth yang kreatif, fungsional, dan sesuai karakter brand Anda untuk menarik perhatian pengunjung.',
+      title: t.services.list.design.title,
+      description: t.services.list.design.description,
     },
     {
       icon: Hammer,
-      title: 'Produksi & Konstruksi Booth',
-      description: 'Tim teknisi berpengalaman memastikan booth dibangun dengan kualitas tinggi, presisi sempurna, dan tepat waktu.',
+      title: t.services.list.construction.title,
+      description: t.services.list.construction.description,
     },
     {
       icon: Palette,
-      title: 'Dekorasi Event & Area Publik',
-      description: 'Menangani dekorasi event, area mall, dan ruang komersial dengan perpaduan estetika dan kebutuhan fungsional.',
+      title: t.services.list.decoration.title,
+      description: t.services.list.decoration.description,
     },
     {
       icon: Repeat,
-      title: 'Instalasi & Dismantle',
-      description: 'Proses pemasangan hingga pembongkaran booth yang cepat, aman, dan efisien dengan koordinasi profesional.',
+      title: t.services.list.installation.title,
+      description: t.services.list.installation.description,
     },
     {
       icon: PackageOpen,
-      title: 'Sewa Perlengkapan Pameran',
-      description: 'Menyediakan furniture, display system, lighting, backdrop, dan partisi dengan kualitas terbaik.',
+      title: t.services.list.rental.title,
+      description: t.services.list.rental.description,
     },
     {
       icon: Briefcase,
-      title: 'Manajemen Proyek Pameran',
-      description: 'Perencanaan dan koordinasi lengkap mulai dari layout, timeline, hingga pengawasan di lokasi.',
+      title: t.services.list.management.title,
+      description: t.services.list.management.description,
     },
   ];
 
@@ -176,7 +178,7 @@ export default function ServicesSection() {
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
             }`}
           >
-            Layanan Kami
+            {t.services.title}
           </h2>
           <div
             className={`w-20 h-1 bg-red-600 rounded-full mx-auto mb-6 transition-all duration-700 delay-100 group-hover:w-32 ${
@@ -188,7 +190,7 @@ export default function ServicesSection() {
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
             }`}
           >
-            Sebagai kontraktor pameran terpadu, NK POL menawarkan berbagai layanan yang dirancang untuk membantu klien menampilkan citra terbaik mereka dalam setiap acara dan pameran.
+            {t.services.subtitle}
           </p>
         </div>
 
