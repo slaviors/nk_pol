@@ -5,10 +5,12 @@ import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Target, Lightbulb } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function AboutSection() {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
+  const t = useTranslation();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -85,46 +87,16 @@ export default function AboutSection() {
               <div className="absolute bottom-4 left-4 w-8 h-8 bg-red-200 rounded-full opacity-0 group-hover:opacity-20 transition-all duration-700 transform -translate-x-4 group-hover:translate-x-0" />
 
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-black group-hover:text-red-600 leading-tight mb-5 transition-colors duration-500 pr-20 md:pr-0">
-                Tentang NK POL
+                {t.about.title}
               </h2>
               <div className="w-20 h-1 bg-red-600 rounded-full mb-5 group-hover:w-32 transition-all duration-500"></div>
 
               <p className="text-base md:text-lg text-gray-600 group-hover:text-gray-700 leading-relaxed mb-4 transition-colors duration-300">
-                Sejak <span className="relative">
-                  <span className="relative z-10">2019</span>
-                  <span className="absolute inset-0 bg-red-100 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-md scale-0 group-hover:scale-100 transform origin-center"></span>
-                </span>, NK POL telah menjadi <span className="relative">
-                  <span className="relative z-10">mitra terpercaya</span>
-                  <span className="absolute inset-0 bg-red-100 opacity-0 group-hover:opacity-100 transition-all duration-700 rounded-md scale-0 group-hover:scale-100 transform origin-center"></span>
-                </span> dalam menciptakan <span className="relative">
-                  <span className="relative z-10">pengalaman pameran yang berkesan</span>
-                  <span className="absolute inset-0 bg-red-100 opacity-0 group-hover:opacity-100 transition-all duration-900 rounded-md scale-0 group-hover:scale-100 transform origin-center"></span>
-                </span>. Kami menggabungkan <span className="relative">
-                  <span className="relative z-10">desain kreatif</span>
-                  <span className="absolute inset-0 bg-red-100 opacity-0 group-hover:opacity-100 transition-all duration-600 rounded-md scale-0 group-hover:scale-100 transform origin-center"></span>
-                </span> dengan <span className="relative">
-                  <span className="relative z-10">teknologi terkini</span>
-                  <span className="absolute inset-0 bg-red-100 opacity-0 group-hover:opacity-100 transition-all duration-800 rounded-md scale-0 group-hover:scale-100 transform origin-center"></span>
-                </span> untuk booth pameran yang <span className="relative">
-                  <span className="relative z-10">fungsional</span>
-                  <span className="absolute inset-0 bg-red-100 opacity-0 group-hover:opacity-100 transition-all duration-1000 rounded-md scale-0 group-hover:scale-100 transform origin-center"></span>
-                </span>.
+                {t.about.description1}
               </p>
 
               <p className="text-base md:text-lg text-gray-600 group-hover:text-gray-700 leading-relaxed mb-6 transition-colors duration-300">
-                Dengan <span className="relative">
-                  <span className="relative z-10">tim profesional</span>
-                  <span className="absolute inset-0 bg-red-100 opacity-0 group-hover:opacity-100 transition-all duration-500 rounded-md scale-0 group-hover:scale-100 transform origin-center"></span>
-                </span>, kami berkomitmen menghadirkan <span className="relative">
-                  <span className="relative z-10">solusi terpadu</span>
-                  <span className="absolute inset-0 bg-red-100 opacity-0 group-hover:opacity-100 transition-all duration-700 rounded-md scale-0 group-hover:scale-100 transform origin-center"></span>
-                </span> dari <span className="relative">
-                  <span className="relative z-10">konsep hingga instalasi</span>
-                  <span className="absolute inset-0 bg-red-100 opacity-0 group-hover:opacity-100 transition-all duration-900 rounded-md scale-0 group-hover:scale-100 transform origin-center"></span>
-                </span> dengan <span className="relative">
-                  <span className="relative z-10">standar internasional</span>
-                  <span className="absolute inset-0 bg-red-100 opacity-0 group-hover:opacity-100 transition-all duration-1100 rounded-md scale-0 group-hover:scale-100 transform origin-center"></span>
-                </span>.
+                {t.about.description2}
               </p>
               
               {/* Hover indicator */}
@@ -149,12 +121,12 @@ export default function AboutSection() {
                     <Target className="w-5 h-5 text-red-600 group-hover:text-white transition-colors duration-300" />
                   </div>
                   <h3 className="text-lg font-bold text-black group-hover:text-red-600 transition-colors duration-300">
-                    Visi
+                    {t.about.vision.title}
                   </h3>
                 </div>
 
                 <p className="text-sm text-gray-600 group-hover:text-gray-700 transition-colors duration-300 leading-relaxed">
-                  Menjadi mitra terpercaya dalam mewujudkan pameran berkesan dan bernilai tinggi melalui inovasi kreatif dan komitmen kepuasan pelanggan.
+                  {t.about.vision.content}
                 </p>
 
                 <div className="absolute bottom-0 right-0 w-0 h-0 bg-red-50 transition-all duration-500 group-hover:w-16 group-hover:h-16 rounded-tl-3xl" />
@@ -176,17 +148,12 @@ export default function AboutSection() {
                     <Lightbulb className="w-5 h-5 text-red-600 group-hover:text-white transition-colors duration-300" />
                   </div>
                   <h3 className="text-lg font-bold text-black group-hover:text-red-600 transition-colors duration-300">
-                    Misi
+                    {t.about.mission.title}
                   </h3>
                 </div>
 
                 <ul className="space-y-2">
-                  {[
-                    'Desain inovatif sesuai brand',
-                    'Layanan terpadu berkualitas',
-                    'Ketepatan waktu profesional',
-                    'Hubungan jangka panjang',
-                  ].map((item, idx) => (
+                  {t.about.mission.items.map((item, idx) => (
                     <li
                       key={idx}
                       className={`flex gap-2 text-sm text-gray-600 group-hover:text-gray-700 transition-colors duration-300 ${

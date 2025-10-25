@@ -2,12 +2,14 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function TestimonySection() {
   const [testimonies, setTestimonies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const t = useTranslation();
 
   const cacheRef = useRef({
     data: [],
@@ -172,12 +174,12 @@ export default function TestimonySection() {
           <div className="text-center mb-20">
             <div className="inline-block group cursor-pointer">
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-black group-hover:text-red-600 mb-4 leading-tight transition-colors duration-500">
-                Testimoni Klien
+                {t.testimonials.title}
               </h2>
               <div className="w-24 h-1 bg-red-600 mx-auto mb-6 group-hover:w-32 transition-all duration-500 ease-out"></div>
             </div>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Dengarkan pengalaman klien kami bekerja sama dengan NK POL dalam mewujudkan pameran yang berkesan
+              {t.testimonials.subtitle}
             </p>
           </div>
 
@@ -257,12 +259,12 @@ export default function TestimonySection() {
         <div className="text-center mb-20">
           <div className="inline-block group cursor-pointer">
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-black group-hover:text-red-600 mb-4 leading-tight transition-colors duration-500">
-              Testimoni Klien
+              {t.testimonials.title}
             </h2>
             <div className="w-24 h-1 bg-red-600 mx-auto mb-6 group-hover:w-32 transition-all duration-500 ease-out"></div>
           </div>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Dengarkan pengalaman klien kami bekerja sama dengan NK POL dalam mewujudkan pameran yang berkesan
+            {t.testimonials.subtitle}
           </p>
         </div>
 

@@ -5,12 +5,14 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Play, Users, BadgeCheck, Briefcase } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function HeroSection() {
   const [isVisible, setIsVisible] = useState(false);
   const [scrollAnimation, setScrollAnimation] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [parallaxOffset, setParallaxOffset] = useState({ x: 0, y: 0 });
+  const t = useTranslation();
 
   const heroImages = [
     '/images/hero-3.jpeg',
@@ -51,9 +53,9 @@ export default function HeroSection() {
   }, [heroImages.length]);
 
   const stats = [
-    { icon: Users, value: '200+', label: 'Klien' },
-    { icon: BadgeCheck, value: '1000+', label: 'Proyek Selesai' },
-    { icon: Briefcase, value: '5+', label: 'Tahun Pengalaman' },
+    { icon: Users, value: '200+', label: t.hero.stats.clients },
+    { icon: BadgeCheck, value: '1000+', label: t.hero.stats.projects },
+    { icon: Briefcase, value: '5+', label: t.hero.stats.experience },
   ];
 
   return (
@@ -130,7 +132,7 @@ export default function HeroSection() {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           
           {/* Left Content */}
-          <div className="text-center lg:text-left space-y-6">
+          <div className="text-center lg:text-left space-y-3">
 
             {/* Main Heading */}
             <h1
@@ -138,14 +140,21 @@ export default function HeroSection() {
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
             >
-              Kontraktor Stand
+              <span className={t.hero.title1 === t.hero.highlightWord ? 'relative inline-block group/highlight' : ''}>
+                {t.hero.title1 === t.hero.highlightWord && (
+                  <span className="absolute bottom-0 md:bottom-1 left-0 right-0 h-2.5 md:h-4 bg-red-600 opacity-25 rounded-sm transform transition-all duration-500 group-hover/highlight:opacity-35 group-hover/highlight:h-3 md:group-hover/highlight:h-5"></span>
+                )}
+                <span className={t.hero.title1 === t.hero.highlightWord ? 'relative z-10' : ''}>{t.hero.title1}</span>
+              </span>{' '}
+              {t.hero.title2}
               <br />
-              Pameran <span className="relative inline-block group/highlight whitespace-nowrap">
-                <span className="relative z-10 text-black px-2 md:px-3">Berkualitas</span>
-                <span className="absolute bottom-0 md:bottom-1 left-2 right-2 h-2.5 md:h-4 bg-red-600 opacity-25 rounded-sm transform transition-all duration-500 group-hover/highlight:opacity-35 group-hover/highlight:h-3 md:group-hover/highlight:h-5"></span>
-              </span>
-              <br />
-              untuk Brand Anda
+              <span className={t.hero.title3 === t.hero.highlightWord ? 'relative inline-block group/highlight whitespace-nowrap' : ''}>
+                {t.hero.title3 === t.hero.highlightWord && (
+                  <span className="absolute bottom-0 md:bottom-1 left-2 right-2 h-2.5 md:h-4 bg-red-600 opacity-25 rounded-sm transform transition-all duration-500 group-hover/highlight:opacity-35 group-hover/highlight:h-3 md:group-hover/highlight:h-5"></span>
+                )}
+                <span className={t.hero.title3 === t.hero.highlightWord ? 'relative z-10 text-black px-2 md:px-3' : ''}>{t.hero.title3}</span>
+              </span>{' '}
+              {t.hero.title4}
             </h1>
 
             {/* Description */}
@@ -154,7 +163,7 @@ export default function HeroSection() {
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
             >
-              Desain kreatif, konstruksi berkualitas, dan eksekusi tepat waktu. NK POL mewujudkan booth pameran impian Anda dengan profesional sejak 2019.
+              {t.hero.description}
             </p>
 
             {/* CTA Buttons */}
@@ -172,7 +181,7 @@ export default function HeroSection() {
                 }}
                 className="group relative inline-flex items-center justify-center gap-3 px-7 py-3.5 rounded-full bg-black text-white text-base font-semibold overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-black/30 cursor-pointer"
               >
-                <span className="relative z-10">Konsultasi Gratis</span>
+                <span className="relative z-10">{t.hero.ctaPrimary}</span>
                 <ArrowRight className="relative z-10 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
                 <span className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-700 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out" />
               </button>
@@ -182,13 +191,13 @@ export default function HeroSection() {
                 className="group inline-flex items-center justify-center gap-3 px-7 py-3.5 rounded-full border-2 border-gray-300 bg-white text-black text-base font-semibold transition-all duration-500 hover:border-black hover:shadow-lg hover:scale-105"
               >
                 <Play className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
-                Lihat Portfolio
+                {t.hero.ctaSecondary}
               </Link>
             </div>
 
             {/* Stats */}
             <div
-              className={`grid grid-cols-3 gap-6 mt-10 pt-6 border-t border-gray-200 transition-all duration-700 delay-500 ${
+              className={`grid grid-cols-3 gap-6 mt-6 lg:mt-4 pt-6 border-t border-gray-200 transition-all duration-700 delay-500 ${
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
             >

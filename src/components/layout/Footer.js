@@ -5,12 +5,14 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Mail, Phone, MapPin, ArrowRight, Instagram } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Footer() {
   const [isVisible, setIsVisible] = useState(false);
   const [itemsVisible, setItemsVisible] = useState({});
   const footerRef = useRef(null);
   const currentYear = new Date().getFullYear();
+  const t = useTranslation();
 
   useEffect(() => {
     const currentRef = footerRef.current;
@@ -46,30 +48,30 @@ export default function Footer() {
   const contactInfo = [
     {
       icon: Phone,
-      label: 'Telepon',
+      label: t.footer.contact.phone,
       value: '+62 896 7890 1569',
       href: 'https://wa.me/6289678901569',
     },
     {
       icon: Mail,
-      label: 'Email',
+      label: t.footer.contact.email,
       value: 'info@nkpol.com',
       href: 'mailto:info@nkpol.com',
     },
     {
       icon: MapPin,
-      label: 'Workshop & Office',
+      label: t.footer.contact.address,
       value: 'RT.10/RW.3, Joglo, Kembangan, West Jakarta City, Jakarta 11640',
       href: 'https://maps.app.goo.gl/4fCTybQbpotj8kDr9',
     },
   ];
 
   const quickLinks = [
-    { name: 'Beranda', href: '/' },
-    { name: 'Tentang Kami', href: '#about-section' },
-    { name: 'Layanan', href: '#services-section' },
-    { name: 'Portfolio', href: '/portofolio' },
-    { name: 'Kontak', href: '/kontak' },
+    { name: t.nav.home, href: '/' },
+    { name: t.nav.about, href: '#about-section' },
+    { name: t.nav.services, href: '#services-section' },
+    { name: t.nav.portfolio, href: '/portofolio' },
+    { name: t.nav.contact, href: '#contact' },
   ];
 
   return (
@@ -114,7 +116,7 @@ export default function Footer() {
               />
             </Link>
             <p className="text-base md:text-lg leading-relaxed text-gray-300 mb-8 font-light max-w-xs">
-              Kontraktor pameran profesional yang mewujudkan pengalaman pameran berkesan sejak 2019. Menghadirkan inovasi dan kualitas terbaik untuk setiap project.
+              {t.footer.description}
             </p>
             <div className="flex items-center space-x-4">
               <a
@@ -140,7 +142,7 @@ export default function Footer() {
             }`}
           >
             <h4 className="text-lg md:text-xl font-bold mb-8 text-white tracking-wider uppercase relative">
-              Menu
+              {t.footer.quickLinks}
               <span className="absolute bottom-0 left-0 w-12 h-1 bg-gradient-to-r from-red-600 to-red-500 rounded-full"></span>
             </h4>
             <ul className="space-y-5">
@@ -215,7 +217,7 @@ export default function Footer() {
         >
           <div className="text-center pt-6">
             <p className="text-base text-gray-400 font-light tracking-wider">
-              © {currentYear} NK POL. All rights reserved.
+              © {currentYear} {t.footer.copyright}
             </p>
           </div>
         </div>

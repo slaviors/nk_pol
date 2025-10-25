@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function GallerySection() {
   const [images, setImages] = useState([]);
@@ -12,6 +13,7 @@ export default function GallerySection() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
+  const t = useTranslation();
 
   const cacheRef = useRef({
     data: [],
@@ -193,39 +195,23 @@ export default function GallerySection() {
               <div className="space-y-6 md:space-y-8">
                 <div>
                   <h2 className="text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-bold text-black mb-4 md:mb-6 leading-[1.15]">
-                    Portfolio <span className="text-red-600">Terbaik</span> Kami
+                    {t.gallery.title} <span className="text-red-600">{t.gallery.titleHighlight}</span>
                   </h2>
                   <p className="text-base md:text-lg lg:text-xl text-gray-600 leading-relaxed max-w-xl">
-                    Koleksi karya stand pameran terbaik yang telah kami selesaikan. Setiap proyek menampilkan dedikasi terhadap inovasi desain dan kualitas konstruksi.
+                    {t.gallery.subtitle}
                   </p>
                 </div>
 
                 {/* Gallery Highlights */}
                 <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-red-600 rounded-full"></div>
-                    <span className="text-gray-700 font-medium">
-                      Beragam industri & jenis acara
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-red-600 rounded-full"></div>
-                    <span className="text-gray-700 font-medium">
-                      Desain kreatif & eksekusi presisi
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-red-600 rounded-full"></div>
-                    <span className="text-gray-700 font-medium">
-                      Solusi booth custom & modular
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-red-600 rounded-full"></div>
-                    <span className="text-gray-700 font-medium">
-                      Kepercayaan klien jangka panjang
-                    </span>
-                  </div>
+                  {t.gallery.highlights.map((highlight, idx) => (
+                    <div key={idx} className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-red-600 rounded-full"></div>
+                      <span className="text-gray-700 font-medium">
+                        {highlight}
+                      </span>
+                    </div>
+                  ))}
                 </div>
 
                 {/* Enhanced CTA */}
@@ -234,12 +220,12 @@ export default function GallerySection() {
                     href="/portofolio"
                     className="group relative inline-flex items-center justify-center gap-3 px-7 py-3.5 rounded-full bg-black text-white text-base font-semibold overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-black/30"
                   >
-                    <span className="relative z-10">Lihat Semua Portfolio</span>
+                    <span className="relative z-10">{t.gallery.viewAll}</span>
                     <ArrowRight className="relative z-10 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
                     <span className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-700 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out" />
                   </Link>
                   <p className="text-sm text-gray-500 mt-3">
-                    Temukan inspirasi untuk proyek Anda
+                    {t.gallery.ctaSubtext}
                   </p>
                 </div>
               </div>

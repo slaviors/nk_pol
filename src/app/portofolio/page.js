@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, Calendar, MapPin, Building2, Eye, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function PortofolioPage() {
   const [posts, setPosts] = useState([]);
@@ -11,6 +12,7 @@ export default function PortofolioPage() {
   const [error, setError] = useState(null);
   const [selectedPost, setSelectedPost] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const t = useTranslation();
 
   useEffect(() => {
     fetchPosts();
@@ -138,22 +140,21 @@ export default function PortofolioPage() {
               className="inline-flex items-center gap-2 text-gray-300 hover:text-white transition-colors mb-8 group"
             >
               <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-              <span className="font-medium">Kembali ke Beranda</span>
+              <span className="font-medium">{t.portfolioPage.backToHome}</span>
             </Link>
 
             {/* Title */}
             <div className="space-y-4">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold">
-                Portfolio <span className="text-red-600">Kami</span>
+                {t.portfolioPage.title.split(' ')[0]} <span className="text-red-600">{t.portfolioPage.title.split(' ').slice(1).join(' ')}</span>
               </h1>
               <p className="text-lg md:text-xl text-gray-300 max-w-3xl">
-                Koleksi lengkap proyek stand pameran terbaik yang telah kami selesaikan. 
-                Setiap proyek mencerminkan dedikasi kami terhadap inovasi desain dan kualitas konstruksi.
+                {t.portfolioPage.subtitle}
               </p>
               <div className="flex items-center gap-6 text-sm text-gray-400">
                 <span className="flex items-center gap-2">
                   <Building2 className="w-4 h-4" />
-                  {posts.length} Proyek
+                  {posts.length} {t.gallery.projects}
                 </span>
               </div>
             </div>
@@ -166,8 +167,8 @@ export default function PortofolioPage() {
             <div className="text-center py-16">
               <div className="inline-block p-8 bg-gray-50 border-2 border-gray-200 rounded-2xl">
                 <Building2 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Belum Ada Portfolio</h3>
-                <p className="text-gray-600">Portfolio akan ditampilkan di sini</p>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{t.portfolioPage.noPortfolio}</h3>
+                <p className="text-gray-600">{t.portfolioPage.noPortfolioDesc}</p>
               </div>
             </div>
           ) : (
@@ -210,7 +211,7 @@ export default function PortofolioPage() {
                         {/* Image Count Badge */}
                         {post.images && post.images.length > 1 && (
                           <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-semibold">
-                            {post.images.length} Foto
+                            {post.images.length} {t.portfolioPage.photos}
                           </div>
                         )}
                       </div>

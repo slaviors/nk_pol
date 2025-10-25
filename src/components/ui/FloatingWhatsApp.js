@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 
 export default function FloatingWhatsApp() {
   const [isVisible, setIsVisible] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     // Show button after a small delay for better UX
@@ -12,7 +13,17 @@ export default function FloatingWhatsApp() {
       setIsVisible(true);
     }, 1000);
 
-    return () => clearTimeout(timer);
+    // Listen for mobile menu state changes
+    const handleMenuToggle = (event) => {
+      setIsMenuOpen(event.detail.isOpen);
+    };
+
+    window.addEventListener('mobileMenuToggle', handleMenuToggle);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('mobileMenuToggle', handleMenuToggle);
+    };
   }, []);
 
   const handleClick = () => {
@@ -23,7 +34,7 @@ export default function FloatingWhatsApp() {
   return (
     <>
       {/* Only show on mobile/tablet (< lg) */}
-      <div className="lg:hidden">
+      <div className={`lg:hidden ${isMenuOpen ? 'hidden' : 'block'}`}>
         {/* Floating Button - Perfect Circle */}
         <button
           onClick={handleClick}

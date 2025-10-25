@@ -1,5 +1,6 @@
 // src/app/layout.js
 import { generateMetadata, jsonLdSchemas, siteMetadata } from '@/config/metadata';
+import { LanguageProvider } from '@/contexts/LanguageContext';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import FloatingWhatsApp from '@/components/ui/FloatingWhatsApp';
@@ -59,24 +60,25 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className="antialiased bg-white text-black">
+        <LanguageProvider>
+          {/* Header */}
+          <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
+            <Navbar />
+          </header>
 
-        {/* Header */}
-        <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
-          <Navbar />
-        </header>
+          {/* Main Content */}
+          <main id="main-content" className="min-h-screen">
+            {children}
+          </main>
 
-        {/* Main Content */}
-        <main id="main-content" className="min-h-screen">
-          {children}
-        </main>
+          {/* Footer */}
+          <footer>
+            <Footer />
+          </footer>
 
-        {/* Footer */}
-        <footer>
-          <Footer />
-        </footer>
-
-        {/* Floating WhatsApp Button (Mobile Only) */}
-        <FloatingWhatsApp />
+          {/* Floating WhatsApp Button (Mobile Only) */}
+          <FloatingWhatsApp />
+        </LanguageProvider>
       </body>
     </html>
   );
