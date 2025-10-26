@@ -71,8 +71,18 @@ export default function PortofolioPage() {
       if (e.key === 'ArrowLeft') prevImage();
     };
 
+    // Manage body scroll when modal is open
+    if (selectedPost) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset'; // Reset on cleanup
+    };
   }, [selectedPost, currentImageIndex]);
 
   if (loading) {
@@ -181,8 +191,9 @@ export default function PortofolioPage() {
                   onClick={() => openLightbox(post)}
                 >
                   {/* Image Card */}
-                  <div className="relative bg-gray-900 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
-                    <div className="relative aspect-[4/3] overflow-hidden">
+                  <div className="relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-200">
+                    {/* Fixed Height Container */}
+                    <div className="relative w-full h-64 sm:h-72 lg:h-64 overflow-hidden bg-gray-50">
                       {post.images && post.images.length > 0 ? (
                         <img
                           src={
@@ -190,11 +201,11 @@ export default function PortofolioPage() {
                             post.images[post.thumbnailIndex || 0]?.url
                           }
                           alt={post.title}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                         />
                       ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
-                          <Building2 className="w-16 h-16 text-gray-600" />
+                        <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                          <Building2 className="w-16 h-16 text-gray-500" />
                         </div>
                       )}
 
@@ -261,12 +272,12 @@ export default function PortofolioPage() {
       {/* Lightbox Modal - White Theme */}
       {selectedPost && (
         <div 
-          className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+          className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4"
           onClick={closeLightbox}
         >
           {/* Modal Container */}
           <div 
-            className="relative bg-white rounded-2xl shadow-2xl max-w-4xl w-full"
+            className="relative bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[95vh] overflow-y-auto scrollbar-hide"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
@@ -278,7 +289,7 @@ export default function PortofolioPage() {
             </button>
 
             {/* Content */}
-            <div className="p-6 md:p-8">
+            <div className="p-4 sm:p-6 md:p-8">
               {/* Header */}
               <div className="mb-6">
                 <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 pr-12">
@@ -300,8 +311,10 @@ export default function PortofolioPage() {
                       <img
                         src={selectedPost.images[currentImageIndex].url}
                         alt={`${selectedPost.title} - Image ${currentImageIndex + 1}`}
-                        className="w-full h-auto object-contain"
-                        style={{ maxHeight: '50vh' }}
+                        className="w-full object-contain"
+                        style={{ 
+                          height: 'clamp(250px, 50vh, 450px)'
+                        }}
                       />
                       {/* Watermark on Main Image */}
                       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 opacity-20 pointer-events-none">
