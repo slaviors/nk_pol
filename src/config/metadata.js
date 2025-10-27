@@ -1,7 +1,7 @@
 // src/config/metadata.js
 export const siteMetadata = {
   title: 'NK POL - Kontraktor Stand Pameran Profesional & Terpercaya',
-  description: 'NK POL adalah kontraktor pameran terpadu sejak 2019. Kami menyediakan jasa desain, konstruksi, dan instalasi booth pameran berkualitas tinggi dengan harga kompetitif. Hubungi kami untuk konsultasi gratis!',
+  description: 'NK POL adalah kontraktor pameran terpadu sejak 2019. Kami menyediakan jasa desain, konstruksi, dan instalasi booth pameran berkualitas tinggi dengan harga kompetitif.',
   author: 'NK POL',
   siteUrl: 'https://www.nkpol.com',
   locale: 'id_ID',
