@@ -287,9 +287,9 @@ export default function GallerySection() {
                     {images[1] && (
                       <Link
                         href="/portofolio"
-                        className="group relative bg-gray-900 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-500 cursor-pointer transform hover:-translate-y-1 h-full block"
+                        className="group relative bg-gray-900 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-500 cursor-pointer transform hover:-translate-y-1 block"
                       >
-                        <div className="relative overflow-hidden h-full min-h-[200px] max-h-[400px]">
+                        <div className="relative overflow-hidden aspect-[4/3]">
                           {images[1].images && images[1].images.length > 0 ? (
                             <img
                               src={
@@ -328,9 +328,9 @@ export default function GallerySection() {
                     {images[2] && (
                       <Link
                         href="/portofolio"
-                        className="group relative bg-gray-900 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-500 cursor-pointer transform hover:-translate-y-1 h-full block"
+                        className="group relative bg-gray-900 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-500 cursor-pointer transform hover:-translate-y-1 block"
                       >
-                        <div className="relative overflow-hidden h-full min-h-[200px] max-h-[400px]">
+                        <div className="relative overflow-hidden aspect-[4/3]">
                           {images[2].images && images[2].images.length > 0 ? (
                             <img
                               src={
