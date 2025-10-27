@@ -63,13 +63,13 @@ export default function HeroSection() {
       className="relative flex items-center justify-center overflow-hidden bg-white"
       style={{ minHeight: 'calc(100vh - 72px)' }}
     >
-      <div className="hidden lg:block absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
 
         {/* Base Gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-gray-100 via-white to-red-50" />
 
         {/* Grid Lines with Dots and Vignette */}
-        <div className="absolute inset-0 opacity-50">
+        <div className="absolute inset-0 opacity-30 lg:opacity-50">
           <div 
             className="absolute inset-0"
             style={{
@@ -101,7 +101,7 @@ export default function HeroSection() {
 
         {/* Large Abstract Shapes with Parallax */}
         <div 
-          className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full overflow-hidden transition-transform duration-300 ease-out"
+          className="absolute -top-20 sm:-top-40 -right-20 sm:-right-40 w-[250px] sm:w-[500px] h-[250px] sm:h-[500px] rounded-full overflow-hidden transition-transform duration-300 ease-out"
           style={{
             transform: `translate(${parallaxOffset.x}px, ${-parallaxOffset.y}px) rotate(${parallaxOffset.x * 0.1}deg)`
           }}
@@ -114,7 +114,7 @@ export default function HeroSection() {
           />
         </div>
         <div 
-          className="absolute -bottom-40 -left-40 w-[600px] h-[600px] rounded-full overflow-hidden transition-transform duration-300 ease-out"
+          className="absolute -bottom-20 sm:-bottom-40 -left-20 sm:-left-40 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] rounded-full overflow-hidden transition-transform duration-300 ease-out"
           style={{
             transform: `translate(${-parallaxOffset.x * 0.8}px, ${parallaxOffset.y * 1.2}px) rotate(${-parallaxOffset.x * 0.15}deg)`
           }}
