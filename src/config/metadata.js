@@ -32,7 +32,7 @@ export const siteMetadata = {
   },
   
   // Vision & Mission
-  vision: 'Menjadi mitra terpercaya dalam mewujudkan pameran berkesan dan bernilai tinggi melalui inovasi kreatif dan komitmen kepuasan pelanggan.',
+  vision: 'Menjadi mitra terpercaya dalam mewujudkan pameran berkesan melalui inovasi kreatif dan komitmen kepuasan pelanggan.',
   mission: [
     'Desain inovatif sesuai brand',
     'Layanan terpadu berkualitas',
@@ -302,7 +302,7 @@ export const jsonLdSchemas = {
     openingHoursSpecification: [
       {
         '@type': 'OpeningHoursSpecification',
-        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
         opens: '09:00',
         closes: '17:00',
       },
@@ -601,7 +601,7 @@ export const generateMetadata = (
           url: `${siteMetadata.siteUrl}${siteMetadata.ogImage}`,
           width: 1200,
           height: 630,
-          alt: 'NK POL - Kontraktor Stand Pameran Berkualitas untuk Brand Anda',
+          alt: 'NK POL - Kontraktor Stand Pameran Profesional & Terpercaya',
           type: 'image/jpeg',
         },
       ],
@@ -632,7 +632,7 @@ export const generateMetadata = (
       },
     },
     verification: {
-      google: 'your-google-verification-code',
+      google: 'your-google-verification-code', // Replace dengan kode asli
     },
     other: {
       'geo.region': 'ID-JK',
