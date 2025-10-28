@@ -68,7 +68,7 @@ export const metadataKeywords = {
     'NK POL instalasi booth'
   ],
 
-  // Primary Keywords (High Priority)
+  // Primary Keywords
   primary: [
     'kontraktor stand pameran',
     'kontraktor booth pameran jakarta',
