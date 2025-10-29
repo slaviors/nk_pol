@@ -1,25 +1,38 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Plus, Edit2, Trash2, GripVertical, Eye, Image as ImageIcon } from 'lucide-react';
+import Image from 'next/image';
+import Modal from '@/components/ui/admin/Modal';
+import FileUpload from '@/components/ui/admin/FileUpload';
+import Button from '@/components/ui/admin/Button';
+import Input from '@/components/ui/admin/Input';
+import Textarea from '@/components/ui/admin/Textarea';
+import Alert from '@/components/ui/admin/Alert';
+import Card from '@/components/ui/admin/Card';
 
 export default function GalleryPostManage() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [draggedItem, setDraggedItem] = useState(null);
-  const [dragOverItem, setDragOverItem] = useState(null);
+  
+  // Modal states
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(null);
 
+  // Form states
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    year: '',
+    location: '',
+    venue: '',
+    thumbnailIndex: 0,
+  });
   const [uploadFiles, setUploadFiles] = useState([]);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [year, setYear] = useState('');
-  const [location, setLocation] = useState('');
-  const [venue, setVenue] = useState('');
-  const [thumbnailIndex, setThumbnailIndex] = useState(0);
-
-  const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({});
 
   useEffect(() => {
     fetchPosts();
@@ -50,28 +63,19 @@ export default function GalleryPostManage() {
     }
   };
 
-  const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
-    
-    if (files.length > 4) {
-      setError('Maximum 4 images allowed per post');
-      return;
-    }
-    
-    setUploadFiles(files);
-    setThumbnailIndex(0);
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      description: '',
+      year: '',
+      location: '',
+      venue: '',
+      thumbnailIndex: 0,
+    });
+    setUploadFiles([]);
   };
 
-  const removeFile = (indexToRemove) => {
-    const newFiles = uploadFiles.filter((_, idx) => idx !== indexToRemove);
-    setUploadFiles(newFiles);
-    
-    if (thumbnailIndex >= newFiles.length) {
-      setThumbnailIndex(Math.max(0, newFiles.length - 1));
-    }
-  };
-
-  const handleSubmit = async (e) => {
+  const handleCreate = async (e) => {
     e.preventDefault();
     
     if (uploadFiles.length === 0) {
@@ -87,16 +91,15 @@ export default function GalleryPostManage() {
     try {
       setLoading(true);
       setError('');
-      setSuccess(`⏳ Creating post with ${uploadFiles.length} image${uploadFiles.length > 1 ? 's' : ''}...`);
 
-      const formData = new FormData();
-      uploadFiles.forEach(file => formData.append('files', file));
-      formData.append('title', title);
-      formData.append('description', description);
-      formData.append('thumbnailIndex', thumbnailIndex);
-      if (year) formData.append('year', year);
-      if (location) formData.append('location', location);
-      if (venue) formData.append('venue', venue);
+      const formDataToSend = new FormData();
+      uploadFiles.forEach(file => formDataToSend.append('files', file));
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('description', formData.description);
+      formDataToSend.append('thumbnailIndex', formData.thumbnailIndex);
+      if (formData.year) formDataToSend.append('year', formData.year);
+      if (formData.location) formDataToSend.append('location', formData.location);
+      if (formData.venue) formDataToSend.append('venue', formData.venue);
 
       const token = localStorage.getItem('auth-token');
       const headers = {};
@@ -106,20 +109,14 @@ export default function GalleryPostManage() {
         method: 'POST',
         credentials: 'include',
         headers,
-        body: formData
+        body: formDataToSend
       });
 
       const data = await response.json();
       if (response.ok) {
-        setSuccess('✓ Gallery post created successfully!');
-        setUploadFiles([]);
-        setTitle('');
-        setDescription('');
-        setYear('');
-        setLocation('');
-        setVenue('');
-        setThumbnailIndex(0);
-        document.getElementById('fileInput').value = '';
+        setSuccess('Gallery post created successfully!');
+        setCreateModalOpen(false);
+        resetForm();
         fetchPosts();
         setTimeout(() => setSuccess(''), 3000);
       } else {
@@ -127,6 +124,41 @@ export default function GalleryPostManage() {
       }
     } catch (err) {
       setError('Upload error: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+
+    try {
+      setLoading(true);
+      setError('');
+
+      const token = localStorage.getItem('auth-token');
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const response = await fetch(`/api/admin/galleryPost/${selectedPost._id}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers,
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setSuccess('Gallery post updated successfully!');
+        setEditModalOpen(false);
+        resetForm();
+        fetchPosts();
+        setTimeout(() => setSuccess(''), 3000);
+      } else {
+        setError(data.error || 'Update failed');
+      }
+    } catch (err) {
+      setError('Update error: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -149,7 +181,7 @@ export default function GalleryPostManage() {
 
       const data = await response.json();
       if (response.ok) {
-        setSuccess(data.message);
+        setSuccess('Post deleted successfully!');
         fetchPosts();
         setTimeout(() => setSuccess(''), 2000);
       } else {
@@ -162,469 +194,425 @@ export default function GalleryPostManage() {
     }
   };
 
-  const startEdit = (post) => {
-    setEditingId(post._id);
-    setEditForm({
+  const openEditModal = (post) => {
+    setSelectedPost(post);
+    setFormData({
       title: post.title || '',
       description: post.description || '',
       year: post.year || '',
       location: post.location || '',
       venue: post.venue || '',
-      thumbnailIndex: post.thumbnailIndex || 0
+      thumbnailIndex: post.thumbnailIndex || 0,
     });
+    setEditModalOpen(true);
   };
 
-  const cancelEdit = () => {
-    setEditingId(null);
-    setEditForm({});
-  };
-
-  const handleUpdate = async (id) => {
-    try {
-      setLoading(true);
-      setError('');
-      setSuccess('');
-
-      const token = localStorage.getItem('auth-token');
-      const headers = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
-      const response = await fetch(`/api/admin/galleryPost/${id}`, {
-        method: 'PUT',
-        credentials: 'include',
-        headers,
-        body: JSON.stringify(editForm)
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        setSuccess('Post updated successfully');
-        setEditingId(null);
-        setEditForm({});
-        fetchPosts();
-        setTimeout(() => setSuccess(''), 2000);
-      } else {
-        setError(data.error || 'Update failed');
-      }
-    } catch (err) {
-      setError('Update error: ' + err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDragStart = (e, index) => {
-    setDraggedItem(index);
-    e.dataTransfer.effectAllowed = 'move';
-    e.currentTarget.style.opacity = '0.4';
-  };
-
-  const handleDragEnter = (e, index) => {
-    e.preventDefault();
-    if (draggedItem !== null && draggedItem !== index) {
-      setDragOverItem(index);
-    }
-  };
-
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    setDragOverItem(null);
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-  };
-
-  const handleDrop = async (e, dropIndex) => {
-    e.preventDefault();
-    setDragOverItem(null);
-    
-    if (draggedItem === null || draggedItem === dropIndex) {
-      return;
-    }
-
-    const newPosts = [...posts];
-    const draggedPost = newPosts[draggedItem];
-    
-    newPosts.splice(draggedItem, 1);
-    newPosts.splice(dropIndex, 0, draggedPost);
-    
-    setPosts(newPosts);
-
-    try {
-      const postIds = newPosts.map(post => post._id);
-      const token = localStorage.getItem('auth-token');
-      const headers = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
-      const response = await fetch('/api/admin/galleryPost', {
-        method: 'PUT',
-        credentials: 'include',
-        headers,
-        body: JSON.stringify({
-          action: 'reorder',
-          postIds
-        })
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        setError(data.error || 'Failed to reorder');
-        fetchPosts();
-      } else {
-        setSuccess('Posts reordered successfully');
-        setTimeout(() => setSuccess(''), 2000);
-      }
-    } catch (err) {
-      setError('Reorder error: ' + err.message);
-      fetchPosts();
-    }
-  };
-
-  const handleDragEnd = (e) => {
-    e.currentTarget.style.opacity = '1';
-    setDraggedItem(null);
-    setDragOverItem(null);
+  const openPreviewModal = (post) => {
+    setSelectedPost(post);
+    setPreviewModalOpen(true);
   };
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Gallery Post Management</h2>
-      
-      <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded">
-        <p className="text-sm">
-          <strong>📋 Info:</strong> Create gallery posts with 1-4 images each. Select which image to use as the thumbnail. Unlimited posts allowed.
-        </p>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b-2 border-gray-100">
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Gallery Posts</h2>
+          <p className="text-sm text-gray-600 mt-2 font-medium">
+            Manage your gallery images and posts • {posts.length} total
+          </p>
+        </div>
+        <Button
+          onClick={() => {
+            resetForm();
+            setCreateModalOpen(true);
+          }}
+          variant="primary"
+          size="lg"
+          className="shadow-xl shadow-black/20"
+        >
+          <Plus className="w-5 h-5 mr-2" />
+          Add New Post
+        </Button>
       </div>
 
-      {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded">
-          {error}
-          <button onClick={() => setError('')} className="ml-2 text-red-900">×</button>
+      {/* Alerts */}
+      {error && <Alert type="error" message={error} onClose={() => setError('')} />}
+      {success && <Alert type="success" message={success} onClose={() => setSuccess('')} />}
+
+      {/* Posts Grid */}
+      {loading && posts.length === 0 ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="w-12 h-12 border-4 border-gray-200 border-t-black rounded-full animate-spin" />
         </div>
-      )}
-      {success && (
-        <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded">
-          {success}
-          <button onClick={() => setSuccess('')} className="ml-2 text-green-900">×</button>
+      ) : posts.length === 0 ? (
+        <Card className="p-16 bg-gradient-to-br from-gray-50 to-white">
+          <div className="text-center">
+            <div className="mx-auto w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+              <Plus className="w-10 h-10 text-gray-500" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">No posts yet</h3>
+            <p className="text-sm text-gray-600 mb-6 max-w-md mx-auto">Get started by creating your first gallery post and showcase your work</p>
+            <Button onClick={() => setCreateModalOpen(true)} variant="primary" size="lg">
+              <Plus className="w-5 h-5 mr-2" />
+              Create First Post
+            </Button>
+          </div>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {posts.map((post, index) => {
+            const thumbnail = post.images && post.images[post.thumbnailIndex || 0];
+            return (
+              <Card 
+                key={post._id} 
+                hover
+                className="group overflow-hidden"
+                style={{ animation: `fadeInScale 0.3s ease-out ${index * 0.1}s both` }}
+              >
+                {/* Image */}
+                <div className="relative aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
+                  {thumbnail ? (
+                    <Image
+                      src={thumbnail.url}
+                      alt={post.title}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-center">
+                        <ImageIcon className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+                        <span className="text-sm text-gray-400 font-medium">No image</span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Overlay Actions */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-2">
+                    <Button
+                      onClick={() => openPreviewModal(post)}
+                      variant="secondary"
+                      size="sm"
+                      className="transform scale-90 group-hover:scale-100"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      onClick={() => openEditModal(post)}
+                      variant="secondary"
+                      size="sm"
+                      className="transform scale-90 group-hover:scale-100"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      onClick={() => handleDelete(post._id)}
+                      variant="danger"
+                      size="sm"
+                      className="transform scale-90 group-hover:scale-100"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+
+                  {/* Image Count Badge */}
+                  {post.images && post.images.length > 1 && (
+                    <div className="absolute top-3 right-3 bg-black/80 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-lg font-bold shadow-lg">
+                      {post.images.length} images
+                    </div>
+                  )}
+                </div>
+
+                {/* Content */}
+                <div className="p-5 space-y-2 bg-gradient-to-b from-white to-gray-50 border-t-2 border-gray-100">
+                  <h3 className="text-base font-bold text-gray-900 line-clamp-2 group-hover:text-black transition-colors">
+                    {post.title}
+                  </h3>
+                  {post.description && (
+                    <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
+                      {post.description}
+                    </p>
+                  )}
+                  <div className="flex items-center gap-2 text-xs text-gray-500 font-medium pt-1">
+                    {post.year && <span className="bg-gray-100 px-2 py-1 rounded-md">{post.year}</span>}
+                    {post.location && <span className="bg-gray-100 px-2 py-1 rounded-md">{post.location}</span>}
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="mb-6 p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
-        <h3 className="text-lg font-semibold mb-3">Create New Gallery Post</h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium mb-2">
-              Images (1-4 images) <span className="text-red-500">*</span>
-            </label>
-            <input
-              id="fileInput"
-              type="file"
-              multiple
-              accept="image/jpeg,image/jpg,image/png,image/webp"
-              onChange={handleFileChange}
-              className="block w-full text-sm border border-gray-300 rounded p-2 bg-white cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-              required
+      {/* Create Modal */}
+      <Modal
+        isOpen={createModalOpen}
+        onClose={() => {
+          setCreateModalOpen(false);
+          resetForm();
+        }}
+        title="Add New Gallery Post"
+        size="lg"
+      >
+        <form onSubmit={handleCreate} className="space-y-6">
+          <FileUpload
+            files={uploadFiles}
+            onChange={setUploadFiles}
+            maxFiles={4}
+            label="Upload Images"
+          />
+
+          <Input
+            label="Title"
+            required
+            value={formData.title}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            placeholder="Enter post title"
+          />
+
+          <Textarea
+            label="Description"
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            placeholder="Enter post description"
+            rows={4}
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Input
+              label="Year"
+              type="number"
+              value={formData.year}
+              onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+              placeholder="2024"
             />
-            <p className="text-xs text-gray-500 mt-1">Select 1-4 images (JPEG, PNG, WebP - max 10MB each)</p>
+            <Input
+              label="Location"
+              value={formData.location}
+              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+              placeholder="City, Country"
+            />
+            <Input
+              label="Venue"
+              value={formData.venue}
+              onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
+              placeholder="Event venue"
+            />
           </div>
 
           {uploadFiles.length > 0 && (
-            <div className="md:col-span-2 p-3 bg-white border border-gray-300 rounded">
-              <p className="text-sm font-medium mb-2">
-                📸 {uploadFiles.length} image{uploadFiles.length > 1 ? 's' : ''} selected
-              </p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <div>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">
+                Thumbnail Image
+              </label>
+              <select
+                value={formData.thumbnailIndex}
+                onChange={(e) => setFormData({ ...formData, thumbnailIndex: parseInt(e.target.value) })}
+                className="w-full px-4 py-2.5 text-sm bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-all"
+              >
                 {uploadFiles.map((file, idx) => (
-                  <div key={idx} className="relative group">
-                    <img
-                      src={URL.createObjectURL(file)}
-                      alt={`Preview ${idx + 1}`}
-                      className={`w-full h-24 object-cover rounded border-2 ${thumbnailIndex === idx ? 'border-blue-500' : 'border-gray-300'}`}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeFile(idx)}
-                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      ×
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setThumbnailIndex(idx)}
-                      className={`absolute bottom-1 left-1 text-xs px-2 py-1 rounded ${thumbnailIndex === idx ? 'bg-blue-500 text-white' : 'bg-white text-gray-700'}`}
-                    >
-                      {thumbnailIndex === idx ? '★ Thumbnail' : 'Set as thumb'}
-                    </button>
-                  </div>
+                  <option key={idx} value={idx}>
+                    Image {idx + 1} - {file.name}
+                  </option>
                 ))}
-              </div>
+              </select>
             </div>
           )}
 
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium mb-2">
-              Title <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g., Taiwan Excellence Exhibition 2024"
-              className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
-              maxLength={200}
-            />
+          <div className="flex gap-3 pt-4">
+            <Button
+              type="button"
+              onClick={() => {
+                setCreateModalOpen(false);
+                resetForm();
+              }}
+              variant="ghost"
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              isLoading={loading}
+              className="flex-1"
+            >
+              Create Post
+            </Button>
           </div>
+        </form>
+      </Modal>
 
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium mb-2">Description</label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Project description..."
-              className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              rows={3}
-              maxLength={1000}
-            />
-          </div>
+      {/* Edit Modal */}
+      <Modal
+        isOpen={editModalOpen}
+        onClose={() => {
+          setEditModalOpen(false);
+          resetForm();
+        }}
+        title="Edit Gallery Post"
+        size="lg"
+      >
+        <form onSubmit={handleUpdate} className="space-y-6">
+          <Input
+            label="Title"
+            required
+            value={formData.title}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            placeholder="Enter post title"
+          />
 
-          <div>
-            <label className="block text-sm font-medium mb-2">Year</label>
-            <input
+          <Textarea
+            label="Description"
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            placeholder="Enter post description"
+            rows={4}
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Input
+              label="Year"
               type="number"
-              value={year}
-              onChange={(e) => setYear(e.target.value)}
-              placeholder="e.g., 2024"
-              className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              min="1800"
-              max={new Date().getFullYear() + 10}
+              value={formData.year}
+              onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+              placeholder="2024"
+            />
+            <Input
+              label="Location"
+              value={formData.location}
+              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+              placeholder="City, Country"
+            />
+            <Input
+              label="Venue"
+              value={formData.venue}
+              onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
+              placeholder="Event venue"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">Location</label>
-            <input
-              type="text"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder="e.g., Jakarta Convention Center"
-              className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              maxLength={200}
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium mb-2">Venue</label>
-            <input
-              type="text"
-              value={venue}
-              onChange={(e) => setVenue(e.target.value)}
-              placeholder="e.g., Hall A"
-              className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              maxLength={200}
-            />
-          </div>
-        </div>
-
-        <button
-          type="submit"
-          disabled={loading || uploadFiles.length === 0}
-          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50 font-semibold"
-        >
-          {loading ? '⏳ Creating...' : `📤 Create Post${uploadFiles.length > 0 ? ` (${uploadFiles.length} image${uploadFiles.length > 1 ? 's' : ''})` : ''}`}
-        </button>
-      </form>
-
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold mb-3">Gallery Posts ({posts.length}) - Drag to Reorder</h3>
-        
-        {loading && posts.length === 0 ? (
-          <p className="text-gray-500">Loading...</p>
-        ) : posts.length === 0 ? (
-          <p className="text-gray-500">No posts created yet.</p>
-        ) : (
-          <div className="space-y-4">
-            {posts.map((post, index) => (
-              <div
-                key={post._id}
-                draggable={editingId !== post._id}
-                onDragStart={(e) => handleDragStart(e, index)}
-                onDragEnter={(e) => handleDragEnter(e, index)}
-                onDragLeave={handleDragLeave}
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, index)}
-                onDragEnd={handleDragEnd}
-                className={`border rounded-lg p-4 transition-all ${
-                  editingId === post._id 
-                    ? 'border-blue-500 bg-blue-50' 
-                    : dragOverItem === index 
-                    ? 'border-green-500 bg-green-50 border-2' 
-                    : 'border-gray-300 hover:border-blue-400 cursor-move bg-white'
-                }`}
+          {selectedPost?.images && selectedPost.images.length > 0 && (
+            <div>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">
+                Thumbnail Image
+              </label>
+              <select
+                value={formData.thumbnailIndex}
+                onChange={(e) => setFormData({ ...formData, thumbnailIndex: parseInt(e.target.value) })}
+                className="w-full px-4 py-2.5 text-sm bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-all"
               >
-                {editingId === post._id ? (
-                  <div>
-                    <div className="flex items-start gap-4 mb-4">
-                      <span className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                        {index + 1}
-                      </span>
-                      <div className="flex-grow">
-                        <p className="text-sm text-gray-600 mb-2">{post.images.length} image{post.images.length > 1 ? 's' : ''}</p>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
-                          {post.images.map((img, idx) => (
-                            <div key={idx} className="relative">
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img
-                                src={img.thumbnailUrl || img.url}
-                                alt={`Image ${idx + 1}`}
-                                className={`w-full h-20 object-cover rounded border-2 ${editForm.thumbnailIndex === idx ? 'border-blue-500' : 'border-gray-300'}`}
-                              />
-                              <button
-                                type="button"
-                                onClick={() => setEditForm({...editForm, thumbnailIndex: idx})}
-                                className={`absolute bottom-1 left-1 text-xs px-1 py-0.5 rounded ${editForm.thumbnailIndex === idx ? 'bg-blue-500 text-white' : 'bg-white text-gray-700'}`}
-                              >
-                                {editForm.thumbnailIndex === idx ? '★' : 'Set'}
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
+                {selectedPost.images.map((img, idx) => (
+                  <option key={idx} value={idx}>
+                    Image {idx + 1} - {img.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <div className="md:col-span-2">
-                        <label className="block text-xs font-medium mb-1">Title</label>
-                        <input
-                          type="text"
-                          value={editForm.title}
-                          onChange={(e) => setEditForm({...editForm, title: e.target.value})}
-                          className="w-full border border-gray-300 rounded p-2 text-sm"
-                          required
-                          maxLength={200}
-                        />
-                      </div>
-                      <div className="md:col-span-2">
-                        <label className="block text-xs font-medium mb-1">Description</label>
-                        <textarea
-                          value={editForm.description}
-                          onChange={(e) => setEditForm({...editForm, description: e.target.value})}
-                          className="w-full border border-gray-300 rounded p-2 text-sm"
-                          rows={2}
-                          maxLength={1000}
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium mb-1">Year</label>
-                        <input
-                          type="number"
-                          value={editForm.year}
-                          onChange={(e) => setEditForm({...editForm, year: e.target.value})}
-                          className="w-full border border-gray-300 rounded p-2 text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium mb-1">Location</label>
-                        <input
-                          type="text"
-                          value={editForm.location}
-                          onChange={(e) => setEditForm({...editForm, location: e.target.value})}
-                          className="w-full border border-gray-300 rounded p-2 text-sm"
-                          maxLength={200}
-                        />
-                      </div>
-                      <div className="md:col-span-2">
-                        <label className="block text-xs font-medium mb-1">Venue</label>
-                        <input
-                          type="text"
-                          value={editForm.venue}
-                          onChange={(e) => setEditForm({...editForm, venue: e.target.value})}
-                          className="w-full border border-gray-300 rounded p-2 text-sm"
-                          maxLength={200}
-                        />
-                      </div>
-                    </div>
+          <div className="flex gap-3 pt-4">
+            <Button
+              type="button"
+              onClick={() => {
+                setEditModalOpen(false);
+                resetForm();
+              }}
+              variant="ghost"
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              isLoading={loading}
+              className="flex-1"
+            >
+              Update Post
+            </Button>
+          </div>
+        </form>
+      </Modal>
 
-                    <div className="flex gap-2 mt-3">
-                      <button
-                        onClick={cancelEdit}
-                        disabled={loading}
-                        className="flex-1 bg-gray-500 text-white px-3 py-2 rounded text-sm hover:bg-gray-600 disabled:opacity-50"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        onClick={() => handleUpdate(post._id)}
-                        disabled={loading || !editForm.title}
-                        className="flex-1 bg-green-600 text-white px-3 py-2 rounded text-sm hover:bg-green-700 disabled:opacity-50"
-                      >
-                        Save Changes
-                      </button>
-                    </div>
+      {/* Preview Modal */}
+      <Modal
+        isOpen={previewModalOpen}
+        onClose={() => setPreviewModalOpen(false)}
+        title={selectedPost?.title || 'Preview'}
+        size="xl"
+      >
+        {selectedPost && (
+          <div className="space-y-6">
+            {/* Images Grid */}
+            {selectedPost.images && selectedPost.images.length > 0 && (
+              <div className="grid grid-cols-2 gap-4">
+                {selectedPost.images.map((img, idx) => (
+                  <div key={idx} className="relative aspect-video rounded-xl overflow-hidden bg-gray-100">
+                    <Image
+                      src={img.url}
+                      alt={img.name}
+                      fill
+                      className="object-cover"
+                    />
+                    {idx === selectedPost.thumbnailIndex && (
+                      <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-lg">
+                        Thumbnail
+                      </div>
+                    )}
                   </div>
-                ) : (
-                  <div className="flex items-start gap-4">
-                    <span className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                      {index + 1}
-                    </span>
-                    
-                    <div className="flex-grow">
-                      <h4 className="font-bold text-lg mb-1">{post.title}</h4>
-                      {post.description && (
-                        <p className="text-sm text-gray-600 mb-2">{post.description}</p>
-                      )}
-                      <div className="flex flex-wrap gap-2 text-xs text-gray-500 mb-3">
-                        {post.year && <span>📅 {post.year}</span>}
-                        {post.location && <span>📍 {post.location}</span>}
-                        {post.venue && <span>🏢 {post.venue}</span>}
-                        <span>🖼️ {post.images.length} image{post.images.length > 1 ? 's' : ''}</span>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
-                        {post.images.map((img, idx) => (
-                          <div key={idx} className="relative">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={img.thumbnailUrl || img.url}
-                              alt={`Image ${idx + 1}`}
-                              className={`w-full h-20 object-cover rounded border-2 ${post.thumbnailIndex === idx ? 'border-blue-500' : 'border-gray-300'}`}
-                            />
-                            {post.thumbnailIndex === idx && (
-                              <span className="absolute bottom-1 left-1 bg-blue-500 text-white text-xs px-1 rounded">
-                                ★ Thumbnail
-                              </span>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                      
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => startEdit(post)}
-                          disabled={loading}
-                          className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 disabled:opacity-50"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(post._id)}
-                          disabled={loading}
-                          className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 disabled:opacity-50"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
+                ))}
+              </div>
+            )}
+
+            {/* Details */}
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{selectedPost.title}</h3>
+                {selectedPost.description && (
+                  <p className="text-sm text-gray-600 leading-relaxed">{selectedPost.description}</p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+                {selectedPost.year && (
+                  <div>
+                    <p className="text-xs text-gray-500 font-medium mb-1">Year</p>
+                    <p className="text-sm font-bold text-gray-900">{selectedPost.year}</p>
+                  </div>
+                )}
+                {selectedPost.location && (
+                  <div>
+                    <p className="text-xs text-gray-500 font-medium mb-1">Location</p>
+                    <p className="text-sm font-bold text-gray-900">{selectedPost.location}</p>
+                  </div>
+                )}
+                {selectedPost.venue && (
+                  <div>
+                    <p className="text-xs text-gray-500 font-medium mb-1">Venue</p>
+                    <p className="text-sm font-bold text-gray-900">{selectedPost.venue}</p>
                   </div>
                 )}
               </div>
-            ))}
+            </div>
           </div>
         )}
-      </div>
+      </Modal>
+
+      {/* Animations */}
+      <style jsx>{`
+        @keyframes fadeInScale {
+          from {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+      `}</style>
     </div>
   );
 }

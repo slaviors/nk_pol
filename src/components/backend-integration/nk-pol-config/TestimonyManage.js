@@ -1,26 +1,36 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Plus, Edit2, Trash2, Star, User, Eye } from 'lucide-react';
+import Image from 'next/image';
+import Modal from '@/components/ui/admin/Modal';
+import FileUpload from '@/components/ui/admin/FileUpload';
+import Button from '@/components/ui/admin/Button';
+import Input from '@/components/ui/admin/Input';
+import Textarea from '@/components/ui/admin/Textarea';
+import Alert from '@/components/ui/admin/Alert';
+import Card from '@/components/ui/admin/Card';
 
 export default function TestimonyManage() {
   const [testimonies, setTestimonies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [draggedItem, setDraggedItem] = useState(null);
-  const [dragOverItem, setDragOverItem] = useState(null);
+  
+  // Modal states
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [selectedTestimony, setSelectedTestimony] = useState(null);
 
-  const [profileImage, setProfileImage] = useState(null);
-  const [name, setName] = useState('');
-  const [title, setTitle] = useState('');
-  const [text, setText] = useState('');
-  const [star, setStar] = useState(5);
-
-  const [editingId, setEditingId] = useState(null);
-  const [editName, setEditName] = useState('');
-  const [editTitle, setEditTitle] = useState('');
-  const [editText, setEditText] = useState('');
-  const [editStar, setEditStar] = useState(5);
+  // Form states
+  const [formData, setFormData] = useState({
+    name: '',
+    title: '',
+    text: '',
+    star: 5,
+  });
+  const [profileImage, setProfileImage] = useState([]);
 
   useEffect(() => {
     fetchTestimonies();
@@ -51,16 +61,20 @@ export default function TestimonyManage() {
     }
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setProfileImage(file);
-    }
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      title: '',
+      text: '',
+      star: 5,
+    });
+    setProfileImage([]);
   };
 
-  const handleSubmit = async (e) => {
+  const handleCreate = async (e) => {
     e.preventDefault();
-    if (!profileImage) {
+    
+    if (profileImage.length === 0) {
       setError('Please select a profile image');
       return;
     }
@@ -68,14 +82,13 @@ export default function TestimonyManage() {
     try {
       setLoading(true);
       setError('');
-      setSuccess('⏳ Creating testimony...');
 
-      const formData = new FormData();
-      formData.append('profileImage', profileImage);
-      formData.append('name', name);
-      formData.append('title', title);
-      formData.append('text', text);
-      formData.append('star', star);
+      const formDataToSend = new FormData();
+      formDataToSend.append('profileImage', profileImage[0]);
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('text', formData.text);
+      formDataToSend.append('star', formData.star);
 
       const token = localStorage.getItem('auth-token');
       const headers = {};
@@ -85,18 +98,14 @@ export default function TestimonyManage() {
         method: 'POST',
         credentials: 'include',
         headers,
-        body: formData
+        body: formDataToSend
       });
 
       const data = await response.json();
       if (response.ok) {
-        setSuccess('✓ Testimony created successfully!');
-        setProfileImage(null);
-        setName('');
-        setTitle('');
-        setText('');
-        setStar(5);
-        document.getElementById('imageInput').value = '';
+        setSuccess('Testimony created successfully!');
+        setCreateModalOpen(false);
+        resetForm();
         fetchTestimonies();
         setTimeout(() => setSuccess(''), 3000);
       } else {
@@ -104,6 +113,50 @@ export default function TestimonyManage() {
       }
     } catch (err) {
       setError('Upload error: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+
+    try {
+      setLoading(true);
+      setError('');
+
+      const formDataToSend = new FormData();
+      if (profileImage.length > 0) {
+        formDataToSend.append('profileImage', profileImage[0]);
+      }
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('text', formData.text);
+      formDataToSend.append('star', formData.star);
+
+      const token = localStorage.getItem('auth-token');
+      const headers = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const response = await fetch(`/api/admin/testimony/${selectedTestimony._id}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers,
+        body: formDataToSend
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setSuccess('Testimony updated successfully!');
+        setEditModalOpen(false);
+        resetForm();
+        fetchTestimonies();
+        setTimeout(() => setSuccess(''), 3000);
+      } else {
+        setError(data.error || 'Update failed');
+      }
+    } catch (err) {
+      setError('Update error: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -126,7 +179,7 @@ export default function TestimonyManage() {
 
       const data = await response.json();
       if (response.ok) {
-        setSuccess(data.message);
+        setSuccess('Testimony deleted successfully!');
         fetchTestimonies();
         setTimeout(() => setSuccess(''), 2000);
       } else {
@@ -139,424 +192,441 @@ export default function TestimonyManage() {
     }
   };
 
-  const startEdit = (testimony) => {
-    setEditingId(testimony._id);
-    setEditName(testimony.name || '');
-    setEditTitle(testimony.title || '');
-    setEditText(testimony.text || '');
-    setEditStar(testimony.star || 5);
+  const openEditModal = (testimony) => {
+    setSelectedTestimony(testimony);
+    setFormData({
+      name: testimony.name || '',
+      title: testimony.title || '',
+      text: testimony.text || '',
+      star: testimony.star || 5,
+    });
+    setProfileImage([]);
+    setEditModalOpen(true);
   };
 
-  const cancelEdit = () => {
-    setEditingId(null);
-    setEditName('');
-    setEditTitle('');
-    setEditText('');
-    setEditStar(5);
-  };
-
-  const handleUpdate = async (id) => {
-    try {
-      setLoading(true);
-      setError('');
-      setSuccess('');
-
-      const token = localStorage.getItem('auth-token');
-      const headers = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
-      const response = await fetch(`/api/admin/testimony/${id}`, {
-        method: 'PUT',
-        credentials: 'include',
-        headers,
-        body: JSON.stringify({
-          name: editName,
-          title: editTitle,
-          text: editText,
-          star: editStar
-        })
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        setSuccess('Testimony updated successfully');
-        setEditingId(null);
-        fetchTestimonies();
-        setTimeout(() => setSuccess(''), 2000);
-      } else {
-        setError(data.error || 'Update failed');
-      }
-    } catch (err) {
-      setError('Update error: ' + err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDragStart = (e, index) => {
-    setDraggedItem(index);
-    e.dataTransfer.effectAllowed = 'move';
-    e.currentTarget.style.opacity = '0.4';
-  };
-
-  const handleDragEnter = (e, index) => {
-    e.preventDefault();
-    if (draggedItem !== null && draggedItem !== index) {
-      setDragOverItem(index);
-    }
-  };
-
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    setDragOverItem(null);
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-  };
-
-  const handleDrop = async (e, dropIndex) => {
-    e.preventDefault();
-    setDragOverItem(null);
-    
-    if (draggedItem === null || draggedItem === dropIndex) {
-      return;
-    }
-
-    const newTestimonies = [...testimonies];
-    const draggedTestimony = newTestimonies[draggedItem];
-    
-    newTestimonies.splice(draggedItem, 1);
-    newTestimonies.splice(dropIndex, 0, draggedTestimony);
-    
-    setTestimonies(newTestimonies);
-
-    try {
-      const testimonyIds = newTestimonies.map(t => t._id);
-      const token = localStorage.getItem('auth-token');
-      const headers = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
-      const response = await fetch('/api/admin/testimony', {
-        method: 'PUT',
-        credentials: 'include',
-        headers,
-        body: JSON.stringify({
-          action: 'reorder',
-          testimonyIds
-        })
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        setError(data.error || 'Failed to reorder');
-        fetchTestimonies();
-      } else {
-        setSuccess('Testimonies reordered successfully');
-        setTimeout(() => setSuccess(''), 2000);
-      }
-    } catch (err) {
-      setError('Reorder error: ' + err.message);
-      fetchTestimonies();
-    }
-  };
-
-  const handleDragEnd = (e) => {
-    e.currentTarget.style.opacity = '1';
-    setDraggedItem(null);
-    setDragOverItem(null);
+  const openPreviewModal = (testimony) => {
+    setSelectedTestimony(testimony);
+    setPreviewModalOpen(true);
   };
 
   const renderStars = (rating) => {
     return (
       <div className="flex gap-1">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <span key={i} className={i <= rating ? 'text-yellow-400' : 'text-gray-300'}>
-            ★
-          </span>
+        {[...Array(5)].map((_, i) => (
+          <Star
+            key={i}
+            className={`w-4 h-4 ${
+              i < rating
+                ? 'fill-yellow-400 text-yellow-400'
+                : 'fill-gray-200 text-gray-200'
+            }`}
+          />
         ))}
       </div>
     );
   };
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Testimony Management</h2>
-      
-      <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded">
-        <p className="text-sm">
-          <strong>📋 Info:</strong> Create and manage client testimonies. Each testimony includes a profile image, name, title, review text, and star rating (1-5).
-        </p>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b-2 border-gray-100">
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Testimonies</h2>
+          <p className="text-sm text-gray-600 mt-2 font-medium">
+            Manage client testimonials and reviews • {testimonies.length} total
+          </p>
+        </div>
+        <Button
+          onClick={() => {
+            resetForm();
+            setCreateModalOpen(true);
+          }}
+          variant="primary"
+          size="lg"
+          className="shadow-xl shadow-black/20"
+        >
+          <Plus className="w-5 h-5 mr-2" />
+          Add Testimony
+        </Button>
       </div>
 
-      {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded">
-          {error}
-          <button onClick={() => setError('')} className="ml-2 text-red-900">×</button>
+      {/* Alerts */}
+      {error && <Alert type="error" message={error} onClose={() => setError('')} />}
+      {success && <Alert type="success" message={success} onClose={() => setSuccess('')} />}
+
+      {/* Testimonies Grid */}
+      {loading && testimonies.length === 0 ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="w-12 h-12 border-4 border-gray-200 border-t-black rounded-full animate-spin" />
         </div>
-      )}
-      {success && (
-        <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded">
-          {success}
-          <button onClick={() => setSuccess('')} className="ml-2 text-green-900">×</button>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="mb-6 p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
-        <h3 className="text-lg font-semibold mb-3">Create New Testimony</h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium mb-2">
-              Profile Image <span className="text-red-500">*</span>
-            </label>
-            <input
-              id="imageInput"
-              type="file"
-              accept="image/jpeg,image/jpg,image/png,image/webp"
-              onChange={handleImageChange}
-              className="block w-full text-sm border border-gray-300 rounded p-2 bg-white cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-              required
-            />
-            <p className="text-xs text-gray-500 mt-1">Accepted formats: JPEG, PNG, WebP (max 5MB)</p>
-            {profileImage && (
-              <p className="text-xs text-green-600 mt-1">✓ Selected: {profileImage.name}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., John Doe"
-              className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
-              maxLength={100}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Title/Position
-            </label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g., CEO at ABC Company"
-              className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              maxLength={150}
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium mb-2">
-              Testimony Text <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder="Write the testimony here..."
-              className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              rows={4}
-              required
-              maxLength={1000}
-            />
-            <p className="text-xs text-gray-500 mt-1">{text.length}/1000 characters</p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Star Rating <span className="text-red-500">*</span>
-            </label>
-            <div className="flex items-center gap-4">
-              <input
-                type="number"
-                value={star}
-                onChange={(e) => setStar(parseInt(e.target.value))}
-                min={1}
-                max={5}
-                className="w-20 border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                required
-              />
-              {renderStars(star)}
+      ) : testimonies.length === 0 ? (
+        <Card className="p-16 bg-gradient-to-br from-gray-50 to-white">
+          <div className="text-center">
+            <div className="mx-auto w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+              <Star className="w-10 h-10 text-gray-500" />
             </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">No testimonies yet</h3>
+            <p className="text-sm text-gray-600 mb-6 max-w-md mx-auto">Get started by adding your first client testimony</p>
+            <Button onClick={() => setCreateModalOpen(true)} variant="primary" size="lg">
+              <Plus className="w-5 h-5 mr-2" />
+              Add First Testimony
+            </Button>
           </div>
-        </div>
-
-        <button
-          type="submit"
-          disabled={loading || !profileImage}
-          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50 font-semibold"
-        >
-          {loading ? '⏳ Creating...' : '📤 Create Testimony'}
-        </button>
-      </form>
-
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold mb-3">Current Testimonies (Drag to Reorder)</h3>
-        
-        {loading && testimonies.length === 0 ? (
-          <p className="text-gray-500">Loading...</p>
-        ) : testimonies.length === 0 ? (
-          <p className="text-gray-500">No testimonies created yet.</p>
-        ) : (
-          <div className="space-y-4">
-            {testimonies.map((testimony, index) => (
-              <div
-                key={testimony._id}
-                draggable={editingId !== testimony._id}
-                onDragStart={(e) => handleDragStart(e, index)}
-                onDragEnter={(e) => handleDragEnter(e, index)}
-                onDragLeave={handleDragLeave}
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, index)}
-                onDragEnd={handleDragEnd}
-                className={`border rounded-lg p-4 transition-all ${
-                  editingId === testimony._id 
-                    ? 'border-blue-500 bg-blue-50' 
-                    : dragOverItem === index 
-                    ? 'border-green-500 bg-green-50 border-2' 
-                    : 'border-gray-300 hover:border-blue-400 cursor-move bg-white'
-                }`}
-              >
-                {editingId === testimony._id ? (
-
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="md:col-span-1">
-                      <img
-                        src={testimony.profileImage.thumbnailUrl || testimony.profileImage.url}
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {testimonies.map((testimony, index) => (
+            <Card 
+              key={testimony._id} 
+              hover
+              className="group overflow-hidden"
+              style={{ animation: `fadeInScale 0.3s ease-out ${index * 0.1}s both` }}
+            >
+              {/* Content */}
+              <div className="p-5 space-y-4">
+                {/* Profile */}
+                <div className="flex items-start gap-4">
+                  <div className="relative w-16 h-16 flex-shrink-0 rounded-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 border-2 border-gray-200">
+                    {testimony.profileImage?.url ? (
+                      <Image
+                        src={testimony.profileImage.url}
                         alt={testimony.name}
-                        className="w-24 h-24 rounded-full object-cover mx-auto"
+                        fill
+                        className="object-cover"
                       />
-                    </div>
-                    
-                    <div className="md:col-span-3 space-y-3">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-xs font-medium mb-1">Name</label>
-                          <input
-                            type="text"
-                            value={editName}
-                            onChange={(e) => setEditName(e.target.value)}
-                            className="w-full border border-gray-300 rounded p-2 text-sm"
-                            required
-                            maxLength={100}
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-medium mb-1">Title</label>
-                          <input
-                            type="text"
-                            value={editTitle}
-                            onChange={(e) => setEditTitle(e.target.value)}
-                            className="w-full border border-gray-300 rounded p-2 text-sm"
-                            maxLength={150}
-                          />
-                        </div>
+                    ) : (
+                      <div className="flex items-center justify-center h-full">
+                        <User className="w-8 h-8 text-gray-400" />
                       </div>
-
-                      <div>
-                        <label className="block text-xs font-medium mb-1">Testimony Text</label>
-                        <textarea
-                          value={editText}
-                          onChange={(e) => setEditText(e.target.value)}
-                          className="w-full border border-gray-300 rounded p-2 text-sm"
-                          rows={3}
-                          required
-                          maxLength={1000}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-medium mb-1">Star Rating</label>
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="number"
-                            value={editStar}
-                            onChange={(e) => setEditStar(parseInt(e.target.value))}
-                            min={1}
-                            max={5}
-                            className="w-20 border border-gray-300 rounded p-2 text-sm"
-                          />
-                          {renderStars(editStar)}
-                        </div>
-                      </div>
-
-                      <div className="flex gap-2">
-                        <button
-                          onClick={cancelEdit}
-                          disabled={loading}
-                          className="flex-1 bg-gray-500 text-white px-3 py-2 rounded text-sm hover:bg-gray-600 disabled:opacity-50"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          onClick={() => handleUpdate(testimony._id)}
-                          disabled={loading || !editName || !editText}
-                          className="flex-1 bg-green-600 text-white px-3 py-2 rounded text-sm hover:bg-green-700 disabled:opacity-50"
-                        >
-                          Save Changes
-                        </button>
-                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base font-bold text-gray-900 truncate">
+                      {testimony.name}
+                    </h3>
+                    <p className="text-sm text-gray-600 truncate">
+                      {testimony.title}
+                    </p>
+                    <div className="mt-1">
+                      {renderStars(testimony.star)}
                     </div>
                   </div>
-                ) : (
+                </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="md:col-span-1 flex flex-col items-center">
-                      <span className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold mb-2">
-                        {index + 1}
-                      </span>
-                      <img
-                        src={testimony.profileImage.thumbnailUrl || testimony.profileImage.url}
-                        alt={testimony.name}
-                        className="w-24 h-24 rounded-full object-cover"
-                      />
-                      <div className="mt-2">
-                        {renderStars(testimony.star)}
-                      </div>
-                    </div>
-                    
-                    <div className="md:col-span-3">
-                      <div className="mb-2">
-                        <h4 className="font-bold text-lg">{testimony.name}</h4>
-                        {testimony.title && (
-                          <p className="text-sm text-gray-600">{testimony.title}</p>
-                        )}
-                      </div>
-                      
-                      <p className="text-gray-700 mb-3 italic">&quot;{testimony.text}&quot;</p>
-                      
-                      <div className="flex gap-2 mt-3">
-                        <button
-                          onClick={() => startEdit(testimony)}
-                          disabled={loading}
-                          className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 disabled:opacity-50"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(testimony._id)}
-                          disabled={loading}
-                          className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 disabled:opacity-50"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
+                {/* Text */}
+                <p className="text-sm text-gray-600 line-clamp-3 leading-relaxed">
+                  &ldquo;{testimony.text}&rdquo;
+                </p>
+
+                {/* Actions */}
+                <div className="flex gap-2 pt-2 border-t-2 border-gray-100">
+                  <Button
+                    onClick={() => openPreviewModal(testimony)}
+                    variant="ghost"
+                    size="sm"
+                    className="flex-1"
+                  >
+                    <Eye className="w-4 h-4 mr-1" />
+                    View
+                  </Button>
+                  <Button
+                    onClick={() => openEditModal(testimony)}
+                    variant="ghost"
+                    size="sm"
+                    className="flex-1"
+                  >
+                    <Edit2 className="w-4 h-4 mr-1" />
+                    Edit
+                  </Button>
+                  <Button
+                    onClick={() => handleDelete(testimony._id)}
+                    variant="ghost"
+                    size="sm"
+                    className="flex-1 text-red-600 hover:bg-red-50"
+                  >
+                    <Trash2 className="w-4 h-4 mr-1" />
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Create Modal */}
+      <Modal
+        isOpen={createModalOpen}
+        onClose={() => {
+          setCreateModalOpen(false);
+          resetForm();
+        }}
+        title="Add New Testimony"
+        size="lg"
+      >
+        <form onSubmit={handleCreate} className="space-y-6">
+          <FileUpload
+            files={profileImage}
+            onChange={setProfileImage}
+            maxFiles={1}
+            label="Profile Image"
+          />
+
+          <Input
+            label="Name"
+            required
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            placeholder="Client name"
+          />
+
+          <Input
+            label="Title/Position"
+            required
+            value={formData.title}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            placeholder="CEO, Company Name"
+          />
+
+          <Textarea
+            label="Testimony Text"
+            required
+            value={formData.text}
+            onChange={(e) => setFormData({ ...formData, text: e.target.value })}
+            placeholder="Enter testimony text..."
+            rows={5}
+          />
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-3">
+              Rating
+            </label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((rating) => (
+                <button
+                  key={rating}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, star: rating })}
+                  className="transition-transform duration-200 hover:scale-110"
+                >
+                  <Star
+                    className={`w-8 h-8 ${
+                      rating <= formData.star
+                        ? 'fill-yellow-400 text-yellow-400'
+                        : 'fill-gray-200 text-gray-200'
+                    }`}
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <Button
+              type="button"
+              onClick={() => {
+                setCreateModalOpen(false);
+                resetForm();
+              }}
+              variant="ghost"
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              isLoading={loading}
+              className="flex-1"
+            >
+              Create Testimony
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Edit Modal */}
+      <Modal
+        isOpen={editModalOpen}
+        onClose={() => {
+          setEditModalOpen(false);
+          resetForm();
+        }}
+        title="Edit Testimony"
+        size="lg"
+      >
+        <form onSubmit={handleUpdate} className="space-y-6">
+          <FileUpload
+            files={profileImage}
+            onChange={setProfileImage}
+            maxFiles={1}
+            label="Profile Image (optional - leave empty to keep current)"
+          />
+
+          {selectedTestimony?.profileImage?.url && profileImage.length === 0 && (
+            <div className="p-4 bg-gray-50 rounded-xl border-2 border-gray-200">
+              <p className="text-sm font-medium text-gray-700 mb-2">Current Image:</p>
+              <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-gray-300">
+                <Image
+                  src={selectedTestimony.profileImage.url}
+                  alt={selectedTestimony.name}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            </div>
+          )}
+
+          <Input
+            label="Name"
+            required
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            placeholder="Client name"
+          />
+
+          <Input
+            label="Title/Position"
+            required
+            value={formData.title}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            placeholder="CEO, Company Name"
+          />
+
+          <Textarea
+            label="Testimony Text"
+            required
+            value={formData.text}
+            onChange={(e) => setFormData({ ...formData, text: e.target.value })}
+            placeholder="Enter testimony text..."
+            rows={5}
+          />
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-3">
+              Rating
+            </label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((rating) => (
+                <button
+                  key={rating}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, star: rating })}
+                  className="transition-transform duration-200 hover:scale-110"
+                >
+                  <Star
+                    className={`w-8 h-8 ${
+                      rating <= formData.star
+                        ? 'fill-yellow-400 text-yellow-400'
+                        : 'fill-gray-200 text-gray-200'
+                    }`}
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <Button
+              type="button"
+              onClick={() => {
+                setEditModalOpen(false);
+                resetForm();
+              }}
+              variant="ghost"
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              isLoading={loading}
+              className="flex-1"
+            >
+              Update Testimony
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Preview Modal */}
+      <Modal
+        isOpen={previewModalOpen}
+        onClose={() => setPreviewModalOpen(false)}
+        title="Testimony Preview"
+        size="md"
+      >
+        {selectedTestimony && (
+          <div className="space-y-6">
+            {/* Profile */}
+            <div className="flex items-center gap-4 pb-6 border-b-2 border-gray-100">
+              <div className="relative w-20 h-20 rounded-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 border-2 border-gray-200">
+                {selectedTestimony.profileImage?.url ? (
+                  <Image
+                    src={selectedTestimony.profileImage.url}
+                    alt={selectedTestimony.name}
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <User className="w-10 h-10 text-gray-400" />
                   </div>
                 )}
               </div>
-            ))}
+              
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">
+                  {selectedTestimony.name}
+                </h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  {selectedTestimony.title}
+                </p>
+                <div className="mt-2">
+                  {renderStars(selectedTestimony.star)}
+                </div>
+              </div>
+            </div>
+
+            {/* Text */}
+            <div>
+              <h4 className="text-sm font-semibold text-gray-900 mb-2">Testimony:</h4>
+              <p className="text-sm text-gray-600 leading-relaxed italic">
+                &ldquo;{selectedTestimony.text}&rdquo;
+              </p>
+            </div>
+
+            {/* Meta Info */}
+            {selectedTestimony.createdAt && (
+              <div className="pt-4 border-t-2 border-gray-100">
+                <p className="text-xs text-gray-500 font-medium">
+                  Created: {new Date(selectedTestimony.createdAt).toLocaleDateString('id-ID', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                  })}
+                </p>
+              </div>
+            )}
           </div>
         )}
-      </div>
+      </Modal>
+
+      {/* Animations */}
+      <style jsx>{`
+        @keyframes fadeInScale {
+          from {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+      `}</style>
     </div>
   );
 }

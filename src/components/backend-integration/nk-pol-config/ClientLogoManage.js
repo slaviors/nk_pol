@@ -1,20 +1,30 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Plus, Edit2, Trash2, Award, Eye, Building2 } from 'lucide-react';
+import Image from 'next/image';
+import Modal from '@/components/ui/admin/Modal';
+import FileUpload from '@/components/ui/admin/FileUpload';
+import Button from '@/components/ui/admin/Button';
+import Input from '@/components/ui/admin/Input';
+import Alert from '@/components/ui/admin/Alert';
+import Card from '@/components/ui/admin/Card';
 
 export default function ClientLogoManage() {
   const [logos, setLogos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [draggedItem, setDraggedItem] = useState(null);
-  const [dragOverItem, setDragOverItem] = useState(null);
+  
+  // Modal states
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [selectedLogo, setSelectedLogo] = useState(null);
 
+  // Form states
   const [uploadFiles, setUploadFiles] = useState([]);
   const [titles, setTitles] = useState([]);
-
-  const [editingId, setEditingId] = useState(null);
-  const [editTitle, setEditTitle] = useState('');
 
   useEffect(() => {
     fetchLogos();
@@ -45,28 +55,33 @@ export default function ClientLogoManage() {
     }
   };
 
-  const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
+  const resetForm = () => {
+    setUploadFiles([]);
+    setTitles([]);
+  };
+
+  const handleFilesChange = (files) => {
     setUploadFiles(files);
     setTitles(files.map(f => f.name.split('.')[0]));
   };
 
-  const removeFile = (indexToRemove) => {
-    setUploadFiles(uploadFiles.filter((_, idx) => idx !== indexToRemove));
-    setTitles(titles.filter((_, idx) => idx !== indexToRemove));
+  const handleTitleChange = (index, newTitle) => {
+    const newTitles = [...titles];
+    newTitles[index] = newTitle;
+    setTitles(newTitles);
   };
 
-  const handleUpload = async (e) => {
+  const handleCreate = async (e) => {
     e.preventDefault();
+    
     if (uploadFiles.length === 0) {
-      setError('Please select files to upload');
+      setError('Please select at least one logo');
       return;
     }
 
     try {
       setLoading(true);
       setError('');
-      setSuccess(`⏳ Uploading ${uploadFiles.length} logo${uploadFiles.length > 1 ? 's' : ''}...`);
 
       const formData = new FormData();
       uploadFiles.forEach(file => formData.append('files', file));
@@ -85,16 +100,15 @@ export default function ClientLogoManage() {
 
       const data = await response.json();
       if (response.ok) {
-        const successMsg = `✓ Successfully uploaded ${data.successCount} logo${data.successCount > 1 ? 's' : ''}!`;
+        const successMsg = `Successfully uploaded ${data.successCount} logo${data.successCount > 1 ? 's' : ''}!`;
         setSuccess(successMsg);
         
         if (data.errorCount > 0) {
-          setError(`⚠️ ${data.errorCount} file${data.errorCount > 1 ? 's' : ''} failed to upload.`);
+          setError(`${data.errorCount} file${data.errorCount > 1 ? 's' : ''} failed to upload.`);
         }
         
-        setUploadFiles([]);
-        setTitles([]);
-        document.getElementById('fileInput').value = '';
+        setCreateModalOpen(false);
+        resetForm();
         fetchLogos();
         setTimeout(() => setSuccess(''), 3000);
       } else {
@@ -102,6 +116,41 @@ export default function ClientLogoManage() {
       }
     } catch (err) {
       setError('Upload error: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+
+    try {
+      setLoading(true);
+      setError('');
+
+      const token = localStorage.getItem('auth-token');
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const response = await fetch(`/api/admin/clientLogo/${selectedLogo._id}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers,
+        body: JSON.stringify({ title: titles[0] })
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setSuccess('Logo updated successfully!');
+        setEditModalOpen(false);
+        resetForm();
+        fetchLogos();
+        setTimeout(() => setSuccess(''), 3000);
+      } else {
+        setError(data.error || 'Update failed');
+      }
+    } catch (err) {
+      setError('Update error: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -124,7 +173,7 @@ export default function ClientLogoManage() {
 
       const data = await response.json();
       if (response.ok) {
-        setSuccess(data.message);
+        setSuccess('Logo deleted successfully!');
         fetchLogos();
         setTimeout(() => setSuccess(''), 2000);
       } else {
@@ -137,347 +186,334 @@ export default function ClientLogoManage() {
     }
   };
 
-  const startEdit = (logo) => {
-    setEditingId(logo._id);
-    setEditTitle(logo.title || '');
+  const openEditModal = (logo) => {
+    setSelectedLogo(logo);
+    setTitles([logo.title || '']);
+    setEditModalOpen(true);
   };
 
-  const cancelEdit = () => {
-    setEditingId(null);
-    setEditTitle('');
-  };
-
-  const handleUpdate = async (id) => {
-    try {
-      setLoading(true);
-      setError('');
-      setSuccess('');
-
-      const token = localStorage.getItem('auth-token');
-      const headers = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
-      const response = await fetch(`/api/admin/clientLogo/${id}`, {
-        method: 'PUT',
-        credentials: 'include',
-        headers,
-        body: JSON.stringify({ title: editTitle })
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        setSuccess('Logo updated successfully');
-        setEditingId(null);
-        setEditTitle('');
-        fetchLogos();
-        setTimeout(() => setSuccess(''), 2000);
-      } else {
-        setError(data.error || 'Update failed');
-      }
-    } catch (err) {
-      setError('Update error: ' + err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDragStart = (e, index) => {
-    setDraggedItem(index);
-    e.dataTransfer.effectAllowed = 'move';
-    e.currentTarget.style.opacity = '0.4';
-  };
-
-  const handleDragEnter = (e, index) => {
-    e.preventDefault();
-    if (draggedItem !== null && draggedItem !== index) {
-      setDragOverItem(index);
-    }
-  };
-
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    setDragOverItem(null);
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-  };
-
-  const handleDrop = async (e, dropIndex) => {
-    e.preventDefault();
-    setDragOverItem(null);
-    
-    if (draggedItem === null || draggedItem === dropIndex) {
-      return;
-    }
-
-    const newLogos = [...logos];
-    const draggedLogo = newLogos[draggedItem];
-    
-    newLogos.splice(draggedItem, 1);
-    newLogos.splice(dropIndex, 0, draggedLogo);
-    
-    setLogos(newLogos);
-
-    try {
-      const logoIds = newLogos.map(logo => logo._id);
-      const token = localStorage.getItem('auth-token');
-      const headers = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
-      const response = await fetch('/api/admin/clientLogo', {
-        method: 'PUT',
-        credentials: 'include',
-        headers,
-        body: JSON.stringify({
-          action: 'reorder',
-          logoIds
-        })
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        setError(data.error || 'Failed to reorder');
-        fetchLogos();
-      } else {
-        setSuccess('Logos reordered successfully');
-        setTimeout(() => setSuccess(''), 2000);
-      }
-    } catch (err) {
-      setError('Reorder error: ' + err.message);
-      fetchLogos();
-    }
-  };
-
-  const handleDragEnd = (e) => {
-    e.currentTarget.style.opacity = '1';
-    setDraggedItem(null);
-    setDragOverItem(null);
+  const openPreviewModal = (logo) => {
+    setSelectedLogo(logo);
+    setPreviewModalOpen(true);
   };
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Client Logo Management</h2>
-      
-      <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded">
-        <p className="text-sm">
-          <strong>📋 Info:</strong> Upload client/partner logos (PNG or SVG format). These will appear in an infinite scrolling carousel on the homepage. Drag to reorder.
-        </p>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b-2 border-gray-100">
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Client Logos</h2>
+          <p className="text-sm text-gray-600 mt-2 font-medium">
+            Manage client and partner logos • {logos.length} total
+          </p>
+        </div>
+        <Button
+          onClick={() => {
+            resetForm();
+            setCreateModalOpen(true);
+          }}
+          variant="primary"
+          size="lg"
+          className="shadow-xl shadow-black/20"
+        >
+          <Plus className="w-5 h-5 mr-2" />
+          Add Logos
+        </Button>
       </div>
 
-      {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded">
-          {error}
-          <button onClick={() => setError('')} className="ml-2 text-red-900">×</button>
-        </div>
-      )}
-      {success && (
-        <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded">
-          {success}
-          <button onClick={() => setSuccess('')} className="ml-2 text-green-900">×</button>
-        </div>
-      )}
+      {/* Alerts */}
+      {error && <Alert type="error" message={error} onClose={() => setError('')} />}
+      {success && <Alert type="success" message={success} onClose={() => setSuccess('')} />}
 
-      <form onSubmit={handleUpload} className="mb-6 p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
-        <h3 className="text-lg font-semibold mb-3">Upload New Logos</h3>
-        
-        <div className="mb-3">
-          <label className="block text-sm font-medium mb-2">
-            Select Logo Files (PNG or SVG only)
-          </label>
-          <input
-            id="fileInput"
-            type="file"
-            multiple
-            accept="image/png,image/svg+xml"
-            onChange={handleFileChange}
-            className="block w-full text-sm border border-gray-300 rounded p-2 bg-white cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-          />
-          <p className="text-xs text-gray-500 mt-1">Accepted formats: PNG, SVG (max 5MB per file)</p>
+      {/* Logos Grid */}
+      {loading && logos.length === 0 ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="w-12 h-12 border-4 border-gray-200 border-t-black rounded-full animate-spin" />
         </div>
-        
-        {uploadFiles.length > 0 && (
-          <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded">
-            <p className="text-sm font-medium text-blue-900">
-              📁 {uploadFiles.length} file{uploadFiles.length > 1 ? 's' : ''} selected - All will be uploaded
-            </p>
+      ) : logos.length === 0 ? (
+        <Card className="p-16 bg-gradient-to-br from-gray-50 to-white">
+          <div className="text-center">
+            <div className="mx-auto w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+              <Award className="w-10 h-10 text-gray-500" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">No client logos yet</h3>
+            <p className="text-sm text-gray-600 mb-6 max-w-md mx-auto">Get started by adding your first client or partner logo</p>
+            <Button onClick={() => setCreateModalOpen(true)} variant="primary" size="lg">
+              <Plus className="w-5 h-5 mr-2" />
+              Add First Logo
+            </Button>
           </div>
-        )}
-
-        {uploadFiles.length > 0 && (
-          <div className="space-y-4">
-            {uploadFiles.map((file, idx) => (
-              <div key={idx} className="p-4 border-2 border-blue-300 rounded-lg bg-white shadow-sm">
-                <div className="flex items-center gap-3 mb-3 pb-3 border-b border-gray-200">
-                  <span className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                    {idx + 1}
-                  </span>
-                  <div className="flex-grow">
-                    <p className="font-semibold text-sm text-gray-900">{file.name}</p>
-                    <p className="text-xs text-gray-500">
-                      {(file.size / 1024).toFixed(2)} KB • {file.type}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => removeFile(idx)}
-                    className="flex-shrink-0 bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1 rounded text-sm font-medium transition-colors"
-                  >
-                    Remove
-                  </button>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Logo Title/Client Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={titles[idx] || ''}
-                    onChange={(e) => {
-                      const newTitles = [...titles];
-                      newTitles[idx] = e.target.value;
-                      setTitles(newTitles);
-                    }}
-                    placeholder="e.g., ABC Company"
-                    className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    required
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        <button
-          type="submit"
-          disabled={loading || uploadFiles.length === 0}
-          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50 font-semibold"
-        >
-          {loading 
-            ? `⏳ Uploading ${uploadFiles.length} logo${uploadFiles.length > 1 ? 's' : ''}...` 
-            : `📤 Upload ${uploadFiles.length > 0 ? uploadFiles.length + ' ' : ''}Logo${uploadFiles.length > 1 ? 's' : ''}`
-          }
-        </button>
-      </form>
-
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold mb-3">Current Logos (Drag to Reorder)</h3>
-        
-        {loading && logos.length === 0 ? (
-          <p className="text-gray-500">Loading...</p>
-        ) : logos.length === 0 ? (
-          <p className="text-gray-500">No logos uploaded yet.</p>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-            {logos.map((logo, index) => (
-              <div
-                key={logo._id}
-                draggable={editingId !== logo._id}
-                onDragStart={(e) => handleDragStart(e, index)}
-                onDragEnter={(e) => handleDragEnter(e, index)}
-                onDragLeave={handleDragLeave}
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, index)}
-                onDragEnd={handleDragEnd}
-                className={`border rounded-lg p-4 transition-all ${
-                  editingId === logo._id 
-                    ? 'border-blue-500 bg-blue-50' 
-                    : dragOverItem === index 
-                    ? 'border-green-500 bg-green-50 border-2' 
-                    : 'border-gray-300 hover:border-blue-400 cursor-move bg-white'
-                }`}
-              >
-                {editingId === logo._id ? (
-
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-center mb-2">
-                      <img
-                        src={logo.image.thumbnailUrl || logo.image.url}
-                        alt={logo.title}
-                        className="h-16 w-auto object-contain"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-xs font-medium mb-1">Title</label>
-                      <input
-                        type="text"
-                        value={editTitle}
-                        onChange={(e) => setEditTitle(e.target.value)}
-                        className="w-full border border-gray-300 rounded p-2 text-sm"
-                        required
-                      />
-                    </div>
-
-                    <div className="flex gap-2">
-                      <button
-                        onClick={cancelEdit}
-                        disabled={loading}
-                        className="flex-1 bg-gray-500 text-white px-2 py-1 rounded text-xs hover:bg-gray-600 disabled:opacity-50"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        onClick={() => handleUpdate(logo._id)}
-                        disabled={loading || !editTitle}
-                        className="flex-1 bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700 disabled:opacity-50"
-                      >
-                        Save
-                      </button>
-                    </div>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          {logos.map((logo, index) => (
+            <Card 
+              key={logo._id} 
+              hover
+              className="group overflow-hidden"
+              style={{ animation: `fadeInScale 0.3s ease-out ${index * 0.05}s both` }}
+            >
+              {/* Logo Image */}
+              <div className="relative aspect-square bg-gradient-to-br from-white to-gray-50 overflow-hidden p-4">
+                {logo.image?.url ? (
+                  <div className="relative w-full h-full flex items-center justify-center">
+                    <Image
+                      src={logo.image.url}
+                      alt={logo.title || 'Client Logo'}
+                      fill
+                      className="object-contain p-2 group-hover:scale-110 transition-transform duration-500"
+                    />
                   </div>
                 ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <Building2 className="w-12 h-12 text-gray-300" />
+                  </div>
+                )}
 
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">
-                        {index + 1}
-                      </span>
-                      <div className="text-xs text-gray-400">⋮⋮</div>
-                    </div>
+                {/* Overlay Actions */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-1 p-2">
+                  <Button
+                    onClick={() => openPreviewModal(logo)}
+                    variant="secondary"
+                    size="sm"
+                    className="transform scale-90 group-hover:scale-100"
+                  >
+                    <Eye className="w-3 h-3" />
+                  </Button>
+                  <Button
+                    onClick={() => openEditModal(logo)}
+                    variant="secondary"
+                    size="sm"
+                    className="transform scale-90 group-hover:scale-100"
+                  >
+                    <Edit2 className="w-3 h-3" />
+                  </Button>
+                  <Button
+                    onClick={() => handleDelete(logo._id)}
+                    variant="danger"
+                    size="sm"
+                    className="transform scale-90 group-hover:scale-100"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                </div>
+              </div>
 
-                    <div className="flex items-center justify-center h-20 bg-gray-50 rounded">
-                      <img
-                        src={logo.image.thumbnailUrl || logo.image.url}
-                        alt={logo.title}
-                        className="max-h-full max-w-full object-contain"
-                      />
-                    </div>
+              {/* Title */}
+              <div className="p-3 bg-gradient-to-b from-white to-gray-50 border-t-2 border-gray-100">
+                <p className="text-xs font-bold text-gray-900 text-center truncate" title={logo.title}>
+                  {logo.title}
+                </p>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
 
-                    <div>
-                      <p className="font-semibold text-sm text-gray-900 truncate" title={logo.title}>
-                        {logo.title}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        Position: {logo.position}
-                      </p>
-                    </div>
+      {/* Create Modal */}
+      <Modal
+        isOpen={createModalOpen}
+        onClose={() => {
+          setCreateModalOpen(false);
+          resetForm();
+        }}
+        title="Add Client Logos"
+        size="lg"
+      >
+        <form onSubmit={handleCreate} className="space-y-6">
+          <FileUpload
+            files={uploadFiles}
+            onChange={handleFilesChange}
+            maxFiles={10}
+            accept="image/png,image/jpeg,image/jpg,image/svg+xml"
+            label="Upload Logos (PNG, JPG, SVG • Max 10)"
+          />
 
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => startEdit(logo)}
-                        disabled={loading}
-                        className="flex-1 bg-blue-600 text-white px-2 py-1 rounded text-xs hover:bg-blue-700 disabled:opacity-50"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(logo._id)}
-                        disabled={loading}
-                        className="flex-1 bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700 disabled:opacity-50"
-                      >
-                        Delete
-                      </button>
-                    </div>
+          {uploadFiles.length > 0 && (
+            <div className="space-y-3">
+              <label className="block text-sm font-semibold text-gray-900">
+                Logo Titles
+              </label>
+              {uploadFiles.map((file, index) => (
+                <div key={index} className="flex items-center gap-3">
+                  <div className="flex-shrink-0 w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <span className="text-xs font-bold text-gray-600">{index + 1}</span>
+                  </div>
+                  <Input
+                    value={titles[index] || ''}
+                    onChange={(e) => handleTitleChange(index, e.target.value)}
+                    placeholder={`Logo ${index + 1} title`}
+                    className="flex-1"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="flex gap-3 pt-4">
+            <Button
+              type="button"
+              onClick={() => {
+                setCreateModalOpen(false);
+                resetForm();
+              }}
+              variant="ghost"
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              isLoading={loading}
+              className="flex-1"
+            >
+              Upload {uploadFiles.length > 0 && `(${uploadFiles.length})`}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Edit Modal */}
+      <Modal
+        isOpen={editModalOpen}
+        onClose={() => {
+          setEditModalOpen(false);
+          resetForm();
+        }}
+        title="Edit Logo Title"
+        size="md"
+      >
+        <form onSubmit={handleUpdate} className="space-y-6">
+          {selectedLogo?.image?.url && (
+            <div className="p-6 bg-gray-50 rounded-xl border-2 border-gray-200">
+              <p className="text-sm font-medium text-gray-700 mb-3">Current Logo:</p>
+              <div className="relative w-full aspect-square max-w-xs mx-auto bg-white rounded-xl p-4 border-2 border-gray-200">
+                <Image
+                  src={selectedLogo.image.url}
+                  alt={selectedLogo.title}
+                  fill
+                  className="object-contain p-2"
+                />
+              </div>
+            </div>
+          )}
+
+          <Input
+            label="Logo Title"
+            required
+            value={titles[0] || ''}
+            onChange={(e) => setTitles([e.target.value])}
+            placeholder="Enter logo title"
+          />
+
+          <div className="flex gap-3 pt-4">
+            <Button
+              type="button"
+              onClick={() => {
+                setEditModalOpen(false);
+                resetForm();
+              }}
+              variant="ghost"
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              isLoading={loading}
+              className="flex-1"
+            >
+              Update Logo
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Preview Modal */}
+      <Modal
+        isOpen={previewModalOpen}
+        onClose={() => setPreviewModalOpen(false)}
+        title="Logo Preview"
+        size="md"
+      >
+        {selectedLogo && (
+          <div className="space-y-6">
+            {/* Logo Display */}
+            <div className="p-8 bg-gradient-to-br from-gray-50 to-white rounded-2xl border-2 border-gray-200">
+              <div className="relative w-full aspect-square max-w-sm mx-auto bg-white rounded-xl shadow-lg p-6">
+                {selectedLogo.image?.url ? (
+                  <Image
+                    src={selectedLogo.image.url}
+                    alt={selectedLogo.title}
+                    fill
+                    className="object-contain p-4"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <Building2 className="w-20 h-20 text-gray-300" />
                   </div>
                 )}
               </div>
-            ))}
+            </div>
+
+            {/* Details */}
+            <div className="space-y-4">
+              <div className="pb-4 border-b-2 border-gray-100">
+                <h3 className="text-xl font-bold text-gray-900 text-center">
+                  {selectedLogo.title}
+                </h3>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                {selectedLogo.image?.size && (
+                  <div className="p-3 bg-gray-50 rounded-xl">
+                    <p className="text-xs text-gray-500 font-medium mb-1">File Size</p>
+                    <p className="text-sm font-bold text-gray-900">
+                      {(selectedLogo.image.size / 1024).toFixed(1)} KB
+                    </p>
+                  </div>
+                )}
+                {selectedLogo.image?.contentType && (
+                  <div className="p-3 bg-gray-50 rounded-xl">
+                    <p className="text-xs text-gray-500 font-medium mb-1">Format</p>
+                    <p className="text-sm font-bold text-gray-900 uppercase">
+                      {selectedLogo.image.contentType.split('/')[1]}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {selectedLogo.createdAt && (
+                <div className="pt-4 border-t-2 border-gray-100">
+                  <p className="text-xs text-gray-500 font-medium text-center">
+                    Added: {new Date(selectedLogo.createdAt).toLocaleDateString('id-ID', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric'
+                    })}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         )}
-      </div>
+      </Modal>
+
+      {/* Animations */}
+      <style jsx>{`
+        @keyframes fadeInScale {
+          from {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+      `}</style>
     </div>
   );
 }

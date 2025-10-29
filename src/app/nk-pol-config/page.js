@@ -3,9 +3,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Home, Image as ImageIcon, MessageSquare, Award, Menu, X } from 'lucide-react';
-import GalleryPostManage from '@/components/backend-integration/nk-pol-config/GalleryPostManageNew';
-import ClientLogoManage from '@/components/backend-integration/nk-pol-config/ClientLogoManageNew';
-import TestimonyManage from '@/components/backend-integration/nk-pol-config/TestimonyManageNew';
+import GalleryPostManage from '@/components/backend-integration/nk-pol-config/GalleryPostManage';
+import ClientLogoManage from '@/components/backend-integration/nk-pol-config/ClientLogoManage';
+import TestimonyManage from '@/components/backend-integration/nk-pol-config/TestimonyManage';
 
 export default function AdminPage() {
   const [user, setUser] = useState(null);
