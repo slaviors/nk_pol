@@ -1,7 +1,8 @@
 // src/components/sections/ClientLogoSection.jsx
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import Image from 'next/image';
 
 export default function ClientLogoSection() {
   const [logos, setLogos] = useState([]);
@@ -20,7 +21,7 @@ export default function ClientLogoSection() {
     return data.map(l => `${l._id}-${l.title}`).join('|');
   };
 
-  const fetchLogos = async (isInitialLoad = false) => {
+  const fetchLogos = useCallback(async (isInitialLoad = false) => {
     try {
       if (isInitialLoad) {
         setLoading(true);
@@ -67,7 +68,7 @@ export default function ClientLogoSection() {
       }
       setIsRefreshing(false);
     }
-  };
+  }, [error]);
 
   useEffect(() => {
     fetchLogos(true);
@@ -77,7 +78,7 @@ export default function ClientLogoSection() {
     }, 30000); 
 
     return () => clearInterval(refreshInterval);
-  }, []);
+  }, [fetchLogos]);
 
   if (loading) {
     return (
@@ -122,9 +123,11 @@ export default function ClientLogoSection() {
                   className="marquee-item flex-shrink-0 w-32 sm:w-36 md:w-40 lg:w-48 mx-3 md:mx-4 p-2 flex items-center justify-center transition-all duration-300 hover:scale-110"
                   title={logo.title}
                 >
-                  <img
+                  <Image
                     src={logo.image.thumbnailUrl || logo.image.url}
                     alt={logo.title}
+                    width={192}
+                    height={80}
                     className="max-h-12 sm:max-h-14 md:max-h-16 lg:max-h-20 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity duration-300"
                   />
                 </div>
@@ -137,9 +140,11 @@ export default function ClientLogoSection() {
                   title={logo.title}
                   aria-hidden="true"
                 >
-                  <img
+                  <Image
                     src={logo.image.thumbnailUrl || logo.image.url}
                     alt={logo.title}
+                    width={192}
+                    height={80}
                     className="max-h-12 sm:max-h-14 md:max-h-16 lg:max-h-20 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity duration-300"
                   />
                 </div>
