@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -22,7 +22,7 @@ export default function TestimonySection() {
     return data.map(t => `${t._id}-${t.text.substring(0, 20)}-${t.star}`).join('|');
   };
 
-  const fetchTestimonies = async (isInitialLoad = false) => {
+  const fetchTestimonies = useCallback(async (isInitialLoad = false) => {
     try {
       if (isInitialLoad) {
         setLoading(true);
@@ -72,7 +72,7 @@ export default function TestimonySection() {
       }
       setIsRefreshing(false);
     }
-  };
+  }, [error]);
 
   useEffect(() => {
     fetchTestimonies(true);
@@ -82,7 +82,7 @@ export default function TestimonySection() {
     }, 30000); 
 
     return () => clearInterval(refreshInterval);
-  }, []); 
+  }, [fetchTestimonies]); 
 
   const renderStars = (rating) => {
     return (
@@ -213,9 +213,11 @@ export default function TestimonySection() {
                   {/* Profile Image - Perfect Circle with Cover */}
                   <div className="flex-shrink-0">
                     <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 border-2 border-red-600 group-hover:border-red-700 transition-colors duration-300">
-                      <img
+                      <Image
                         src={testimony.profileImage.thumbnailUrl || testimony.profileImage.url}
                         alt={testimony.name}
+                        width={48}
+                        height={48}
                         className="w-full h-full object-cover object-center min-w-full min-h-full"
                       />
                     </div>
@@ -298,9 +300,11 @@ export default function TestimonySection() {
                 {/* Profile Image - Perfect Circle with Cover */}
                 <div className="flex-shrink-0">
                   <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 border-2 border-red-600 group-hover:border-red-700 transition-colors duration-300">
-                    <img
+                    <Image
                       src={testimony.profileImage.thumbnailUrl || testimony.profileImage.url}
                       alt={testimony.name}
+                      width={48}
+                      height={48}
                       className="w-full h-full object-cover object-center min-w-full min-h-full"
                     />
                   </div>

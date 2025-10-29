@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
@@ -26,7 +26,7 @@ export default function GallerySection() {
     return data.map((post) => `${post._id}-${post.title}-${post.images?.length || 0}`).join("|");
   };
 
-  const fetchGalleryImages = async (isInitialLoad = false) => {
+  const fetchGalleryImages = useCallback(async (isInitialLoad = false) => {
     try {
       if (isInitialLoad) {
         setLoading(true);
@@ -72,7 +72,7 @@ export default function GallerySection() {
       }
       setIsRefreshing(false);
     }
-  };
+  }, [error]);
 
   useEffect(() => {
     fetchGalleryImages(true);
@@ -98,7 +98,7 @@ export default function GallerySection() {
       clearInterval(refreshInterval);
       observer.disconnect();
     };
-  }, []);
+  }, [fetchGalleryImages]);
 
   if (loading) {
     return (
@@ -243,13 +243,14 @@ export default function GallerySection() {
                     >
                       <div className="relative aspect-[3/2] overflow-hidden">
                         {images[0].images && images[0].images.length > 0 ? (
-                          <img
+                          <Image
                             src={
                               images[0].images[images[0].thumbnailIndex || 0]?.thumbnailUrl ||
                               images[0].images[images[0].thumbnailIndex || 0]?.url
                             }
                             alt={images[0].title || "Gallery Image"}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-700"
                           />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
@@ -289,15 +290,16 @@ export default function GallerySection() {
                         href="/portofolio"
                         className="group relative bg-gray-900 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-500 cursor-pointer transform hover:-translate-y-1 block"
                       >
-                        <div className="relative overflow-hidden aspect-[4/3]">
+                        <div className="relative aspect-[4/3] overflow-hidden">
                           {images[1].images && images[1].images.length > 0 ? (
-                            <img
+                            <Image
                               src={
                                 images[1].images[images[1].thumbnailIndex || 0]?.thumbnailUrl ||
                                 images[1].images[images[1].thumbnailIndex || 0]?.url
                               }
                               alt={images[1].title || "Gallery Image"}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                              fill
+                              className="object-cover group-hover:scale-105 transition-transform duration-700"
                             />
                           ) : (
                             <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
@@ -330,15 +332,16 @@ export default function GallerySection() {
                         href="/portofolio"
                         className="group relative bg-gray-900 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-500 cursor-pointer transform hover:-translate-y-1 block"
                       >
-                        <div className="relative overflow-hidden aspect-[4/3]">
+                        <div className="relative aspect-[4/3] overflow-hidden">
                           {images[2].images && images[2].images.length > 0 ? (
-                            <img
+                            <Image
                               src={
                                 images[2].images[images[2].thumbnailIndex || 0]?.thumbnailUrl ||
                                 images[2].images[images[2].thumbnailIndex || 0]?.url
                               }
                               alt={images[2].title || "Gallery Image"}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                              fill
+                              className="object-cover group-hover:scale-105 transition-transform duration-700"
                             />
                           ) : (
                             <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
