@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 export default function ClientLogoManage() {
   const [logos, setLogos] = useState([]);
@@ -390,12 +391,13 @@ export default function ClientLogoManage() {
                 }`}
               >
                 {editingId === logo._id ? (
-
                   <div className="space-y-3">
                     <div className="flex items-center justify-center mb-2">
-                      <img
+                      <Image
                         src={logo.image.thumbnailUrl || logo.image.url}
                         alt={logo.title}
+                        width={64}
+                        height={64}
                         className="h-16 w-auto object-contain"
                       />
                     </div>
@@ -429,7 +431,6 @@ export default function ClientLogoManage() {
                     </div>
                   </div>
                 ) : (
-
                   <div className="space-y-3">
                     <div className="flex items-center justify-between mb-2">
                       <span className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">
@@ -437,11 +438,13 @@ export default function ClientLogoManage() {
                       </span>
                       <div className="text-xs text-gray-400">⋮⋮</div>
                     </div>
-
+                    
                     <div className="flex items-center justify-center h-20 bg-gray-50 rounded">
-                      <img
+                      <Image
                         src={logo.image.thumbnailUrl || logo.image.url}
                         alt={logo.title}
+                        width={80}
+                        height={80}
                         className="max-h-full max-w-full object-contain"
                       />
                     </div>

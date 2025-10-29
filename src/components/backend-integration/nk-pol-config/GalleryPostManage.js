@@ -476,7 +476,6 @@ export default function GalleryPostManage() {
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
                           {post.images.map((img, idx) => (
                             <div key={idx} className="relative">
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
                                 src={img.thumbnailUrl || img.url}
                                 alt={`Image ${idx + 1}`}
@@ -586,7 +585,6 @@ export default function GalleryPostManage() {
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
                         {post.images.map((img, idx) => (
                           <div key={idx} className="relative">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                               src={img.thumbnailUrl || img.url}
                               alt={`Image ${idx + 1}`}

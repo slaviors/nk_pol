@@ -134,7 +134,6 @@ export default function GalleryLightbox({ images, selectedImage, onClose, onNavi
                       : 'ring-2 ring-gray-200 hover:ring-red-400 hover:scale-105'
                   }`}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={img.thumbnailUrl || img.url}
                     alt={`Thumbnail ${idx + 1}`}
