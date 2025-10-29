@@ -195,13 +195,15 @@ export default function PortofolioPage() {
                     {/* Fixed Height Container */}
                     <div className="relative w-full h-64 sm:h-72 lg:h-64 overflow-hidden bg-gray-50">
                       {post.images && post.images.length > 0 ? (
-                        <img
+                        <Image
                           src={
                             post.images[post.thumbnailIndex || 0]?.thumbnailUrl ||
                             post.images[post.thumbnailIndex || 0]?.url
                           }
                           alt={post.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-700"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
@@ -304,29 +306,31 @@ export default function PortofolioPage() {
 
               {/* Image Area */}
               <div className="relative mb-6">
-                {/* Main Image */}
-                <div className="relative bg-gray-100 rounded-xl overflow-hidden canvas-bg">
-                  {selectedPost.images && selectedPost.images[currentImageIndex] && (
-                    <>
-                      <img
-                        src={selectedPost.images[currentImageIndex].url}
-                        alt={`${selectedPost.title} - Image ${currentImageIndex + 1}`}
-                        className="w-full object-contain"
-                        style={{ 
-                          height: 'clamp(250px, 50vh, 450px)'
-                        }}
+                {selectedPost.images && selectedPost.images[currentImageIndex] && (
+                  <>
+                    <Image
+                      src={selectedPost.images[currentImageIndex].url}
+                      alt={`${selectedPost.title} - Image ${currentImageIndex + 1}`}
+                      width={800}
+                      height={450}
+                      className="w-full object-contain"
+                      style={{ 
+                        height: 'clamp(250px, 50vh, 450px)'
+                      }}
+                      priority
+                    />
+                    {/* Watermark on Main Image */}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 opacity-20 pointer-events-none">
+                      <Image
+                        src="/images/assets/logo.png"
+                        alt="NK POL"
+                        width={80}
+                        height={80}
+                        className="w-16 h-16 md:w-20 md:h-20 object-contain grayscale"
                       />
-                      {/* Watermark on Main Image */}
-                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 opacity-20 pointer-events-none">
-                        <img
-                          src="/images/assets/logo.png"
-                          alt="NK POL"
-                          className="w-16 h-16 md:w-20 md:h-20 object-contain grayscale"
-                        />
-                      </div>
-                    </>
-                  )}
-                </div>
+                    </div>
+                  </>
+                )}
 
                 {/* Navigation Buttons - Outside image container */}
                 {selectedPost.images && selectedPost.images.length > 1 && (
@@ -374,22 +378,26 @@ export default function PortofolioPage() {
                           e.stopPropagation();
                           setCurrentImageIndex(idx);
                         }}
-                        className={`relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
-                          idx === currentImageIndex
-                            ? 'border-red-600 ring-4 ring-red-100 scale-105'
-                            : 'border-gray-200 hover:border-red-300'
+                        className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 transition-all flex-shrink-0 ${
+                          currentImageIndex === idx 
+                            ? 'border-red-600 shadow-lg' 
+                            : 'border-gray-200 hover:border-gray-300'
                         }`}
                       >
-                        <img
+                        <Image
                           src={img.thumbnailUrl || img.url}
                           alt={`Thumbnail ${idx + 1}`}
-                          className="w-full h-full object-cover"
+                          fill
+                          className="object-cover"
+                          sizes="64px"
                         />
                         {/* Watermark on Thumbnail */}
                         <div className="absolute bottom-1 left-1/2 -translate-x-1/2 opacity-30 pointer-events-none">
-                          <img
+                          <Image
                             src="/images/assets/logo.png"
                             alt="NK POL"
+                            width={32}
+                            height={32}
                             className="w-8 h-8 object-contain grayscale"
                           />
                         </div>
