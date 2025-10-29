@@ -11,7 +11,7 @@ import ContactSection from '@/components/sections/ContactSection';
 // Page Metadata
 export const metadata = generateMetadata(
   'NK POL - Kontraktor Stand Pameran Profesional & Terpercaya',
-  'NK POL adalah kontraktor stand pameran terpercaya sejak 2019 dengan 200+ klien dan 1000+ proyek selesai. Desain kreatif, konstruksi berkualitas, eksekusi tepat waktu. Konsultasi gratis untuk booth pameran impian Anda di Jakarta dan seluruh Indonesia.',
+  'NK POL adalah kontraktor pameran terpercaya sejak 2019. Kami menyediakan jasa desain, konstruksi, dan instalasi booth pameran berkualitas dengan harga kompetitif.',
   '/'
 );
 
