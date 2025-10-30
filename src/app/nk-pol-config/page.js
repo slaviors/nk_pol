@@ -120,8 +120,8 @@ export default function AdminPage() {
       </div>
 
       {/* Header */}
-      <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-gray-200 shadow-lg shadow-black/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-30 bg-white/90">
+        <div className="container-custom">
           <div className="flex justify-between items-center h-20">
             {/* Title */}
             <div>
@@ -164,7 +164,7 @@ export default function AdminPage() {
 
       {/* Navigation Tabs */}
       <nav className="sticky top-20 z-20 bg-white/90 backdrop-blur-xl border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container-custom">
           <div className="flex overflow-x-auto scrollbar-hide">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -193,7 +193,7 @@ export default function AdminPage() {
 
       {/* Error Alert */}
       {error && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        <div className="container-custom pt-6">
           <div 
             className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3 shadow-sm"
             style={{ animation: 'slideDown 0.3s ease-out' }}
@@ -213,7 +213,7 @@ export default function AdminPage() {
       )}
 
       {/* Main Content */}
-      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+      <main className="relative z-10 container-custom py-6 md:py-8">
         <div 
           className="bg-white rounded-2xl border-2 border-gray-200 shadow-2xl shadow-black/10"
           style={{ animation: 'fadeInUp 0.5s ease-out' }}

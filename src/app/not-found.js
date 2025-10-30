@@ -52,8 +52,8 @@ export default function NotFound() {
         <div className="absolute inset-0 bg-gradient-to-br from-red-50/50 via-transparent to-gray-50/50" />
       </div>
 
-      <div className="container-custom relative z-10 py-16 px-6">
-        <div className="max-w-7xl mx-auto">
+      <div className="container-custom relative z-10 py-16">
+        <div>
           
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             

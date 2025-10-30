@@ -1,5 +1,5 @@
 export const siteMetadata = {
-  title: 'NK POL - Kontraktor Stand Pameran Profesional & Terpercaya',
+  title: 'NK POL - Kontraktor Booth Pameran Berkualitas & Terpercaya',
   description: 'NK POL adalah kontraktor pameran terpercaya sejak 2019 yang menyediakan jasa desain, konstruksi, dan instalasi booth berkualitas dengan harga kompetitif.',
   author: 'NK POL',
   siteUrl: 'https://www.nkpol.com',
@@ -21,7 +21,7 @@ export const siteMetadata = {
   },
   
   // Company Info
-  tagline: 'Kontraktor Stand Pameran Berkualitas untuk Brand Anda',
+  tagline: 'Kontraktor Booth Pameran Berkualitas untuk Brand Anda',
   foundingYear: '2019',
   
   // Company Statistics
@@ -601,7 +601,7 @@ export const generateMetadata = (
           url: `${siteMetadata.siteUrl}${siteMetadata.ogImage}`,
           width: 1200,
           height: 630,
-          alt: 'NK POL - Kontraktor Stand Pameran Profesional & Terpercaya',
+          alt: 'NK POL - Kontraktor Booth Pameran Berkualitas & Terpercaya',
           type: 'image/jpeg',
         },
       ],
