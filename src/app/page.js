@@ -10,7 +10,7 @@ import ContactSection from '@/components/sections/ContactSection';
 
 // Page Metadata
 export const metadata = generateMetadata(
-  'NK POL - Kontraktor Stand Pameran Profesional & Terpercaya',
+  'NK POL - Kontraktor Booth Pameran Berkualitas & Terpercaya',
   'NK POL adalah kontraktor pameran terpercaya sejak 2019 yang menyediakan jasa desain, konstruksi, dan instalasi booth berkualitas dengan harga kompetitif.',
   '/'
 );

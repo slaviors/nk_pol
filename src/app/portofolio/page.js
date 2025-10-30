@@ -90,7 +90,7 @@ export default function PortofolioPage() {
       <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-white">
         {/* Header Skeleton */}
         <div className="bg-gradient-to-br from-black via-gray-900 to-black text-white py-16 md:py-24">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="container-custom">
             <div className="animate-pulse space-y-4">
               <div className="h-8 bg-gray-700 rounded w-32"></div>
               <div className="h-12 bg-gray-700 rounded w-64"></div>
@@ -100,7 +100,7 @@ export default function PortofolioPage() {
         </div>
 
         {/* Grid Skeleton */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="container-custom py-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="animate-pulse">
@@ -143,7 +143,7 @@ export default function PortofolioPage() {
             }} />
           </div>
 
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="container-custom relative z-10">
             {/* Back Button */}
             <Link 
               href="/"
@@ -172,7 +172,7 @@ export default function PortofolioPage() {
         </div>
 
         {/* Portfolio Grid */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+        <div className="container-custom py-12 md:py-16">
           {posts.length === 0 ? (
             <div className="text-center py-16">
               <div className="inline-block p-8 bg-gray-50 border-2 border-gray-200 rounded-2xl">
