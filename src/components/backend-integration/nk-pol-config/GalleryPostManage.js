@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, GripVertical, Eye, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import Modal from '@/components/ui/admin/Modal';
+import ConfirmModal from '@/components/ui/admin/ConfirmModal';
 import FileUpload from '@/components/ui/admin/FileUpload';
 import Button from '@/components/ui/admin/Button';
 import Input from '@/components/ui/admin/Input';
@@ -21,7 +22,10 @@ export default function GalleryPostManage() {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [confirmDeleteImageOpen, setConfirmDeleteImageOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   // Form states
   const [formData, setFormData] = useState({
@@ -166,8 +170,8 @@ export default function GalleryPostManage() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this post and all its images?')) return;
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
 
     try {
       setLoading(true);
@@ -175,7 +179,7 @@ export default function GalleryPostManage() {
       const headers = {};
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      const response = await fetch(`/api/admin/galleryPost/${id}`, {
+      const response = await fetch(`/api/admin/galleryPost/${deleteTarget}`, {
         method: 'DELETE',
         credentials: 'include',
         headers
@@ -184,6 +188,8 @@ export default function GalleryPostManage() {
       const data = await response.json();
       if (response.ok) {
         setSuccess('Post deleted successfully!');
+        setConfirmDeleteOpen(false);
+        setDeleteTarget(null);
         fetchPosts();
         setTimeout(() => setSuccess(''), 2000);
       } else {
@@ -194,6 +200,11 @@ export default function GalleryPostManage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const openDeleteModal = (id) => {
+    setDeleteTarget(id);
+    setConfirmDeleteOpen(true);
   };
 
   const openEditModal = (post) => {
@@ -252,8 +263,10 @@ export default function GalleryPostManage() {
     }
   };
 
-  const handleDeleteImage = async (postId, imageIndex) => {
-    if (!confirm('Are you sure you want to delete this image?')) return;
+  const handleDeleteImage = async () => {
+    if (!deleteTarget) return;
+
+    const { postId, imageIndex } = deleteTarget;
 
     try {
       setLoading(true);
@@ -278,6 +291,8 @@ export default function GalleryPostManage() {
       if (response.ok) {
         setSuccess('Image deleted successfully!');
         setSelectedPost(data.post);
+        setConfirmDeleteImageOpen(false);
+        setDeleteTarget(null);
         fetchPosts();
         setTimeout(() => setSuccess(''), 3000);
       } else {
@@ -288,6 +303,11 @@ export default function GalleryPostManage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const openDeleteImageModal = (postId, imageIndex) => {
+    setDeleteTarget({ postId, imageIndex });
+    setConfirmDeleteImageOpen(true);
   };
 
   const handleReplaceImage = async (postId, imageIndex, file) => {
@@ -427,7 +447,7 @@ export default function GalleryPostManage() {
                       <Edit2 className="w-4 h-4" />
                     </Button>
                     <Button
-                      onClick={() => handleDelete(post._id)}
+                      onClick={() => openDeleteModal(post._id)}
                       variant="danger"
                       size="sm"
                       className="transform scale-90 group-hover:scale-100"
@@ -629,7 +649,7 @@ export default function GalleryPostManage() {
                           type="button"
                           variant="danger"
                           size="sm"
-                          onClick={() => handleDeleteImage(selectedPost._id, idx)}
+                          onClick={() => openDeleteImageModal(selectedPost._id, idx)}
                         >
                           <Trash2 className="w-3 h-3" />
                         </Button>
@@ -814,6 +834,38 @@ export default function GalleryPostManage() {
           </div>
         )}
       </Modal>
+
+      {/* Delete Post Confirmation */}
+      <ConfirmModal
+        isOpen={confirmDeleteOpen}
+        onClose={() => {
+          setConfirmDeleteOpen(false);
+          setDeleteTarget(null);
+        }}
+        onConfirm={handleDelete}
+        title="Delete Gallery Post"
+        message="Are you sure you want to delete this post and all its images? This action cannot be undone."
+        confirmText="Delete Post"
+        cancelText="Cancel"
+        variant="danger"
+        isLoading={loading}
+      />
+
+      {/* Delete Image Confirmation */}
+      <ConfirmModal
+        isOpen={confirmDeleteImageOpen}
+        onClose={() => {
+          setConfirmDeleteImageOpen(false);
+          setDeleteTarget(null);
+        }}
+        onConfirm={handleDeleteImage}
+        title="Delete Image"
+        message="Are you sure you want to delete this image? This action cannot be undone."
+        confirmText="Delete Image"
+        cancelText="Cancel"
+        variant="danger"
+        isLoading={loading}
+      />
 
       {/* Animations */}
       <style jsx>{`
