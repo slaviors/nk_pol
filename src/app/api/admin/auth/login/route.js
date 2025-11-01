@@ -106,7 +106,7 @@ export async function POST(request) {
       },
       process.env.JWT_TOKEN,
       {
-        expiresIn: '24h',
+        expiresIn: '48h',
         issuer: 'nk-pol-api',
         audience: 'nk-pol-admin'
       }
