@@ -19,15 +19,15 @@ export default function AdminPage() {
     try {
 
       const token = localStorage.getItem('auth-token');
-      
+
       const headers = {
         'Content-Type': 'application/json'
       };
-      
+
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
-      
+
       const response = await fetch('/api/admin/auth/me', {
         credentials: 'include',
         headers
@@ -57,15 +57,25 @@ export default function AdminPage() {
   const handleLogout = async () => {
     try {
       setLoading(true);
+
+      const token = localStorage.getItem('auth-token');
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const response = await fetch('/api/admin/auth/logout', {
         method: 'POST',
-        credentials: 'include' 
+        credentials: 'include',
+        headers
       });
 
       if (response.ok) {
-
         localStorage.removeItem('auth-token');
-        setUser(null); 
+        setUser(null);
         router.push('/nk-pol-config/auth/login');
       } else {
         setError('Logout failed');
@@ -104,7 +114,7 @@ export default function AdminPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100">
       {/* Background Pattern */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div 
+        <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
             backgroundImage: `
@@ -129,14 +139,25 @@ export default function AdminPage() {
               <p className="text-sm text-gray-600 mt-0.5">Welcome back, <span className="font-semibold text-gray-900">{user?.username}</span></p>
             </div>
 
-            {/* Desktop Back to Home Button */}
-            <button
-              onClick={() => router.push('/')}
-              className="hidden sm:flex items-center gap-2 px-5 py-2.5 bg-black text-white rounded-xl font-semibold text-sm hover:bg-gray-800 transition-all duration-300 shadow-lg shadow-black/10 hover:shadow-xl hover:shadow-black/20 transform active:scale-95"
-            >
-              <Home className="w-4 h-4" />
-              Back to Home
-            </button>
+            {/* Desktop Actions */}
+            <div className="hidden sm:flex items-center gap-3">
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-5 py-2.5 bg-white text-gray-900 border-2 border-gray-200 rounded-xl font-semibold text-sm hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 shadow-sm hover:shadow-md transform active:scale-95"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Logout
+              </button>
+              <button
+                onClick={() => router.push('/')}
+                className="flex items-center gap-2 px-5 py-2.5 bg-black text-white rounded-xl font-semibold text-sm hover:bg-gray-800 transition-all duration-300 shadow-lg shadow-black/10 hover:shadow-xl hover:shadow-black/20 transform active:scale-95"
+              >
+                <Home className="w-4 h-4" />
+                Back to Home
+              </button>
+            </div>
 
             {/* Mobile Menu Button */}
             <button
@@ -150,6 +171,15 @@ export default function AdminPage() {
           {/* Mobile Menu */}
           {mobileMenuOpen && (
             <div className="sm:hidden pb-4 border-t border-gray-100 space-y-2 pt-4">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-200 rounded-xl font-semibold text-sm hover:bg-gray-50 transition-all duration-300"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Logout
+              </button>
               <button
                 onClick={() => router.push('/')}
                 className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-black text-white rounded-xl font-semibold text-sm hover:bg-gray-800 transition-all duration-300"
@@ -194,7 +224,7 @@ export default function AdminPage() {
       {/* Error Alert */}
       {error && (
         <div className="container-custom pt-6">
-          <div 
+          <div
             className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3 shadow-sm"
             style={{ animation: 'slideDown 0.3s ease-out' }}
           >
@@ -202,7 +232,7 @@ export default function AdminPage() {
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
             </svg>
             <p className="text-red-800 text-sm flex-1 font-medium">{error}</p>
-            <button 
+            <button
               onClick={() => setError('')}
               className="text-red-600 hover:text-red-800 transition-colors"
             >
@@ -214,7 +244,7 @@ export default function AdminPage() {
 
       {/* Main Content */}
       <main className="relative z-10 container-custom py-6 md:py-8">
-        <div 
+        <div
           className="bg-white rounded-2xl border-2 border-gray-200 shadow-2xl shadow-black/10"
           style={{ animation: 'fadeInUp 0.5s ease-out' }}
         >
