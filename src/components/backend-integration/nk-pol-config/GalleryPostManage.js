@@ -16,7 +16,7 @@ export default function GalleryPostManage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  
+
   // Modal states
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -33,6 +33,7 @@ export default function GalleryPostManage() {
     thumbnailIndex: 0,
   });
   const [uploadFiles, setUploadFiles] = useState([]);
+  const [editImages, setEditImages] = useState([]);
 
   useEffect(() => {
     fetchPosts();
@@ -73,11 +74,12 @@ export default function GalleryPostManage() {
       thumbnailIndex: 0,
     });
     setUploadFiles([]);
+    setEditImages([]);
   };
 
   const handleCreate = async (e) => {
     e.preventDefault();
-    
+
     if (uploadFiles.length === 0) {
       setError('Please select at least 1 image');
       return;
@@ -204,7 +206,125 @@ export default function GalleryPostManage() {
       venue: post.venue || '',
       thumbnailIndex: post.thumbnailIndex || 0,
     });
+    setEditImages([]);
     setEditModalOpen(true);
+  };
+
+  const handleAddImages = async (postId) => {
+    if (editImages.length === 0) {
+      setError('Please select images to add');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError('');
+
+      const formDataToSend = new FormData();
+      editImages.forEach(file => formDataToSend.append('files', file));
+      formDataToSend.append('action', 'add');
+
+      const token = localStorage.getItem('auth-token');
+      const headers = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const response = await fetch(`/api/admin/galleryPost/${postId}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers,
+        body: formDataToSend
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setSuccess('Images added successfully!');
+        setSelectedPost(data.post);
+        setEditImages([]);
+        fetchPosts();
+        setTimeout(() => setSuccess(''), 3000);
+      } else {
+        setError(data.error || 'Failed to add images');
+      }
+    } catch (err) {
+      setError('Upload error: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteImage = async (postId, imageIndex) => {
+    if (!confirm('Are you sure you want to delete this image?')) return;
+
+    try {
+      setLoading(true);
+      setError('');
+
+      const formDataToSend = new FormData();
+      formDataToSend.append('action', 'delete');
+      formDataToSend.append('imageIndex', imageIndex);
+
+      const token = localStorage.getItem('auth-token');
+      const headers = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const response = await fetch(`/api/admin/galleryPost/${postId}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers,
+        body: formDataToSend
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setSuccess('Image deleted successfully!');
+        setSelectedPost(data.post);
+        fetchPosts();
+        setTimeout(() => setSuccess(''), 3000);
+      } else {
+        setError(data.error || 'Failed to delete image');
+      }
+    } catch (err) {
+      setError('Delete error: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReplaceImage = async (postId, imageIndex, file) => {
+    try {
+      setLoading(true);
+      setError('');
+
+      const formDataToSend = new FormData();
+      formDataToSend.append('files', file);
+      formDataToSend.append('action', 'replace');
+      formDataToSend.append('imageIndex', imageIndex);
+
+      const token = localStorage.getItem('auth-token');
+      const headers = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const response = await fetch(`/api/admin/galleryPost/${postId}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers,
+        body: formDataToSend
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setSuccess('Image replaced successfully!');
+        setSelectedPost(data.post);
+        fetchPosts();
+        setTimeout(() => setSuccess(''), 3000);
+      } else {
+        setError(data.error || 'Failed to replace image');
+      }
+    } catch (err) {
+      setError('Replace error: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const openPreviewModal = (post) => {
@@ -264,8 +384,8 @@ export default function GalleryPostManage() {
           {posts.map((post, index) => {
             const thumbnail = post.images && post.images[post.thumbnailIndex || 0];
             return (
-              <Card 
-                key={post._id} 
+              <Card
+                key={post._id}
                 hover
                 className="group overflow-hidden"
                 style={{ animation: `fadeInScale 0.3s ease-out ${index * 0.1}s both` }}
@@ -287,7 +407,7 @@ export default function GalleryPostManage() {
                       </div>
                     </div>
                   )}
-                  
+
                   {/* Overlay Actions */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-2">
                     <Button
@@ -452,88 +572,183 @@ export default function GalleryPostManage() {
           resetForm();
         }}
         title="Edit Gallery Post"
-        size="lg"
+        size="xl"
       >
-        <form onSubmit={handleUpdate} className="space-y-6">
-          <Input
-            label="Title"
-            required
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            placeholder="Enter post title"
-          />
-
-          <Textarea
-            label="Description"
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            placeholder="Enter post description"
-            rows={4}
-          />
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Input
-              label="Year"
-              type="number"
-              value={formData.year}
-              onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-              placeholder="2024"
-            />
-            <Input
-              label="Location"
-              value={formData.location}
-              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-              placeholder="City, Country"
-            />
-            <Input
-              label="Venue"
-              value={formData.venue}
-              onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
-              placeholder="Event venue"
-            />
-          </div>
-
+        <div className="space-y-6">
           {selectedPost?.images && selectedPost.images.length > 0 && (
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Thumbnail Image
+              <label className="block text-sm font-semibold text-gray-900 mb-3">
+                Current Images ({selectedPost.images.length}/4)
               </label>
-              <select
-                value={formData.thumbnailIndex}
-                onChange={(e) => setFormData({ ...formData, thumbnailIndex: parseInt(e.target.value) })}
-                className="w-full px-4 py-2.5 text-sm bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-all"
-              >
+              <div className="grid grid-cols-2 gap-4 mb-4">
                 {selectedPost.images.map((img, idx) => (
-                  <option key={idx} value={idx}>
-                    Image {idx + 1} - {img.name}
-                  </option>
+                  <div key={idx} className="relative group">
+                    <div className="relative aspect-video rounded-xl overflow-hidden bg-gray-100 border-2 border-gray-200">
+                      <Image
+                        src={img.url}
+                        alt={img.name}
+                        fill
+                        className="object-cover"
+                      />
+                      {idx === selectedPost.thumbnailIndex && (
+                        <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded-lg font-bold">
+                          Thumbnail
+                        </div>
+                      )}
+                      <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-lg font-bold">
+                        {idx + 1}
+                      </div>
+                    </div>
+                    <div className="flex gap-2 mt-2">
+                      <div className="flex-1">
+                        <input
+                          id={`replace-image-${idx}`}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            if (e.target.files?.[0]) {
+                              handleReplaceImage(selectedPost._id, idx, e.target.files[0]);
+                              e.target.value = '';
+                            }
+                          }}
+                        />
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          className="w-full"
+                          onClick={() => document.getElementById(`replace-image-${idx}`).click()}
+                        >
+                          <Edit2 className="w-3 h-3 mr-1" />
+                          Replace
+                        </Button>
+                      </div>
+                      {selectedPost.images.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="danger"
+                          size="sm"
+                          onClick={() => handleDeleteImage(selectedPost._id, idx)}
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
                 ))}
-              </select>
+              </div>
             </div>
           )}
 
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              onClick={() => {
-                setEditModalOpen(false);
-                resetForm();
-              }}
-              variant="ghost"
-              className="flex-1"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              isLoading={loading}
-              className="flex-1"
-            >
-              Update Post
-            </Button>
-          </div>
-        </form>
+          {selectedPost?.images && selectedPost.images.length < 4 && (
+            <div>
+              <label className="block text-sm font-semibold text-gray-900 mb-3">
+                Add More Images ({4 - selectedPost.images.length} slots available)
+              </label>
+              <FileUpload
+                files={editImages}
+                onChange={setEditImages}
+                maxFiles={4 - selectedPost.images.length}
+                label=""
+              />
+              {editImages.length > 0 && (
+                <Button
+                  type="button"
+                  onClick={() => handleAddImages(selectedPost._id)}
+                  variant="primary"
+                  size="sm"
+                  isLoading={loading}
+                  className="mt-3"
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  Add {editImages.length} Image(s)
+                </Button>
+              )}
+            </div>
+          )}
+
+          <form onSubmit={handleUpdate} className="space-y-6 pt-4 border-t-2 border-gray-100">
+            <Input
+              label="Title"
+              required
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              placeholder="Enter post title"
+            />
+
+            <Textarea
+              label="Description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Enter post description"
+              rows={4}
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Input
+                label="Year"
+                type="number"
+                value={formData.year}
+                onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                placeholder="2024"
+              />
+              <Input
+                label="Location"
+                value={formData.location}
+                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                placeholder="City, Country"
+              />
+              <Input
+                label="Venue"
+                value={formData.venue}
+                onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
+                placeholder="Event venue"
+              />
+            </div>
+
+            {selectedPost?.images && selectedPost.images.length > 0 && (
+              <div>
+                <label className="block text-sm font-semibold text-gray-900 mb-2">
+                  Thumbnail Image
+                </label>
+                <select
+                  value={formData.thumbnailIndex}
+                  onChange={(e) => setFormData({ ...formData, thumbnailIndex: parseInt(e.target.value) })}
+                  className="w-full px-4 py-2.5 text-sm bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-all"
+                >
+                  {selectedPost.images.map((img, idx) => (
+                    <option key={idx} value={idx}>
+                      Image {idx + 1} - {img.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-4">
+              <Button
+                type="button"
+                onClick={() => {
+                  setEditModalOpen(false);
+                  resetForm();
+                }}
+                variant="ghost"
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="primary"
+                isLoading={loading}
+                className="flex-1"
+              >
+                Update Details
+              </Button>
+            </div>
+          </form>
+        </div>
       </Modal>
 
       {/* Preview Modal */}
