@@ -67,11 +67,11 @@ export default function Footer() {
   ];
 
   const quickLinks = [
-    { name: t.nav.home, href: '/' },
-    { name: t.nav.about, href: '#about-section' },
-    { name: t.nav.services, href: '#services-section' },
+    { name: t.nav.home, href: '/', section: 'home' },
+    { name: t.nav.about, href: '/', section: 'about-section' },
+    { name: t.nav.services, href: '/', section: 'services-section' },
     { name: t.nav.portfolio, href: '/portofolio' },
-    { name: t.nav.contact, href: '#contact' },
+    { name: t.nav.contact, href: '/', section: 'contact' },
   ];
 
   return (
@@ -84,10 +84,10 @@ export default function Footer() {
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-red-600 rounded-full blur-3xl opacity-10" />
         <div className="absolute top-1/2 left-0 w-80 h-80 bg-red-600 rounded-full blur-3xl opacity-8" />
         <div className="absolute top-1/4 right-1/3 w-64 h-64 bg-red-500 rounded-full blur-3xl opacity-5" />
-        
+
         {/* Gold accent line */}
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-red-600 to-transparent opacity-50" />
-        
+
         {/* Grid pattern */}
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTAgMTBIMTBWMEgwVjEwWk0wIDQwSDEwVjMwSDBWNDBaTTEwIDIwSDIwVjEwSDEwVjIwWk0yMCAzMEgzMFYyMEgyMFYzMFpNMzAgMTBINDBWMEgzMFYxMFpNMzAgNDBINDBWMzBIMzBWNDBaIiBmaWxsPSIjMDAwMDAwIiBmaWxsLW9wYWNpdHk9IjAuMDMiLz4KPC9zdmc+Cg==')] opacity-20" />
       </div>
@@ -98,12 +98,11 @@ export default function Footer() {
         <div className="grid md:grid-cols-3 gap-12 lg:gap-16 mb-8 pb-8 border-b border-gray-800">
           {/* Brand Section */}
           <div
-            className={`transition-all duration-700 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`}
+            className={`transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+              }`}
           >
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="inline-flex items-center transition-opacity duration-300 hover:opacity-80 mb-6 group"
             >
               <Image
@@ -137,9 +136,8 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div
-            className={`transition-all duration-700 delay-100 ${
-              itemsVisible[0] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`}
+            className={`transition-all duration-700 delay-100 ${itemsVisible[0] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+              }`}
           >
             <h4 className="text-lg md:text-xl font-bold mb-8 text-white tracking-wider uppercase relative">
               {t.footer.quickLinks}
@@ -150,6 +148,22 @@ export default function Footer() {
                 <li key={index}>
                   <Link
                     href={link.href}
+                    onClick={(e) => {
+                      if (link.section) {
+                        e.preventDefault();
+                        const element = document.getElementById(link.section);
+                        if (element) {
+                          const navbarHeight = 72;
+                          const elementPosition = element.offsetTop - navbarHeight;
+                          window.scrollTo({
+                            top: link.section === 'home' ? 0 : Math.max(0, elementPosition),
+                            behavior: 'smooth'
+                          });
+                        } else if (link.section === 'home') {
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                      }
+                    }}
                     className="text-gray-300 hover:text-red-500 transition-all duration-300 text-base font-light relative group flex items-center"
                   >
                     <ArrowRight className="w-4 h-4 mr-2 opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all duration-300" />
@@ -165,9 +179,8 @@ export default function Footer() {
 
           {/* Contact Info */}
           <div
-            className={`transition-all duration-700 delay-200 ${
-              itemsVisible[1] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`}
+            className={`transition-all duration-700 delay-200 ${itemsVisible[1] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+              }`}
           >
             <h4 className="text-lg md:text-xl font-bold mb-8 text-white tracking-wider uppercase relative">
               Hubungi Kami
@@ -211,9 +224,8 @@ export default function Footer() {
 
         {/* Bottom Section */}
         <div
-          className={`transition-all duration-700 delay-300 ${
-            itemsVisible[2] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`}
+          className={`transition-all duration-700 delay-300 ${itemsVisible[2] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
         >
           <div className="text-center pt-6">
             <p className="text-base text-gray-400 font-light tracking-wider">
