@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Award, Eye, Building2 } from 'lucide-react';
 import Image from 'next/image';
 import Modal from '@/components/ui/admin/Modal';
+import ConfirmModal from '@/components/ui/admin/ConfirmModal';
 import FileUpload from '@/components/ui/admin/FileUpload';
 import Button from '@/components/ui/admin/Button';
 import Input from '@/components/ui/admin/Input';
@@ -15,12 +16,14 @@ export default function ClientLogoManage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  
+
   // Modal states
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [selectedLogo, setSelectedLogo] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   // Form states
   const [uploadFiles, setUploadFiles] = useState([]);
@@ -73,7 +76,7 @@ export default function ClientLogoManage() {
 
   const handleCreate = async (e) => {
     e.preventDefault();
-    
+
     if (uploadFiles.length === 0) {
       setError('Please select at least one logo');
       return;
@@ -102,11 +105,11 @@ export default function ClientLogoManage() {
       if (response.ok) {
         const successMsg = `Successfully uploaded ${data.successCount} logo${data.successCount > 1 ? 's' : ''}!`;
         setSuccess(successMsg);
-        
+
         if (data.errorCount > 0) {
           setError(`${data.errorCount} file${data.errorCount > 1 ? 's' : ''} failed to upload.`);
         }
-        
+
         setCreateModalOpen(false);
         resetForm();
         fetchLogos();
@@ -156,8 +159,8 @@ export default function ClientLogoManage() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this logo?')) return;
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
 
     try {
       setLoading(true);
@@ -165,7 +168,7 @@ export default function ClientLogoManage() {
       const headers = {};
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      const response = await fetch(`/api/admin/clientLogo/${id}`, {
+      const response = await fetch(`/api/admin/clientLogo/${deleteTarget}`, {
         method: 'DELETE',
         credentials: 'include',
         headers
@@ -174,6 +177,8 @@ export default function ClientLogoManage() {
       const data = await response.json();
       if (response.ok) {
         setSuccess('Logo deleted successfully!');
+        setConfirmDeleteOpen(false);
+        setDeleteTarget(null);
         fetchLogos();
         setTimeout(() => setSuccess(''), 2000);
       } else {
@@ -184,6 +189,11 @@ export default function ClientLogoManage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const openDeleteModal = (id) => {
+    setDeleteTarget(id);
+    setConfirmDeleteOpen(true);
   };
 
   const openEditModal = (logo) => {
@@ -247,8 +257,8 @@ export default function ClientLogoManage() {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
           {logos.map((logo, index) => (
-            <Card 
-              key={logo._id} 
+            <Card
+              key={logo._id}
               hover
               className="group overflow-hidden"
               style={{ animation: `fadeInScale 0.3s ease-out ${index * 0.05}s both` }}
@@ -289,7 +299,7 @@ export default function ClientLogoManage() {
                     <Edit2 className="w-3 h-3" />
                   </Button>
                   <Button
-                    onClick={() => handleDelete(logo._id)}
+                    onClick={() => openDeleteModal(logo._id)}
                     variant="danger"
                     size="sm"
                     className="transform scale-90 group-hover:scale-100"
@@ -500,6 +510,22 @@ export default function ClientLogoManage() {
           </div>
         )}
       </Modal>
+
+      {/* Delete Confirmation */}
+      <ConfirmModal
+        isOpen={confirmDeleteOpen}
+        onClose={() => {
+          setConfirmDeleteOpen(false);
+          setDeleteTarget(null);
+        }}
+        onConfirm={handleDelete}
+        title="Delete Client Logo"
+        message="Are you sure you want to delete this logo? This action cannot be undone."
+        confirmText="Delete Logo"
+        cancelText="Cancel"
+        variant="danger"
+        isLoading={loading}
+      />
 
       {/* Animations */}
       <style jsx>{`

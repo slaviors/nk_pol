@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Star, User, Eye } from 'lucide-react';
 import Image from 'next/image';
 import Modal from '@/components/ui/admin/Modal';
+import ConfirmModal from '@/components/ui/admin/ConfirmModal';
 import FileUpload from '@/components/ui/admin/FileUpload';
 import Button from '@/components/ui/admin/Button';
 import Input from '@/components/ui/admin/Input';
@@ -16,12 +17,14 @@ export default function TestimonyManage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  
+
   // Modal states
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [selectedTestimony, setSelectedTestimony] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   // Form states
   const [formData, setFormData] = useState({
@@ -73,7 +76,7 @@ export default function TestimonyManage() {
 
   const handleCreate = async (e) => {
     e.preventDefault();
-    
+
     if (profileImage.length === 0) {
       setError('Please select a profile image');
       return;
@@ -162,8 +165,8 @@ export default function TestimonyManage() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this testimony?')) return;
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
 
     try {
       setLoading(true);
@@ -171,7 +174,7 @@ export default function TestimonyManage() {
       const headers = {};
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      const response = await fetch(`/api/admin/testimony/${id}`, {
+      const response = await fetch(`/api/admin/testimony/${deleteTarget}`, {
         method: 'DELETE',
         credentials: 'include',
         headers
@@ -180,6 +183,8 @@ export default function TestimonyManage() {
       const data = await response.json();
       if (response.ok) {
         setSuccess('Testimony deleted successfully!');
+        setConfirmDeleteOpen(false);
+        setDeleteTarget(null);
         fetchTestimonies();
         setTimeout(() => setSuccess(''), 2000);
       } else {
@@ -190,6 +195,11 @@ export default function TestimonyManage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const openDeleteModal = (id) => {
+    setDeleteTarget(id);
+    setConfirmDeleteOpen(true);
   };
 
   const openEditModal = (testimony) => {
@@ -215,11 +225,10 @@ export default function TestimonyManage() {
         {[...Array(5)].map((_, i) => (
           <Star
             key={i}
-            className={`w-4 h-4 ${
-              i < rating
+            className={`w-4 h-4 ${i < rating
                 ? 'fill-yellow-400 text-yellow-400'
                 : 'fill-gray-200 text-gray-200'
-            }`}
+              }`}
           />
         ))}
       </div>
@@ -276,8 +285,8 @@ export default function TestimonyManage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {testimonies.map((testimony, index) => (
-            <Card 
-              key={testimony._id} 
+            <Card
+              key={testimony._id}
               hover
               className="group overflow-hidden"
               style={{ animation: `fadeInScale 0.3s ease-out ${index * 0.1}s both` }}
@@ -300,7 +309,7 @@ export default function TestimonyManage() {
                       </div>
                     )}
                   </div>
-                  
+
                   <div className="flex-1 min-w-0">
                     <h3 className="text-base font-bold text-gray-900 truncate">
                       {testimony.name}
@@ -340,7 +349,7 @@ export default function TestimonyManage() {
                     Edit
                   </Button>
                   <Button
-                    onClick={() => handleDelete(testimony._id)}
+                    onClick={() => openDeleteModal(testimony._id)}
                     variant="ghost"
                     size="sm"
                     className="flex-1 text-red-600 hover:bg-red-50"
@@ -411,11 +420,10 @@ export default function TestimonyManage() {
                   className="transition-transform duration-200 hover:scale-110"
                 >
                   <Star
-                    className={`w-8 h-8 ${
-                      rating <= formData.star
+                    className={`w-8 h-8 ${rating <= formData.star
                         ? 'fill-yellow-400 text-yellow-400'
                         : 'fill-gray-200 text-gray-200'
-                    }`}
+                      }`}
                   />
                 </button>
               ))}
@@ -516,11 +524,10 @@ export default function TestimonyManage() {
                   className="transition-transform duration-200 hover:scale-110"
                 >
                   <Star
-                    className={`w-8 h-8 ${
-                      rating <= formData.star
+                    className={`w-8 h-8 ${rating <= formData.star
                         ? 'fill-yellow-400 text-yellow-400'
                         : 'fill-gray-200 text-gray-200'
-                    }`}
+                      }`}
                   />
                 </button>
               ))}
@@ -576,7 +583,7 @@ export default function TestimonyManage() {
                   </div>
                 )}
               </div>
-              
+
               <div>
                 <h3 className="text-xl font-bold text-gray-900">
                   {selectedTestimony.name}
@@ -613,6 +620,22 @@ export default function TestimonyManage() {
           </div>
         )}
       </Modal>
+
+      {/* Delete Confirmation */}
+      <ConfirmModal
+        isOpen={confirmDeleteOpen}
+        onClose={() => {
+          setConfirmDeleteOpen(false);
+          setDeleteTarget(null);
+        }}
+        onConfirm={handleDelete}
+        title="Delete Testimony"
+        message="Are you sure you want to delete this testimony? This action cannot be undone."
+        confirmText="Delete Testimony"
+        cancelText="Cancel"
+        variant="danger"
+        isLoading={loading}
+      />
 
       {/* Animations */}
       <style jsx>{`
