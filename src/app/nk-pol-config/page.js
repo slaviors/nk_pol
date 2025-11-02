@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Home, Image as ImageIcon, MessageSquare, Award, Menu, X } from 'lucide-react';
+import { Home, Image as ImageIcon, MessageSquare, Award, ChevronDown, X, ChevronUp } from 'lucide-react';
 import GalleryPostManage from '@/components/backend-integration/nk-pol-config/GalleryPostManage';
 import ClientLogoManage from '@/components/backend-integration/nk-pol-config/ClientLogoManage';
 import TestimonyManage from '@/components/backend-integration/nk-pol-config/TestimonyManage';
@@ -164,7 +164,7 @@ export default function AdminPage() {
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="sm:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <ChevronUp className="w-6 h-6" /> : <ChevronDown className="w-6 h-6" />}
             </button>
           </div>
 
