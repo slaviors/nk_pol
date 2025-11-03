@@ -7,14 +7,9 @@ export default function ContactMap() {
 
   const locations = [
     {
-      name: 'Workshop & Office 1',
+      name: 'Workshop & Office',
       address: 'Joglo, RT.10/RW.03, Kec. Kembangan, Kota Jakarta Barat, DKI Jakarta 11640',
       mapUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3795.9400806750714!2d106.7474405!3d-6.214832999999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f710d7f8d4e3%3A0x47f76e67fbb18c24!2sNK%20POL%20(%20workshop%20%26%20office%20)!5e1!3m2!1sid!2sid!4v1760434011175!5m2!1sid!2sid'
-    },
-    {
-      name: 'Workshop 2',
-      address: 'Jl. H Briti A No.107, RT.4/RW.6, Kembangan Sel., Kec. Kembangan, Kota Jakarta Barat, DKI Jakarta 11610',
-      mapUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3796.148349975224!2d106.75644969999999!3d-6.185898099999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f70f0434bbab%3A0x7d64ebf2b18e0127!2sJl.%20H%20Briti%20A%20No.107%2C%20RW.6%2C%20Kembangan%20Sel.%2C%20Kec.%20Kembangan%2C%20Kota%20Jakarta%20Barat%2C%20Daerah%20Khusus%20Ibukota%20Jakarta%2011610!5e1!3m2!1sid!2sid!4v1760434617496!5m2!1sid!2sid'
     }
   ];
 
