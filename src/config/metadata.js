@@ -1,16 +1,32 @@
+const getSiteUrl = () => {
+  if (typeof window !== 'undefined') {
+    return window.location.origin;
+  }
+
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, '');
+  }
+
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+
+  return 'https://nkpol.com';
+};
+
 export const siteMetadata = {
   title: 'NK POL - Kontraktor Booth Pameran Berkualitas & Terpercaya',
   description: 'NK POL adalah kontraktor pameran terpercaya sejak 2019 yang menyediakan jasa desain, konstruksi, dan instalasi booth berkualitas dengan harga kompetitif.',
   author: 'NK POL',
-  siteUrl: 'https://nkpol.com',
+  siteUrl: getSiteUrl(),
   locale: 'id_ID',
   ogImage: '/images/og-image.png',
-  
+
   // Contact Information
   phone: '+62 896-7890-1569',
   whatsapp: '+62 896-7890-1569',
   email: 'contact@nkpol.com',
-  
+
   // Company Address
   address: {
     street: 'Joglo, RT.10/RW.03, Kec. Kembangan',
@@ -19,18 +35,18 @@ export const siteMetadata = {
     postalCode: '11640',
     country: 'Indonesia',
   },
-  
+
   // Company Info
   tagline: 'Kontraktor Booth Pameran Berkualitas untuk Brand Anda',
   foundingYear: '2019',
-  
+
   // Company Statistics
   stats: {
     clients: '200+',
     projects: '1000+',
     experience: '5+',
   },
-  
+
   // Vision & Mission
   vision: 'Menjadi mitra terpercaya dalam mewujudkan pameran berkesan melalui inovasi kreatif dan komitmen kepuasan pelanggan.',
   mission: [
@@ -39,7 +55,7 @@ export const siteMetadata = {
     'Ketepatan waktu profesional',
     'Hubungan jangka panjang',
   ],
-  
+
   // Social Media Links
   social: {
     facebook: 'https://www.facebook.com/share/16GDrtk8Tf/',
@@ -80,7 +96,7 @@ export const metadataKeywords = {
     'kontraktor exhibition',
     'booth pameran jakarta'
   ],
-  
+
   // Secondary Keywords
   secondary: [
     'jasa pembuatan booth pameran',
@@ -92,7 +108,7 @@ export const metadataKeywords = {
     'booth pameran profesional',
     'produksi booth pameran',
   ],
-  
+
   // Long-Tail Keywords
   longTail: [
     'kontraktor stand pameran berkualitas',
@@ -108,7 +124,7 @@ export const metadataKeywords = {
     'booth pameran impian',
     'pengalaman pameran berkesan',
   ],
-  
+
   // Location-Based Keywords
   locations: [
     'kontraktor booth pameran jakarta',
@@ -123,7 +139,7 @@ export const metadataKeywords = {
     'kontraktor pameran jakarta barat',
     'kontraktor exhibition jakarta',
   ],
-  
+
   // Service Keywords
   services: [
     'desain booth pameran',
@@ -141,7 +157,7 @@ export const metadataKeywords = {
     'manajemen proyek pameran',
     'koordinasi event pameran',
   ],
-  
+
   // Commercial Keywords (Buyer Intent)
   commercial: [
     'harga booth pameran 3x3',
@@ -169,7 +185,7 @@ export const metadataKeywords = {
 
 // JSON-LD Schema.org Structured Data
 export const jsonLdSchemas = {
-  
+
   // Organization Schema
   organization: {
     '@context': 'https://schema.org',
@@ -516,7 +532,7 @@ export const jsonLdSchemas = {
         .split('-')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
-      
+
       breadcrumbItems.push({
         '@type': 'ListItem',
         position: index + 2,
@@ -570,7 +586,7 @@ export const generateMetadata = (
     ...additionalKeywords,
   ];
 
-  const fullTitle = pageTitle 
+  const fullTitle = pageTitle
     ? pageTitle
     : siteMetadata.title;
 
@@ -646,7 +662,7 @@ export const generateMetadata = (
 
 // Helper: Generate Location Metadata
 export const generateLocationMetadata = (city) => {
-  const locationKeywords = metadataKeywords.locations.filter(kw => 
+  const locationKeywords = metadataKeywords.locations.filter(kw =>
     kw.toLowerCase().includes(city.toLowerCase())
   );
 
