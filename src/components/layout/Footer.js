@@ -55,8 +55,8 @@ export default function Footer() {
     {
       icon: Mail,
       label: t.footer.contact.email,
-      value: 'info@nkpol.com',
-      href: 'mailto:info@nkpol.com',
+      value: 'contact@nkpol.com',
+      href: 'mailto:contact@nkpol.com',
     },
     {
       icon: MapPin,

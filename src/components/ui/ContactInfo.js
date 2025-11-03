@@ -45,10 +45,10 @@ export default function ContactInfo() {
           }
         >
           <a 
-            href="mailto:info@nkpol.com" 
+            href="mailto:contact@nkpol.com" 
             className="block hover:text-red-600 transition-colors font-medium text-sm"
           >
-            info@nkpol.com
+            contact@nkpol.com
           </a>
         </ContactInfoCard>
       </div>

@@ -9,7 +9,7 @@ export const siteMetadata = {
   // Contact Information
   phone: '+62 896-7890-1569',
   whatsapp: '+62 896-7890-1569',
-  email: 'info@nkpol.com',
+  email: 'contact@nkpol.com',
   
   // Company Address
   address: {
