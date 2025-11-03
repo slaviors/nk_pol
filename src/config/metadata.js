@@ -2,9 +2,9 @@ export const siteMetadata = {
   title: 'NK POL - Kontraktor Booth Pameran Berkualitas & Terpercaya',
   description: 'NK POL adalah kontraktor pameran terpercaya sejak 2019 yang menyediakan jasa desain, konstruksi, dan instalasi booth berkualitas dengan harga kompetitif.',
   author: 'NK POL',
-  siteUrl: 'https://www.nkpol.com',
+  siteUrl: 'https://nkpol.com',
   locale: 'id_ID',
-  ogImage: '/images/og-image.jpg',
+  ogImage: '/images/og-image.png',
   
   // Contact Information
   phone: '+62 896-7890-1569',

@@ -1,5 +1,5 @@
 # Robots.txt for NK POL - Kontraktor Stand Pameran
-# Website: https://www.nkpol.com
+# Website: https://nkpol.com
 
 # Allow all crawlers to access all content
 User-agent: *
@@ -20,7 +20,7 @@ Allow: /api/public/
 Crawl-delay: 1
 
 # Sitemap location
-Sitemap: https://www.nkpol.com/sitemap.xml
+Sitemap: https://nkpol.com/sitemap.xml
 
 # Specific rules for major search engines
 User-agent: Googlebot
