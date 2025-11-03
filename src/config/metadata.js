@@ -599,10 +599,11 @@ export const generateMetadata = (
       images: [
         {
           url: `${siteMetadata.siteUrl}${siteMetadata.ogImage}`,
+          secureUrl: `${siteMetadata.siteUrl}${siteMetadata.ogImage}`,
           width: 1200,
           height: 630,
           alt: 'NK POL - Kontraktor Booth Pameran Berkualitas & Terpercaya',
-          type: 'image/jpeg',
+          type: 'image/png',
         },
       ],
     },
