@@ -1,0 +1,33 @@
+{
+  "name": "NK POL - Kontraktor Booth Pameran Berkualitas & Terpercaya",
+  "short_name": "NK POL",
+  "description": "NK POL adalah kontraktor pameran terpadu sejak 2019. Kami menyediakan jasa desain, konstruksi, dan instalasi booth pameran berkualitas tinggi dengan harga kompetitif.",
+  "icons": [
+    {
+      "src": "/images/assets/logo.ico",
+      "sizes": "16x16 32x32",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/images/assets/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/assets/logo.png", 
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#dc2626",
+  "background_color": "#ffffff",
+  "categories": ["business", "construction", "exhibition"],
+  "lang": "id",
+  "dir": "ltr"
+}
