@@ -4,7 +4,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Mail, Phone, MapPin, ArrowRight, Instagram } from 'lucide-react';
+import { Mail, Phone, MapPin, ArrowRight, Instagram, Facebook } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Footer() {
@@ -119,6 +119,15 @@ export default function Footer() {
             </p>
             <div className="flex items-center space-x-4">
               <a
+                href="https://www.facebook.com/nk.pol.750323"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex w-12 h-12 rounded-full bg-gradient-to-br from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 items-center justify-center transition-all duration-300 transform hover:scale-110 hover:shadow-lg hover:shadow-red-600/25 group"
+                aria-label="Facebook"
+              >
+                <Facebook className="w-5 h-5 text-white group-hover:scale-110 transition-transform duration-300" />
+              </a>
+              <a
                 href="https://instagram.com/nk.pol_kontraktor_pameran"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -128,7 +137,7 @@ export default function Footer() {
                 <Instagram className="w-5 h-5 text-white group-hover:scale-110 transition-transform duration-300" />
               </a>
               <div className="text-sm md:text-base text-gray-400">
-                <p className="font-medium text-white">Follow us</p>
+                <p className="font-medium text-white">Follow us on Instagram</p>
                 <p className="text-xs md:text-sm">@nk.pol_kontraktor_pameran</p>
               </div>
             </div>
