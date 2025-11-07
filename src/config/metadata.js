@@ -58,7 +58,7 @@ export const siteMetadata = {
 
   // Social Media Links
   social: {
-    facebook: 'https://www.facebook.com/share/16GDrtk8Tf/',
+    facebook: 'https://www.facebook.com/nk.pol.750323',
     instagram: 'https://www.instagram.com/nk.pol_kontraktor_pameran',
   },
 };
