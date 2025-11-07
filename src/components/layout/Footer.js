@@ -137,8 +137,7 @@ export default function Footer() {
                 <Instagram className="w-5 h-5 text-white group-hover:scale-110 transition-transform duration-300" />
               </a>
               <div className="text-sm md:text-base text-gray-400">
-                <p className="font-medium text-white">Follow us on Instagram</p>
-                <p className="text-xs md:text-sm">@nk.pol_kontraktor_pameran</p>
+                <p className="font-medium text-white">Follow on our social media</p>
               </div>
             </div>
           </div>
