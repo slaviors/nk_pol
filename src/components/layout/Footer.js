@@ -128,7 +128,7 @@ export default function Footer() {
                 <Facebook className="w-5 h-5 text-white group-hover:scale-110 transition-transform duration-300" />
               </a>
               <a
-                href="https://instagram.com/nk.pol_kontraktor_pameran"
+                href="https://instagram.com/nkpol.exhibition"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex w-12 h-12 rounded-full bg-gradient-to-br from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 items-center justify-center transition-all duration-300 transform hover:scale-110 hover:shadow-lg hover:shadow-red-600/25 group"
